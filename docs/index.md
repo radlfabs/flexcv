@@ -19,4 +19,4 @@ The `flexcv` package provides the following features:
 
 ## Contributions
 
-We welcome contributions to this repository. If you have any questions, please contact us at rosenthal.fabian@gmail.com.
+We welcome contributions to this repository. If you have any questions, please don't hesitate to get in contact.
