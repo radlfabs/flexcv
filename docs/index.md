@@ -2,6 +2,8 @@
 
 __Flexible Cross Validation and Machine Learning for Tabular Data__
 
+[Repository](https://github.com/radlfabs/flexcv)
+
 `flexcv` is a Python package that implements flexible cross validation and machine learning for tabular data. It provides a range of features for comparing machine learning models on different datasets with different sets of predictors, customizing just about everything around cross validations. It supports both fixed and random effects, as well as random slopes.
 
 Since we ware in a very early phase and currently preparing the package release, this documentation is under construction and is currently being edited.

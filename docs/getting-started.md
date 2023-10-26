@@ -4,6 +4,8 @@ This guide will help you get started with the `flexcv` package quickly. It will 
 
 ## Installation
 
+Clone our [repository on github](https://github.com/radlfabs/flexcv) to your computer.
+
 `flexcv` was tested using Python v3.10. You can easily install this version of Python using conda (Anaconda or Miniconda). We recommend using a fresh environment for cleanly holding all relevant packages corresponding to this repo. With conda installed, you can create a new Python 3.10 environment, activate it, and install our requirements by running the following lines from the command line:
 
 ```bash
