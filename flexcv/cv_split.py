@@ -54,6 +54,8 @@ class CrossValMethod(Enum):
 
 
 class CustomStratifiedGroupKFold(BaseCrossValidator):
+    """sklearn's StratifiedGroupKFold adapted for continuous target variables.
+    """
     def __init__(self, n_splits, shuffle=True, random_state=42, groups=None):
         self.n_splits = n_splits
         self.shuffle = shuffle
@@ -84,6 +86,9 @@ class CustomStratifiedGroupKFold(BaseCrossValidator):
 
 
 class CustomStratifiedKFold(BaseCrossValidator):
+    """
+    sklearn's StratifiedKFold adapted for continuous target variables. 
+    """
     def __init__(self, n_splits, shuffle=True, random_state=42, groups=None):
         self.n_splits = n_splits
         self.shuffle = shuffle

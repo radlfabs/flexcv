@@ -94,8 +94,7 @@ class DataConfigurator(BaseConfigurator):
     X (pd.DataFrame): Dataframe containing the features.
     y (pd.Series): Series containing the target variable.
     group (pd.Series): Series containing the group variable. If None, the model level is set to "fixed_only".
-    # slopes (bool | str | list[str]): Whether to use random slopes. If True, the random slopes are automatically selected from the dataset variable names table. If False, no random slopes are used. If a string, the column based on the string is used as random slopes. If a list of strings, the random slopes are selected from the dataset based on the list of strings.
-    slopes # TODO add slopes and assert that slopes variable is in X
+    slopes (bool | str | list[str]): Whether to use random slopes. If True, the random slopes are automatically selected from the dataset variable names table. If False, no random slopes are used. If a string, the column based on the string is used as random slopes. If a list of strings, the random slopes are selected from the dataset based on the list of strings.
     model_level (str)
 
     Methods:

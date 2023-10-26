@@ -17,6 +17,8 @@ style_talk = "seaborn-talk"  # refer to plt.style.available
 
 class LinearRegDiagnostic:
     """
+    Implementation by https://www.statsmodels.org/stable/examples/notebooks/generated/linear_regression_diagnostics_plots.html#Simple-multiple-linear-regression
+    
     Diagnostic plots to identify potential problems in a linear regression fit.
     Mainly,
         a. non-linearity of data

@@ -16,19 +16,17 @@ from .cv_metrics import MetricsDict, METRICS
 
 
 class CustomNeptuneCallback(npt_utils.NeptuneCallback):
+    """This class inherits from NeptuneCallback and overrides the __call__ method.
+    The __call__ method is called after each trial and logs the best trial and the plots.
+    The override is necessary because logging each trial is not feasible for multiple models, folds and trials.
+    It would hit Neptune's namespace limits."""
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # self._namespaces = None
 
     def __call__(self, study, trial):
-        # if self._namespaces is None:
-        #     self._namespaces = npt_utils._get_namespaces(study, self._target_names)
-        # self._log_trial(study, trial)
-        # self._log_trial_distributions(trial)
         self._log_best_trials(study)
-        # self._log_study_details(study, trial)
         self._log_plots(study, trial)
-        # self._log_study(study, trial)
 
 
 def log_diagnostics(
@@ -54,8 +52,6 @@ def log_diagnostics(
             ax[i].set_title(col)
             # remove scientific notation for both axes
             ax[i].ticklabel_format(style="plain", axis="both")
-
-        # fig.tight_layout()  # change padding
         return fig
 
     def get_series_hist_fig(ser):
