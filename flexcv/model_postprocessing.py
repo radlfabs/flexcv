@@ -53,7 +53,7 @@ def rf_post(results_all_folds, fold_result, run, *args, **kwargs):
     explainer = shap.TreeExplainer(fold_result.best_model)
     shap_values = explainer.shap_values(fold_result.X_train)
     shap_explainer = explainer(fold_result.X_train)
-    plot.lls_plot_shap(
+    plot.plot_shap(
         shap_values=shap_values,
         X=fold_result.X_train,
         run=run,
@@ -66,7 +66,7 @@ def rf_post(results_all_folds, fold_result, run, *args, **kwargs):
         results_all_folds[fold_result.model_name]["shap_values"].append(shap_values)
 
     shap_values_test = explainer.shap_values(fold_result.X_test)
-    plot.lls_plot_shap(
+    plot.plot_shap(
         shap_values=shap_values_test,
         X=fold_result.X_test,
         run=run,
@@ -81,7 +81,7 @@ def xgboost_post(results_all_folds, fold_result, run, *args, **kwargs):
     explainer = shap.TreeExplainer(fold_result.best_model)
     shap_values = explainer.shap_values(fold_result.X_train)
     shap_explainer = explainer(fold_result.X_train)
-    plot.lls_plot_shap(
+    plot.plot_shap(
         shap_values=shap_values,
         X=fold_result.X_train,
         run=run,
@@ -98,7 +98,7 @@ def xgboost_post(results_all_folds, fold_result, run, *args, **kwargs):
     )
 
     shap_values_test = explainer.shap_values(fold_result.X_test)
-    plot.lls_plot_shap(
+    plot.plot_shap(
         shap_values=shap_values_test,
         X=fold_result.X_test,
         run=run,

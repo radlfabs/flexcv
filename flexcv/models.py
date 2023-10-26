@@ -83,7 +83,6 @@ class LinearModel(BaseLinearModel):
         -----
         This method fits a OLS class on the X data.
         """
-        # X, y = check_X_y(X, y)
         assert (
             X.shape[0] == y.shape[0]
         ), "Number of X samples must match number of y samples."
@@ -137,7 +136,6 @@ class LinearMixedEffectsModel(BaseLinearModel):
         -----
         This method fits a MixedLM to the data.
         """
-        # X, y = check_X_y(X, y)
         assert (
             X.shape[0] == y.shape[0]
         ), "Number of X samples must match number of y samples."
@@ -196,7 +194,6 @@ class LinearMixedEffectsModel(BaseLinearModel):
                 # # If cluster does exist, apply the correction.
                 b_i = self.md_.random_effects[cluster_id]
 
-                # Z_i = self.md.exog_re_li[indices_i]
                 Z_i = Z[indices_i]
                 yp[indices_i] += Z_i.dot(b_i)
 
@@ -281,8 +278,6 @@ class EarthRegressor(BaseEstimator, RegressorMixin):
         numpy2ri.activate()
         pandas2ri.activate()
 
-        # assert type(X) == pd.DataFrame, "X must be a pandas DataFrame."
-        # assert type(y) == pd.Series, "y must be a pandas Series."
         assert (
             X.shape[0] == y.shape[0]
         ), "Number of X samples must match number of y samples."
@@ -342,7 +337,6 @@ class EarthRegressor(BaseEstimator, RegressorMixin):
     def predict(self, X):
         if np.iscomplexobj(X):
             raise ValueError("Complex data not supported")
-        # ro.r('sink(nullfile())')
         ro.r(
             """
             library(earth)
@@ -422,5 +416,4 @@ class EarthRegressor(BaseEstimator, RegressorMixin):
 
 
 if __name__ == "__main__":
-    earth = EarthRegressor()
-    check_estimator(earth)
+    pass

@@ -28,7 +28,7 @@ def set_axes_params(ax) -> None:
     return None
 
 
-def lls_plot_merf_training_stats(
+def plot_merf_training_stats(
     run, model, model_name, num_clusters_to_plot=5
 ) -> None:
     """
@@ -115,7 +115,7 @@ def lls_plot_merf_training_stats(
             )
             run[
                 "Errors"
-            ] = "Error in lls_plot_merf_training_stats: model.trained_b.hist(bins=100, ax=ax)"
+            ] = "Error in plot_merf_training_stats: model.trained_b.hist(bins=100, ax=ax)"
     plt.tight_layout()
     run[f"{model_name}/Plots/Training_Hists"].log(fig)
     plt.close(fig)
@@ -144,7 +144,7 @@ def plot_merf_results(
 
     run[f"{model_name}/Plots/Predictions"].log(fig)
     plt.close(fig)
-    lls_plot_merf_training_stats(
+    plot_merf_training_stats(
         run=run,
         model=model,
         model_name=model_name,
@@ -154,15 +154,7 @@ def plot_merf_results(
     return None
 
 
-def lls_plot_importance(base_result: dict, run=None):
-    fig, ax = plt.subplots(1, 1)
-    plot_importance(base_result["model_out"], max_num_features=10, ax=ax)
-    run["Feature Importance Plots/Base_Importance"].log(fig)
-    plt.close(fig)
-    return None
-
-
-def lls_plot_shap(
+def plot_shap(
     shap_values,
     X: pd.DataFrame,
     run=None,
@@ -207,24 +199,6 @@ def plot_qq(
     return None
 
 
-def plot_residual_hist(
-    y: pd.Series,
-    yhat: pd.Series,
-    run=None,
-    model_name: str = "LM",
-    log_destination: str = "LM_Plots/Residuals/",
-):
-    """Creates residuals histogram and logs it to a Neptune Run."""
-    plt.close()
-    plt.cla()
-    fig = plt.figure()
-    residuals = y - yhat
-    residuals.hist(bins=100)
-    plt.title(f"Histogram of residuals - {model_name}")
-    run[f"{log_destination}{model_name}_Residuals_Hist"].log(fig)
-    del fig
-    return None
-
 
 def permutation_importance(
     model, model_name, X, y, features
@@ -244,3 +218,7 @@ def permutation_importance(
         }
     )
     return fig, df
+
+
+if __name__ == "__main__":
+    pass
