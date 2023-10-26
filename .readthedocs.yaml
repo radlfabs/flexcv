@@ -12,3 +12,6 @@ build:
 
 mkdocs:
   configuration: mkdocs.yml
+  # add material for mkdocs dependency
+  dependencies:
+    - mkdocs-material
