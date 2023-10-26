@@ -2,12 +2,6 @@ import numpy as np
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 
-def rmse_score(y_true, y_pred):
-    """This function calculates the root mean squared error (RMSE) between the true and predicted values.
-    It takes the squared root (numpy) of the sklearn MSE function."""
-    return np.sqrt(mean_squared_error(y_true, y_pred))
-
-
 def mse_wrapper(y_valid, y_pred, y_train_in, y_pred_train):
     """This function is only used to calculate the objective function value for the hyperparameter optimization.
     In order to allow for customized objective functions it takes the validation and training data and the corresponding predictions as arguments.
@@ -19,6 +13,14 @@ def mse_wrapper(y_valid, y_pred, y_train_in, y_pred_train):
 class MetricsDict(dict):
     """A dictionary that maps metric names to functions.
     It can be passed to the cross_validate function to specify which metrics to calculate in the outer loop.
+    By default, the following metrics are initialized:
+    R²: The coefficient of determination
+    MSE: Mean squared error
+    MAE: Mean absolute error
+    
+    We decided againt using the RMSE as a default metric, because we would run into trouble wherever we would average over it.
+    RMSE should always be averaged as `sqrt(mean(MSE_values))` and not as `mean(sqrt(MSE_values))`.
+    Also, the standard deviation would be calculated incorrectly if RMSE is included at this point.
     """
 
     def __init__(self):
@@ -26,7 +28,10 @@ class MetricsDict(dict):
         self["r2"] = r2_score
         self["mse"] = mean_squared_error
         self["mae"] = mean_absolute_error
-        self["rmse"] = rmse_score
 
 
 METRICS = MetricsDict()
+
+
+if __name__ == "__main__":
+    pass
