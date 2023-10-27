@@ -11,15 +11,12 @@ from flexcv.interface import ModelMappingDict
 from flexcv.run import Run
 from flexcv.models import LinearModel
 from flexcv.models import LinearMixedEffectsModel
-
+from flexcv.funcs import empty_func
 
 def simple_regression():
 
     dummy_run = Run()
     X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise=9.1e-2)
-
-    def empty_func(*args, **kwargs):
-        pass
 
     model_map = ModelMappingDict({
         "LinearModel": ModelConfigDict({

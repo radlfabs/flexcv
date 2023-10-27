@@ -15,15 +15,12 @@ from flexcv.run import Run
 from flexcv.models import LinearModel
 from flexcv.models import LinearMixedEffectsModel
 import flexcv.model_postprocessing as mp
-
+from flexcv.funcs import empty_func
 
 def random_forest_regression():
 
     dummy_run = Run()
     X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise=9.1e-2)
-
-    def empty_func(*args, **kwargs):
-        pass
 
     model_map = ModelMappingDict({
         "RandomForest": ModelConfigDict({
