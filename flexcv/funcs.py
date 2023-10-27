@@ -13,6 +13,10 @@ import seaborn as sns
 logger = logging.getLogger(__name__)
 
 
+def empty_func(*args, **kwargs):
+    pass
+
+
 def add_module_handlers(logger: logging.Logger):
     logger = logging.getLogger()  # Get the root logger
     logger.setLevel(logging.INFO)
