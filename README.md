@@ -50,10 +50,44 @@ Now you have installed everything you need to perform flexible cross validation 
 
 ## Getting Started
 
-To get started with the ML Method Comparison Framework, you can import it into your Python script or notebook:
+Note: The interface is currently under review and may be changed soon. Therefore, the getting started may be a off at the moment.
+
+Let's set up a minimal working example using a LinearRegression estimator and some randomly generated regression data.
 
 ```py
+# import the most important object
 from flexcv import CrossValidation
+# import the function for data generation
+from flexcv.data_generation import generate_regression
+# import the model class
+from flexcv.models import LinearModel
+  
+# make sample data
+X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise=9.1e-2)
+  
+# create a model mapping
+model_map = ModelMappingDict({
+    "LinearModel": ModelConfigDict({
+        "model": LinearModel,
+    }),
+})
+
+# instantiate our cross validation class
+cv = CrossValidation()
+
+# now we can use method chaining to set up our configuration perform the cross validation
+results = (
+    cv
+    .set_dataframes(X, y, group, dataset_name="ExampleData")
+    .set_splits(method_outer_split=flexcv.CrossValMethod.GROUP, method_inner_split=flexcv.CrossValMethod.KFOLD)
+    .set_models(model_map)
+    .perform()
+    .get_results()
+)
+
+# results has a summary property which returns a dataframe
+# we can simply call the pandas method "to_excel"
+results.summary.to_excel("my_cv_results.xlsx")
 ```
 
 You can then use the various functions and classes provided by the framework to compare machine learning models on your data.
