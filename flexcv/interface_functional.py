@@ -285,7 +285,10 @@ class CrossValidation:
     def log(self, run: NeptuneRun = None):
         """Logs the config to Neptune"""
         if not run:
-            run = self.config["run"]
+            if hasattr(self.config, "run"):
+                run = self.config["run"]
+            else:
+                run = DummyRun()
         else:
             self.config["run"] = run
 
@@ -348,6 +351,10 @@ class CrossValidation:
 
     @run_padding
     def perform(self):
+        if not hasattr(self.config, "run"):
+            self.config["run"] = DummyRun()
+        run = self.config["run"]
+        
         results = cross_validate(**self.config)
         self.results_ = CrossValidationResults(results)
         if self._was_logged:
@@ -363,35 +370,32 @@ class CrossValidation:
 
 
 if __name__ == "__main__":
+
     import flexcv
-    import neptune
+    from flexcv.data_generation import generate_regression
+    from flexcv.models import LinearModel
 
-    X = pd.DataFrame({"x": [1, 2, 3, 4, 5], "z": [1, 2, 3, 4, 5]})
-    y = pd.Series([1, 2, 3, 4, 5])
+    from flexcv.run import Run # import dummy run object
+    
+    # make sample data
+    X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise=9.1e-2)
+    
+    model_map = ModelMappingDict({
+        "LinearModel": ModelConfigDict({
+            "model": LinearModel,
+        }),
+    })
 
-    map = flexcv.ModelMappingDict(
-        {
-            "LinearModel": flexcv.ModelConfigDict(
-                {
-                    "model": "LinearRegression",
-                    "kwargs": {"fit_intercept": True},
-                }
-            ),
-        }
-    )
-
-    run = neptune.init_run()
     cv = CrossValidation()
 
     results = (
         cv
-        .set_dataframes(X, y)
-        .set_models(map)
-        .set_run(run)
+        .set_dataframes(X, y, group, dataset_name="ExampleData")
+        .set_splits(method_outer_split=flexcv.CrossValMethod.GROUP, method_inner_split=flexcv.CrossValMethod.KFOLD)
+        .set_models(model_map)
+        .set_run(Run())
         .perform()
         .get_results()
     )
 
-    results2 = results.copy()
-
-    merged = results2 + results
+    results.summary.to_excel("my_cv_results.xlsx")
