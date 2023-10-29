@@ -81,20 +81,27 @@ class ModelConfigDict(Dict[str, Type]):
         self._set_defaults()
 
     def _set_defaults(self):
-        if not hasattr(self, "inner_cv"):
-            self["inner_cv"] = False
-        if not hasattr(self, "n_trials"):
-            self["n_trials"] = 100
-        if not hasattr(self, "n_jobs"):
-            self["n_jobs"] = {"n_jobs": 1}
-        if not hasattr(self, "n_jobs_cv"):
-            self["n_jobs_cv"] = 1
-        if not hasattr(self, "params"):
-            self["params"] = {}
-        if not hasattr(self, "post_processor"):
-            self["post_processor"] = empty_func
-        if hasattr(self, "mixed_model") and not hasattr(self, "mixed_name"):
+        # check if dict key exists, if not, set default value
+        self._check_key_set_default("inner_cv", False)
+        self._check_key_set_default("n_trials", 100)
+        self._check_key_set_default("n_jobs", {"n_jobs": 1})
+        self._check_key_set_default("n_jobs_cv", 1)
+        self._check_key_set_default("params", {})
+        self._check_key_set_default("post_processor", empty_func)
+
+        if self._has_key("mixed_model") and not self._has_key("mixed_name"):
             self["mixed_name"] = self["mixed_model"].__repr__()
+
+    def _has_key(self, key):
+        try:
+            self[key]
+            return True
+        except KeyError:
+            return False
+        
+    def _check_key_set_default(self, key, default):
+        if not self._has_key(key):
+            self[key] = default
 
 
 class ModelMappingDict(Dict[str, ModelConfigDict]):
