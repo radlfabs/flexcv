@@ -140,8 +140,8 @@ def cross_validate(
         X_test = X.iloc[test_index]
         y_test = y.iloc[test_index]  # type: ignore
 
-        cluster_train = groups.iloc[train_index]  # type: ignore
-        cluster_test = groups.iloc[test_index]  # type: ignore
+        cluster_train = groups.iloc[train_index] if groups is not None else None  # type: ignore
+        cluster_test = groups.iloc[test_index]  if groups is not None else None # type: ignore
 
         #### ALTERNATIVE IMPLEMENTATION USING SCIKIT LEARTN PIPELINES ####
 
