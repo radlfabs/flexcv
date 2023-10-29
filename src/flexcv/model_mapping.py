@@ -91,8 +91,8 @@ class ModelConfigDict(Dict[str, Type]):
             self["n_jobs_cv"] = 1
         if not hasattr(self, "params"):
             self["params"] = {}
-        if not hasattr(self, "model_post_processor"):
-            self["model_post_processor"] = empty_func
+        if not hasattr(self, "post_processor"):
+            self["post_processor"] = empty_func
         if hasattr(self, "mixed_model") and not hasattr(self, "mixed_name"):
             self["mixed_name"] = self["mixed_model"].__repr__()
 
