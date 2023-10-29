@@ -2,58 +2,34 @@ import pandas as pd
 import numpy as np
 
 from flexcv.data_generation import generate_regression
-from flexcv.interface import DataConfigurator
-from flexcv.interface import CrossValConfigurator
-from flexcv.interface import RunConfigurator
-from flexcv.interface import CrossValidation
-from flexcv.interface import ModelConfigDict
-from flexcv.interface import ModelMappingDict
+from flexcv.interface_functional import CrossValidation
+from flexcv.interface_functional import ModelConfigDict
+from flexcv.interface_functional import ModelMappingDict
 from flexcv.run import Run
 from flexcv.models import LinearModel
-from flexcv.models import LinearMixedEffectsModel
-from flexcv.funcs import empty_func
 
 def simple_regression():
 
-    dummy_run = Run()
     X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise=9.1e-2)
-
-    model_map = ModelMappingDict({
-        "LinearModel": ModelConfigDict({
-            "inner_cv": False,
-            "n_jobs_model": {"n_jobs": 1},
-            "model": LinearModel,
-            "params": {},
-            "post_processor": empty_func,
-        }),
-    })
-        
-    data_config = DataConfigurator(
-        dataset_name="random_example",
-        model_level="fixed_only",
-        target_name=y.name,
-        X=X,
-        y=y,
-        group=group,
-        slopes=random_slopes,
+    model_map = ModelMappingDict(
+        {
+            "LinearModel": ModelConfigDict(
+                {
+                    "model": LinearModel,
+                }
+            ),
+        }
+    )
+    
+    cv = CrossValidation()
+    results = (
+        cv.set_dataframes(X, y, group, random_slopes)
+        .set_models(model_map)
+        .set_run(Run())
+        .perform()
+        .get_results()
     )
 
-    cv_config = CrossValConfigurator(
-        n_splits=3,
-    )
-
-    run_config = RunConfigurator(
-        run=dummy_run
-    )
-
-    cv = CrossValidation(
-        data_config=data_config,
-        cross_val_config=cv_config,
-        run_config=run_config,
-        model_mapping=model_map,
-    )
-
-    results = cv.perform()
     n_values = len(results["LinearModel"]["metrics"])
     r2_values = [results["LinearModel"]["metrics"][k]["r2"] for k in range(n_values)]
     return np.mean(r2_values)

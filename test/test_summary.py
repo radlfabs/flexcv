@@ -2,15 +2,10 @@ import pandas as pd
 import numpy as np
 
 from flexcv.data_generation import generate_regression
-from flexcv.interface import DataConfigurator
-from flexcv.interface import CrossValConfigurator
-from flexcv.interface import RunConfigurator
-from flexcv.interface import CrossValidation
-from flexcv.interface import ModelConfigDict
-from flexcv.interface import ModelMappingDict
+from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
+from flexcv.interface_functional import CrossValidation
 from flexcv.run import Run
 from flexcv.models import LinearModel
-from flexcv.models import LinearMixedEffectsModel
 from flexcv.funcs import empty_func
 
 def regression_with_summary():
@@ -27,32 +22,14 @@ def regression_with_summary():
         }),
     })
         
-    data_config = DataConfigurator(
-        dataset_name="random_example",
-        model_level="fixed_only",
-        target_name=y.name,
-        X=X,
-        y=y,
-        group=group,
-        slopes=random_slopes,
+    cv = CrossValidation()
+    results = (
+        cv.set_dataframes(X, y, group, random_slopes)
+        .set_models(model_map)
+        .set_run(Run())
+        .perform()
+        .get_results()
     )
-
-    cv_config = CrossValConfigurator(
-        n_splits=3,
-    )
-
-    run_config = RunConfigurator(
-        run=dummy_run
-    )
-
-    cv = CrossValidation(
-        data_config=data_config,
-        cross_val_config=cv_config,
-        run_config=run_config,
-        model_mapping=model_map,
-    )
-
-    results = cv.perform()
     return results.summary
 
 def test_summary():

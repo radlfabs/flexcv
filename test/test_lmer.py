@@ -3,9 +3,8 @@ import pandas as pd
 
 from flexcv.data_generation import generate_regression
 from flexcv.funcs import empty_func
-from flexcv.interface import (CrossValConfigurator, CrossValidation,
-                              DataConfigurator, ModelConfigDict,
-                              ModelMappingDict, RunConfigurator)
+from flexcv.interface_functional import CrossValidation
+from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
 from flexcv.models import LinearMixedEffectsModel, LinearModel
 from flexcv.run import Run
 
@@ -34,30 +33,16 @@ def simple_regression():
         }
     )
 
-    data_config = DataConfigurator(
-        dataset_name="random_example",
-        model_level="mixed",
-        target_name=y.name,
-        X=X,
-        y=y,
-        group=group,
-        slopes=random_slopes,
+    cv = CrossValidation()
+    results = (
+        cv.set_dataframes(X, y, group, random_slopes)
+        .set_splits(n_splits_out=3)
+        .set_models(model_map, model_effects="mixed")
+        .set_run(Run())
+        .perform()
+        .get_results()
     )
-
-    cv_config = CrossValConfigurator(
-        n_splits=3,
-    )
-
-    run_config = RunConfigurator(run=dummy_run)
-
-    cv = CrossValidation(
-        data_config=data_config,
-        cross_val_config=cv_config,
-        run_config=run_config,
-        model_mapping=model_map,
-    )
-
-    results = cv.perform()
+    
     n_values = len(results["MixedLM"]["metrics"])
     r2_values = [results["MixedLM"]["metrics"][k]["r2"] for k in range(n_values)]
     return np.mean(r2_values)
