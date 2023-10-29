@@ -7,14 +7,14 @@ import pandas as pd
 from neptune.metadata_containers.run import Run as NeptuneRun
 from neptune.types import File
 
-from .cross_validate import cross_validate
-from .cv_metrics import MetricsDict
-from .cv_objective import ObjectiveScorer
-from .cv_results import CrossValidationResults
-from .cv_split import CrossValMethod
-from .funcs import add_module_handlers, run_padding
-from .model_mapping import ModelConfigDict, ModelMappingDict
-from .run import DummyRun
+from cross_validate import cross_validate
+from cv_metrics import MetricsDict
+from cv_objective import ObjectiveScorer
+from cv_results import CrossValidationResults
+from cv_split import CrossValMethod
+from funcs import add_module_handlers, run_padding
+from model_mapping import ModelConfigDict, ModelMappingDict
+from run import DummyRun
 
 logger = logging.getLogger(__name__)
 add_module_handlers(logger)
@@ -405,3 +405,27 @@ if __name__ == "__main__":
     )
 
     results.summary.to_excel("my_cv_results.xlsx")
+
+
+if __name__ == "__main__":
+    from data_generation import generate_regression
+    
+    X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise=9.1e-2)
+    model_map = ModelMappingDict(
+        {
+            "LinearModel": ModelConfigDict(
+                {
+                    "model": LinearModel,
+                }
+            ),
+        }
+    )
+    
+    cv = CrossValidation()
+    results = (
+        cv.set_dataframes(X, y, group, random_slopes)
+        .set_models(model_map)
+        .set_run(DummyRun())
+        .perform()
+        .get_results()
+    )

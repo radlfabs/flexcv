@@ -211,7 +211,7 @@ class MergedSummary(CrossValidationResults):
         """Merges the two summaries dataframes into one."""
         return pd.concat([self.cv_results_1.summary, self.cv_results_2.summary], axis=1)
 
-    def __add__(self, other: CrossValidationResults | MergedSummary) -> MergedSummary:
+    def __add__(self, other) -> MergedSummary:
         return super().__add__(other)
 
 
