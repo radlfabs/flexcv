@@ -37,6 +37,12 @@ requires-python = ">=3.10"
 "Bug Tracker" = "https://github.com/radlfabs/flexcv/issues"
 "Docs" = "radlfabs.github.io/flexcv"
 
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["flexcv*"]
+exclude = ["dev_env*"]  # empty by default
+namespaces = false  # true by default
+
 [isort]
 profile = "black"
 known_first_party = "flexcv"
