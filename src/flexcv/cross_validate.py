@@ -44,12 +44,12 @@ def cross_validate(
     split_out: CrossValMethod,
     split_in: CrossValMethod,
     break_cross_val: bool,
-    scale_inner_fold: bool,
-    scale_outer_fold: bool,
+    scale_in: bool,
+    scale_out: bool,
     n_splits_out: int,
     n_splits_in: int,
     random_seed: int,
-    effects: str,
+    model_effects: str,
     n_trials: int,
     mapping: ModelMappingDict,
     metrics: MetricsDict,
@@ -123,7 +123,7 @@ def cross_validate(
     )
 
     model_keys = list(mapping.keys())
-    if effects == "mixed":
+    if model_effects == "mixed":
         for inner_dict in mapping.values():
             model_keys.append(inner_dict["mixed_name"])
 
@@ -166,7 +166,7 @@ def cross_validate(
         }
         """
 
-        if scale_outer_fold:
+        if scale_out:
             # apply standard scaler but preserve the type pd.DataFrame
             scaler = StandardScaler()
             X_train_scaled = pd.DataFrame(
@@ -185,7 +185,7 @@ def cross_validate(
             Z_train_slope = slopes.iloc[train_index]
             Z_test_slope = slopes.iloc[test_index]
 
-            if scale_outer_fold:
+            if scale_out:
                 scaler = StandardScaler()
                 Z_train_slope_scaled = pd.DataFrame(
                     scaler.fit_transform(Z_train_slope),
@@ -220,7 +220,7 @@ def cross_validate(
 
         ##### DIAGNOSTICS #####
         if diagnostics:
-            if effects == "mixed":
+            if model_effects == "mixed":
                 to_diagnose = {
                     "effects": 4,
                     "cluster_train": cluster_train,
@@ -242,7 +242,7 @@ def cross_validate(
                 param_grid = mapping[model_name]["params"]
             # get bool in mapping[model_name]["inner_cv"] and negate it
             skip_inner_cv = not mapping[model_name]["inner_cv"]
-            n_jobs_model_dict = mapping[model_name]["n_jobs_model"]
+            n_jobs_model_dict = mapping[model_name]["n_jobs"]
             model_seed = {} if "SVR" in model_name else {"random_state": RANDOM_SEED}
 
             # build inner cv folds
@@ -260,7 +260,7 @@ def cross_validate(
             else:
                 n_trials
                 n_jobs_cv_int = mapping[model_name]["n_jobs_cv"]
-                if not scale_inner_fold:
+                if not scale_in:
                     pipe_in = Pipeline(
                         [
                             (
@@ -409,7 +409,7 @@ def cross_validate(
             # store the level 4 model in the model_results_dict
             # run the level 4 postprocessing
 
-            if (effects == "mixed") and mapping[model_name]["mixed_name"]:
+            if (model_effects == "mixed") and mapping[model_name]["mixed_name"]:
                 logger.info(f"Evaluating {mapping[model_name]['mixed_name']}...")
                 # tag the base prediction
                 y_pred_base = y_pred.copy()

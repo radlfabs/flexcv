@@ -14,7 +14,7 @@ from cv_results import CrossValidationResults
 from cv_split import CrossValMethod
 from funcs import add_module_handlers, run_padding
 from model_mapping import ModelConfigDict, ModelMappingDict
-from run import DummyRun
+from run import Run as DummyRun
 
 logger = logging.getLogger(__name__)
 add_module_handlers(logger)
@@ -57,6 +57,7 @@ class CrossValidation:
     """
 
     def __init__(self) -> None:
+        self._was_logged = False
         self.config = {
             # Data related
             "X": None,
@@ -66,7 +67,8 @@ class CrossValidation:
             "groups": None,
             "slopes": None,
             # CV strategy related
-            "n_splits": 5,
+            "n_splits_out": 5,
+            "n_splits_in": 5,
             "split_out": CrossValMethod.KFOLD,
             "split_in": CrossValMethod.KFOLD,
             "scale_out": True,
@@ -74,7 +76,7 @@ class CrossValidation:
             "metrics": None,
             # models and optimisation
             "mapping": None,
-            "effects": "fixed",
+            "model_effects": "fixed",
             # optimization related
             "n_trials": 100,
             "objective_scorer": None,
@@ -149,57 +151,62 @@ class CrossValidation:
         self.config["slopes"] = slopes
         if target_name:
             self.config["target_name"] = target_name
+        else:
+            self.config["target_name"] = y.name
         if dataset_name:
             self.config["dataset_name"] = dataset_name
         return self
 
     def set_splits(
         self,
-        method_outer_split: CrossValMethod | str = CrossValMethod.KFOLD,
-        method_inner_split: CrossValMethod | str = CrossValMethod.KFOLD,
-        n_splits: int = 5,
-        scale_inner_fold: bool = True,
-        scale_outer_fold: bool = True,
+        split_out: CrossValMethod | str = CrossValMethod.KFOLD,
+        split_in: CrossValMethod | str = CrossValMethod.KFOLD,
+        n_splits_out: int = 5,
+        n_splits_in: int = 5,
+        scale_in: bool = True,
+        scale_out: bool = True,
         break_cross_val: bool = False,
         metrics: MetricsDict = None,
     ):
-        ALLOWED_METHODS = CrossValMethod.allowed_methods
+        # get values of CrossValMethod enums
+        ALLOWED_METHODS = [method.value for method in CrossValMethod]
 
         # check values
-        if not isinstance(method_outer_split, CrossValMethod) and not isinstance(
-            method_outer_split, str
+        if not isinstance(split_out, CrossValMethod) and not isinstance(
+            split_out, str
         ):
-            raise TypeError("method_outer_split must be a CrossValMethod")
-        if not isinstance(method_inner_split, CrossValMethod) and not isinstance(
-            method_inner_split, str
+            raise TypeError("split_out must be a CrossValMethod")
+        if not isinstance(split_in, CrossValMethod) and not isinstance(
+            split_in, str
         ):
-            raise TypeError("method_inner_split must be a CrossValMethod")
-        if method_outer_split not in ALLOWED_METHODS and isinstance(
-            method_outer_split, str
+            raise TypeError("split_in must be a CrossValMethod")
+        if split_out not in ALLOWED_METHODS and isinstance(
+            split_out, str
         ):
-            raise ValueError(f"method_outer_split must be one of {ALLOWED_METHODS}")
-        if method_inner_split not in ALLOWED_METHODS and isinstance(
-            method_inner_split, str
+            raise ValueError(f"split_out must be one of {ALLOWED_METHODS}")
+        if split_in not in ALLOWED_METHODS and isinstance(
+            split_in, str
         ):
-            raise ValueError(f"method_inner_split must be one of {ALLOWED_METHODS}")
+            raise ValueError(f"split_in must be one of {ALLOWED_METHODS}")
 
-        if not isinstance(n_splits, int):
-            raise TypeError("n_splits must be an integer")
-        if not isinstance(scale_inner_fold, bool):
-            raise TypeError("scale_inner_fold must be a boolean")
-        if not isinstance(scale_outer_fold, bool):
-            raise TypeError("scale_outer_fold must be a boolean")
+        if not isinstance(n_splits_out, int):
+            raise TypeError("n_splits_out must be an integer")
+        if not isinstance(scale_in, bool):
+            raise TypeError("scale_in must be a boolean")
+        if not isinstance(scale_out, bool):
+            raise TypeError("scale_out must be a boolean")
         if not isinstance(break_cross_val, bool):
             raise TypeError("break_cross_val must be a boolean")
         if metrics and not isinstance(metrics, MetricsDict):
             raise TypeError("metrics must be a MetricsDict")
 
         # assign values
-        self.config["method_out"] = method_outer_split
-        self.config["method_in"] = method_inner_split
-        self.config["n_splits"] = n_splits
-        self.config["scale_inner_fold"] = scale_inner_fold
-        self.config["scale_outer_fold"] = scale_outer_fold
+        self.config["split_out"] = split_out
+        self.config["split_in"] = split_in
+        self.config["n_splits_out"] = n_splits_out
+        self.config["n_splits_in"] = n_splits_in
+        self.config["scale_in"] = scale_in
+        self.config["scale_out"] = scale_out
         self.config["break_cross_val"] = break_cross_val
         if metrics:
             self.config["metrics"] = metrics
@@ -295,7 +302,7 @@ class CrossValidation:
 
         run["data/dataset_name"].log(self.config["dataset_name"])
         run["data/target_name"].log(self.config["target_name"])
-        run["data/effects"].log(self.config["effects"])
+        run["data/model_effects"].log(self.config["model_effects"])
 
         run["data/X"].upload(File.as_html(self.config["X"]))
         run["data/y"].upload(File.as_html(pd.DataFrame(self.config["y"])))
@@ -395,8 +402,8 @@ if __name__ == "__main__":
     results = (
         cv.set_dataframes(X, y, group, dataset_name="ExampleData")
         .set_splits(
-            method_outer_split=flexcv.CrossValMethod.GROUP,
-            method_inner_split=flexcv.CrossValMethod.KFOLD,
+            split_out=flexcv.CrossValMethod.GROUP,
+            split_in=flexcv.CrossValMethod.KFOLD,
         )
         .set_models(model_map)
         .set_run(Run())

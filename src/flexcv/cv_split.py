@@ -8,14 +8,6 @@ from sklearn.model_selection import (BaseCrossValidator, GroupKFold, KFold,
                                      StratifiedGroupKFold, StratifiedKFold)
 from sklearn.preprocessing import KBinsDiscretizer
 
-ALLOWED_METHODS = [
-    "KFOLD",
-    "GROUP",
-    "STRATGROUP",
-    "CUSTOMSTRATGROUP",
-    "CUSTOMSTRAT",
-]
-
 
 class CrossValMethod(Enum):
     """Enum class to assign CrossValMethods to the cross_val() function.
@@ -42,11 +34,6 @@ class CrossValMethod(Enum):
     CUSTOMSTRAT = "CustomStratifiedKFold"
     STRATGROUP = "StratifiedGroupKFold"
     CUSTOMSTRATGROUP = "CustomStratifiedGroupKFold"
-
-    @property
-    @classmethod
-    def allowed_methods(self):
-        return ALLOWED_METHODS
 
 
 class CustomStratifiedGroupKFold(BaseCrossValidator):
