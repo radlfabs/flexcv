@@ -8,9 +8,9 @@ import rpy2.robjects as ro
 import shap
 from neptune.types import File
 
-import plot
-from plot import permutation_importance
-from statsmodels_diagnostics import LinearRegDiagnostic
+from . import plot
+from .plot import permutation_importance
+from .statsmodels_diagnostics import LinearRegDiagnostic
 
 mpl.use("Agg")
 logger = logging.getLogger(__name__)

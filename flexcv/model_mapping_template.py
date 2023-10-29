@@ -3,10 +3,10 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.svm import SVR
 from xgboost import XGBRegressor
 
-from  import model_postprocessing as mp
-from merf_adaptation import MERF
-from model_mapping import ModelConfigDict, ModelMappingDict
-from models import EarthRegressor, LinearMixedEffectsModel, LinearModel
+from . import model_postprocessing as mp
+from .merf_adaptation import MERF
+from .model_mapping import ModelConfigDict, ModelMappingDict
+from .models import EarthRegressor, LinearMixedEffectsModel, LinearModel
 
 MODEL_MAPPING = ModelMappingDict(
     {

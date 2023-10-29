@@ -11,7 +11,7 @@ from main import main
 from neptune.types import File
 from run import RunConfigurator
 
-import flexcv.cross_val_split as cross_val_split
+from . import cross_val_split as cross_val_split
 
 logger = logging.getLogger(__name__)
 

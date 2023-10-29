@@ -1,6 +1,6 @@
 from typing import Dict, Type
 
-from funcs import empty_func
+from .funcs import empty_func
 
 """
 - Model mapping is a dictionary of dictionaries, where the keys of the outer dictionary are the names of the models

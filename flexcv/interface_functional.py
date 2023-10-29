@@ -7,14 +7,14 @@ import pandas as pd
 from neptune.metadata_containers.run import Run as NeptuneRun
 from neptune.types import File
 
-from cross_validate import cross_validate
-from cv_metrics import MetricsDict
-from cv_objective import ObjectiveScorer
-from cv_results import CrossValidationResults
-from cv_split import CrossValMethod
-from funcs import add_module_handlers, run_padding
-from model_mapping import ModelConfigDict, ModelMappingDict
-from run import Run as DummyRun
+from .cross_validate import cross_validate
+from .cv_metrics import MetricsDict
+from .cv_objective import ObjectiveScorer
+from .cv_results import CrossValidationResults
+from .cv_split import CrossValMethod
+from .funcs import add_module_handlers, run_padding
+from .model_mapping import ModelConfigDict, ModelMappingDict
+from .run import Run as DummyRun
 
 logger = logging.getLogger(__name__)
 add_module_handlers(logger)

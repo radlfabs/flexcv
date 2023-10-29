@@ -13,7 +13,7 @@ import seaborn as sns
 from neptune.types import File
 from optuna.study import Study
 
-from cv_metrics import METRICS, MetricsDict
+from .cv_metrics import METRICS, MetricsDict
 
 
 class CustomNeptuneCallback(npt_utils.NeptuneCallback):
