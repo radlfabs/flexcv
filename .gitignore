@@ -47,3 +47,6 @@ src/EasyFlexyML.egg-info/PKG-INFO
 src/EasyFlexyML.egg-info/requires.txt
 src/EasyFlexyML.egg-info/SOURCES.txt
 src/EasyFlexyML.egg-info/top_level.txt
+/flexcv-env
+/dev_env
+.pre-commit-config.yaml

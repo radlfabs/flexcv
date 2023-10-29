@@ -29,15 +29,32 @@ The `flexcv` package provides the following features:
 
 First, clone this repository.
 
-To use `flexcv` you will need Python v3.10. You can easily install this version of Python using conda (Anaconda or Miniconda). We recommend using a fresh environment for cleanly holding all relevant packages corresponding to this repo. With conda installed you can create a new Python 3.10 environment, activate it and install our requirements by running the following lines from the command line:
+To use `flexcv` you will need Python v 3.10 or v3.11. Some dependencies are not yet compatible with Python version 3.12. As soon as they update their compatibility we can support Python 3.12 as well.
+
+##### Using conda
+
+You can easily install this version of Python using conda (Anaconda or Miniconda). We recommend using a fresh environment for cleanly holding all relevant packages corresponding to this repo. With conda installed you can create a new Python 3.10 environment, activate it and install our requirements by running the following lines from the command line:
 
 ```bash
-conda create --n flexcv python=3.10
+conda create --name flexcv python=3.10
 conda activate flexcv
 conda install pip
 cd path/to/this/repo
-pip install -r requirements.txt
+pip install -r flexcv/requirements.txt
 ```
+
+##### Using env
+
+To separate Python environments on your system, you can also use the `venv` package from the standard library.
+
+```bash
+cd path/to/this/repo
+python -m venv my_env_name
+my_env_name/Scripts/activate
+pip install flexcv/requirements.txt
+```
+
+##### Additional dependencies `rpy2`
 
 Some of our model classes are actually wrapping around `rpy2` code and are using `R` under the hood. To use them, you should use a recent `R` version and run our `install_rpackages.py` script:
 
