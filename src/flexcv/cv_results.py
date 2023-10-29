@@ -187,7 +187,7 @@ class CrossValidationResults(dict):
         If the key is not found, returns None and will not raise an error."""
         return self[model_name].get("parameters", [None])[fold_id]
 
-    def __add__(self, other: CrossValidationResults | MergedSummary) -> MergedSummary:
+    def __add__(self, other) -> MergedSummary:
         """Adds two CrossValidationResults summaries.
         The result is a MergedResult object.
         """
