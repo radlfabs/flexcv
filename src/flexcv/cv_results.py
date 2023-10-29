@@ -30,7 +30,7 @@ def add_summary_stats(df: pd.DataFrame) -> pd.DataFrame:
     df.loc["median"] = original_fold_slice.median(skipna=True)
     df.loc["std"] = original_fold_slice.std(skipna=True)
     return df
-
+    
 
 class CrossValidationResults(dict):
     """A summary of the results of CrossValidation.perform().
@@ -187,18 +187,18 @@ class CrossValidationResults(dict):
         If the key is not found, returns None and will not raise an error."""
         return self[model_name].get("parameters", [None])[fold_id]
 
-    def __add__(self, other) -> MergedSummary:
+    def __add__(self, other):
         """Adds two CrossValidationResults summaries.
         The result is a MergedResult object.
         """
-        return MergedSummary(self, other)
+        raise NotImplementedError
 
 
 class MergedSummary(CrossValidationResults):
     def __init__(
         self,
-        cv_results_1: CrossValidationResults | MergedSummary,
-        cv_results_2: CrossValidationResults | MergedSummary,
+        cv_results_1,
+        cv_results_2,
     ):
         self.cv_results_1 = cv_results_1
         self.cv_results_2 = cv_results_2
@@ -211,48 +211,9 @@ class MergedSummary(CrossValidationResults):
         """Merges the two summaries dataframes into one."""
         return pd.concat([self.cv_results_1.summary, self.cv_results_2.summary], axis=1)
 
-    def __add__(self, other) -> MergedSummary:
-        return super().__add__(other)
-
-
-import unittest
-
-from flexcv.interface import (CrossValidation, CrossValidationResults,
-                              MergedSummary)
-
-
-class TestCrossValidation(unittest.TestCase):
-    def setUp(self):
-        # Initialize CrossValidation instances here
-        self.cv1 = CrossValidation(...)
-        self.cv2 = CrossValidation(...)
-
-    def test_perform(self):
-        # Test the perform method of CrossValidation
-        result1 = self.cv1.perform()
-        result2 = self.cv2.perform()
-
-        self.assertIsInstance(result1, CrossValidationResults)
-        self.assertIsInstance(result2, CrossValidationResults)
-
-    def test_add_CrossValidationResults(self):
-        # Test the __add__ method for two CrossValidationResults instances
-        result1 = self.cv1.perform()
-        result2 = self.cv2.perform()
-
-        merged_result = result1 + result2
-
-        self.assertIsInstance(merged_result, MergedSummary)
-
-    def test_add_MergedResults_CrossValidationResults(self):
-        # Test the __add__ method for MergedResults and CrossValidationResults
-        result1 = self.cv1.perform()
-        result2 = self.cv2.perform()
-
-        merged_result = result1 + result2
-        new_merged_result = merged_result + result1
-
-        self.assertIsInstance(new_merged_result, MergedSummary)
+    def __add__(self, other):
+        raise NotImplementedError
+    
 
 
 if __name__ == "__main__":
