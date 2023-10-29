@@ -159,8 +159,8 @@ class CrossValidation:
 
     def set_splits(
         self,
-        split_out: CrossValMethod | str = CrossValMethod.KFOLD,
-        split_in: CrossValMethod | str = CrossValMethod.KFOLD,
+        split_out: CrossValMethod = CrossValMethod.KFOLD,
+        split_in: CrossValMethod = CrossValMethod.KFOLD,
         n_splits_out: int = 5,
         n_splits_in: int = 5,
         scale_in: bool = True,
@@ -170,31 +170,25 @@ class CrossValidation:
     ):
         # get values of CrossValMethod enums
         ALLOWED_METHODS = [method.value for method in CrossValMethod]
-
+        ALLOWED_ENUNMS = [method for method in CrossValMethod]
         # check values
-        if not isinstance(split_out, CrossValMethod) and not isinstance(
-            split_out, str
-        ):
-            raise TypeError("split_out must be a CrossValMethod")
-        if not isinstance(split_in, CrossValMethod) and not isinstance(
-            split_in, str
-        ):
-            raise TypeError("split_in must be a CrossValMethod")
-        if split_out not in ALLOWED_METHODS and isinstance(
-            split_out, str
-        ):
-            raise ValueError(f"split_out must be one of {ALLOWED_METHODS}")
-        if split_in not in ALLOWED_METHODS and isinstance(
-            split_in, str
-        ):
-            raise ValueError(f"split_in must be one of {ALLOWED_METHODS}")
 
+        if not (split_out.value in ALLOWED_METHODS):
+            raise TypeError("split_out must be a CrossValMethod ")
+        
+        if not (split_in.value in ALLOWED_METHODS):
+            raise TypeError("split_in must be a CrossValMethod")
+        
         if not isinstance(n_splits_out, int):
             raise TypeError("n_splits_out must be an integer")
+        if not isinstance(n_splits_in, int):
+            raise TypeError("n_splits_in must be an integer")
+        
         if not isinstance(scale_in, bool):
             raise TypeError("scale_in must be a boolean")
         if not isinstance(scale_out, bool):
             raise TypeError("scale_out must be a boolean")
+        
         if not isinstance(break_cross_val, bool):
             raise TypeError("break_cross_val must be a boolean")
         if metrics and not isinstance(metrics, MetricsDict):
@@ -378,43 +372,8 @@ class CrossValidation:
 
 
 if __name__ == "__main__":
-
-    import flexcv
-    from flexcv.data_generation import generate_regression
-    from flexcv.models import LinearModel
-    from flexcv.run import Run  # import dummy run object
-
-    # make sample data
-    X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise=9.1e-2)
-
-    model_map = ModelMappingDict(
-        {
-            "LinearModel": ModelConfigDict(
-                {
-                    "model": LinearModel,
-                }
-            ),
-        }
-    )
-
-    cv = CrossValidation()
-
-    results = (
-        cv.set_dataframes(X, y, group, dataset_name="ExampleData")
-        .set_splits(
-            split_out=flexcv.CrossValMethod.GROUP,
-            split_in=flexcv.CrossValMethod.KFOLD,
-        )
-        .set_models(model_map)
-        .set_run(Run())
-        .perform()
-        .get_results()
-    )
-
-    results.summary.to_excel("my_cv_results.xlsx")
-
-
-if __name__ == "__main__":
+    import numpy as np
+    from models import LinearModel
     from data_generation import generate_regression
     
     X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise=9.1e-2)
@@ -436,3 +395,7 @@ if __name__ == "__main__":
         .perform()
         .get_results()
     )
+    
+    n_values = len(results["LinearModel"]["metrics"])
+    r2_values = [results["LinearModel"]["metrics"][k]["r2"] for k in range(n_values)]
+    print(f"Mean R2: {np.mean(r2_values)}")
