@@ -160,11 +160,6 @@ def make_model_config_from_estimator(
     )
 
 
-# EM parameters as fine tuned by SV and FR in call on 2023-09-04
-EM_MAX_ITER_PER_DATASET: Dict[str, int] = {"HSDD": 200, "ARAUSD": 50, "ISD": 300}
-EM_WINDOW_PER_DATASET: Dict[str, int] = {"HSDD": 50, "ARAUSD": 15, "ISD": 25}
-EM_THRESH_PER_DATASET: Dict[str, float] = {"HSDD": 0.025, "ARAUSD": 0.005, "ISD": 0.01}
-
 MIXED_TO_BASE_MODEL_MAPPING: Dict[str, str] = {
     "MixedLM": "LinearModel",
     "MERF": "RandomForest",
@@ -175,6 +170,7 @@ MIXED_TO_BASE_MODEL_MAPPING: Dict[str, str] = {
 
 
 if __name__ == "__main__":
+    # test default values
     mymodel = ModelConfigDict()
     print(mymodel.__repr__)
     print()

@@ -20,8 +20,6 @@ from .cv_objective import ObjectiveScorer, objective_cv
 from .cv_split import CrossValMethod, make_cross_val_split
 from .funcs import get_fixed_effects_formula, get_re_formula
 from .model_mapping import ModelMappingDict
-from .model_mapping import (EM_MAX_ITER_PER_DATASET, EM_THRESH_PER_DATASET,
-                            EM_WINDOW_PER_DATASET)
 
 warnings.filterwarnings("ignore", module=r"matplotlib\..*")
 warnings.filterwarnings("ignore", module=r"xgboost\..*")
@@ -102,18 +100,12 @@ def cross_validate(
 
     if isinstance(em_max_iterations, int):
         max_iterations = em_max_iterations
-    elif em_max_iterations == "mapped":
-        max_iterations = EM_MAX_ITER_PER_DATASET[dataset_name]
 
     if isinstance(em_stopping_window, int):
         em_window = em_stopping_window
-    elif em_stopping_window == "mapped":
-        em_window = EM_WINDOW_PER_DATASET[dataset_name]
 
     if isinstance(em_stopping_threshold, float):
         em_stopping_threshold = em_stopping_threshold
-    elif em_stopping_threshold == "mapped":
-        em_stopping_threshold = EM_THRESH_PER_DATASET[dataset_name]
 
     print()
     re_formula = get_re_formula(slopes)
