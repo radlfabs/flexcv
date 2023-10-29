@@ -5,6 +5,7 @@ class Run(NeptuneRun):
     """Dummy Run class inheriting from Neptune Run.
     It can be used to pass to all functions and methods that expect a Neptune Run Object.
     It will not do anything."""
+
     def __init__(self, *args, **kwargs):
         self.run_id = "dummy"
 

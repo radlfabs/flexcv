@@ -1,20 +1,19 @@
-from dataclasses import dataclass
-from typing import Callable, Dict, Type
-from pprint import pformat
 import logging
+from dataclasses import dataclass
+from pprint import pformat
+from typing import Callable, Dict, Type
+
 import pandas as pd
 from neptune.metadata_containers.run import Run as NeptuneRun
 from neptune.types import File
 
-from .cv_split import CrossValMethod
+from .cross_validate import cross_validate
 from .cv_metrics import MetricsDict
 from .cv_objective import ObjectiveScorer
 from .cv_results import CrossValidationResults
-from .cross_validate import cross_validate
-from .funcs import run_padding
-from .funcs import add_module_handlers
-from .funcs import get_fixed_effects_formula
-from .funcs import get_re_formula
+from .cv_split import CrossValMethod
+from .funcs import (add_module_handlers, get_fixed_effects_formula,
+                    get_re_formula, run_padding)
 
 logger = logging.getLogger(__name__)
 add_module_handlers(logger)

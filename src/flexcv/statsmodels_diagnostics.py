@@ -1,16 +1,17 @@
 # base code
+import matplotlib as mpl
 import numpy as np
 import pandas as pd
 import seaborn as sns
 import statsmodels
-from statsmodels.tools.tools import maybe_unwrap_results
 from statsmodels.graphics.gofplots import ProbPlot
 from statsmodels.stats.outliers_influence import variance_inflation_factor
-import matplotlib as mpl
+from statsmodels.tools.tools import maybe_unwrap_results
 
 mpl.use("Agg")
-import matplotlib.pyplot as plt
 from typing import Type
+
+import matplotlib.pyplot as plt
 
 style_talk = "seaborn-talk"  # refer to plt.style.available
 
@@ -18,7 +19,7 @@ style_talk = "seaborn-talk"  # refer to plt.style.available
 class LinearRegDiagnostic:
     """
     Implementation by https://www.statsmodels.org/stable/examples/notebooks/generated/linear_regression_diagnostics_plots.html#Simple-multiple-linear-regression
-    
+
     Diagnostic plots to identify potential problems in a linear regression fit.
     Mainly,
         a. non-linearity of data

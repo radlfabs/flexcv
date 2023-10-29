@@ -30,7 +30,7 @@ def generate_regression(
         number of random slopes
     noise: float
         standard deviation of the noise
-            
+
     Returns:
     tuple of pandas DataFrames and Series:
         X: feature matrix

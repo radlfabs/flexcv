@@ -1,16 +1,13 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 from flexcv.data_generation import generate_regression
-from flexcv.interface import DataConfigurator
-from flexcv.interface import CrossValConfigurator
-from flexcv.interface import RunConfigurator
-from flexcv.interface import CrossValidation
-from flexcv.interface import ModelConfigDict
-from flexcv.interface import ModelMappingDict
+from flexcv.funcs import empty_func
+from flexcv.interface import (CrossValConfigurator, CrossValidation,
+                              DataConfigurator, ModelConfigDict,
+                              ModelMappingDict, RunConfigurator)
+from flexcv.models import LinearMixedEffectsModel, LinearModel
 from flexcv.run import Run
-from flexcv.models import LinearModel
-from flexcv.models import LinearMixedEffectsModel
 
 
 def simple_regression():
@@ -18,24 +15,25 @@ def simple_regression():
     dummy_run = Run()
     X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise=9.1e-2)
 
-    def empty_func(*args, **kwargs):
-        pass
+    model_map = ModelMappingDict(
+        {
+            "LinearModel": ModelConfigDict(
+                {
+                    "inner_cv": False,
+                    "n_trials": 100,
+                    "n_jobs_model": {"n_jobs": 1},
+                    "n_jobs_cv": 1,
+                    "model": LinearModel,
+                    "params": {},
+                    "post_processor": empty_func,
+                    "mixed_model": LinearMixedEffectsModel,
+                    "mixed_post_processor": empty_func,
+                    "mixed_name": "MixedLM",
+                }
+            ),
+        }
+    )
 
-    model_map = ModelMappingDict({
-        "LinearModel": ModelConfigDict({
-            "inner_cv": False,
-            "n_trials": 100,
-            "n_jobs_model": {"n_jobs": 1},
-            "n_jobs_cv": 1,
-            "model": LinearModel,
-            "params": {},
-            "post_processor": empty_func,
-            "mixed_model": LinearMixedEffectsModel,
-            "mixed_post_processor": empty_func,
-            "mixed_name": "MixedLM"
-        }),
-    })
-        
     data_config = DataConfigurator(
         dataset_name="random_example",
         model_level="mixed",
@@ -50,9 +48,7 @@ def simple_regression():
         n_splits=3,
     )
 
-    run_config = RunConfigurator(
-        run=dummy_run
-    )
+    run_config = RunConfigurator(run=dummy_run)
 
     cv = CrossValidation(
         data_config=data_config,

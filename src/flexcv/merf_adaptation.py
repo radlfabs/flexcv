@@ -10,14 +10,15 @@
 """
 Mixed Effects Random Forest model.
 """
-from dataclasses import dataclass
 import logging
-from tqdm import tqdm
+from dataclasses import dataclass
+
 import numpy as np
 import pandas as pd
+from sklearn.base import BaseEstimator
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.exceptions import NotFittedError
-from sklearn.base import BaseEstimator
+from tqdm import tqdm
 
 logger = logging.getLogger(__name__)
 

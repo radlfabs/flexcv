@@ -1,20 +1,20 @@
-from dataclasses import dataclass
-from typing import Callable, Dict, Type
-from pprint import pformat
 import logging
+from dataclasses import dataclass
+from pprint import pformat
+from typing import Callable, Dict, Type
+
 import pandas as pd
 from neptune.metadata_containers.run import Run as NeptuneRun
 from neptune.types import File
 
-from .cv_split import CrossValMethod
+from .cross_validate import cross_validate
 from .cv_metrics import MetricsDict
 from .cv_objective import ObjectiveScorer
 from .cv_results import CrossValidationResults
-from .cross_validate import cross_validate
-from .funcs import run_padding
-from .funcs import add_module_handlers
+from .cv_split import CrossValMethod
+from .funcs import add_module_handlers, run_padding
+from .model_mapping import ModelConfigDict, ModelMappingDict
 from .run import DummyRun
-from .model_mapping import ModelMappingDict, ModelConfigDict
 
 logger = logging.getLogger(__name__)
 add_module_handlers(logger)
@@ -23,7 +23,7 @@ add_module_handlers(logger)
 @dataclass
 class CrossValidation:
     """Functional interface for cross validation.
-    
+
     This class is a functional interface for cross validation. It allows you to
     configure the cross validation and then run it. It also allows you to log
     the configuration and results to Neptune.
@@ -53,8 +53,9 @@ class CrossValidation:
         ...     .perform()
         ...     .get_results()
         ... )
-        
+
     """
+
     def __init__(self) -> None:
         self.config = {
             # Data related
@@ -354,7 +355,7 @@ class CrossValidation:
         if not hasattr(self.config, "run"):
             self.config["run"] = DummyRun()
         run = self.config["run"]
-        
+
         results = cross_validate(**self.config)
         self.results_ = CrossValidationResults(results)
         if self._was_logged:
@@ -363,7 +364,7 @@ class CrossValidation:
 
     def get_results(self) -> CrossValidationResults:
         return self.results_
-    
+
     @property
     def results(self) -> CrossValidationResults:
         return self.results_
@@ -374,24 +375,29 @@ if __name__ == "__main__":
     import flexcv
     from flexcv.data_generation import generate_regression
     from flexcv.models import LinearModel
+    from flexcv.run import Run  # import dummy run object
 
-    from flexcv.run import Run # import dummy run object
-    
     # make sample data
     X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise=9.1e-2)
-    
-    model_map = ModelMappingDict({
-        "LinearModel": ModelConfigDict({
-            "model": LinearModel,
-        }),
-    })
+
+    model_map = ModelMappingDict(
+        {
+            "LinearModel": ModelConfigDict(
+                {
+                    "model": LinearModel,
+                }
+            ),
+        }
+    )
 
     cv = CrossValidation()
 
     results = (
-        cv
-        .set_dataframes(X, y, group, dataset_name="ExampleData")
-        .set_splits(method_outer_split=flexcv.CrossValMethod.GROUP, method_inner_split=flexcv.CrossValMethod.KFOLD)
+        cv.set_dataframes(X, y, group, dataset_name="ExampleData")
+        .set_splits(
+            method_outer_split=flexcv.CrossValMethod.GROUP,
+            method_inner_split=flexcv.CrossValMethod.KFOLD,
+        )
         .set_models(model_map)
         .set_run(Run())
         .perform()

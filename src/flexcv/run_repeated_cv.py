@@ -1,17 +1,17 @@
 import logging
-import openpyxl
-import neptune
-from neptune.types import File
-import numpy as np
-import pandas as pd
 from pprint import pformat
 
-from funcs import make_acronym
-from main import main
+import neptune
+import numpy as np
+import openpyxl
+import pandas as pd
 from data_loader import DataLoadConfig
+from funcs import add_module_handlers, make_acronym
+from main import main
+from neptune.types import File
 from run import RunConfigurator
+
 import flexcv.cross_val_split as cross_val_split
-from funcs import add_module_handlers
 
 logger = logging.getLogger(__name__)
 

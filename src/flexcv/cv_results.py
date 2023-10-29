@@ -2,6 +2,7 @@
 # is returned by CrossValidation.perform()
 
 import operator
+
 import numpy as np
 import pandas as pd
 
@@ -195,10 +196,10 @@ class CrossValidationResults(dict):
 
 class MergedSummary(CrossValidationResults):
     def __init__(
-            self, 
-            cv_results_1: CrossValidationResults | MergedSummary, 
-            cv_results_2: CrossValidationResults | MergedSummary
-            ):
+        self,
+        cv_results_1: CrossValidationResults | MergedSummary,
+        cv_results_2: CrossValidationResults | MergedSummary,
+    ):
         self.cv_results_1 = cv_results_1
         self.cv_results_2 = cv_results_2
 
@@ -210,15 +211,15 @@ class MergedSummary(CrossValidationResults):
         """Merges the two summaries dataframes into one."""
         return pd.concat([self.cv_results_1.summary, self.cv_results_2.summary], axis=1)
 
-    def __add__(
-            self,
-            other: CrossValidationResults | MergedSummary
-            ) -> MergedSummary:
+    def __add__(self, other: CrossValidationResults | MergedSummary) -> MergedSummary:
         return super().__add__(other)
 
 
 import unittest
-from flexcv.interface import CrossValidation, CrossValidationResults, MergedSummary
+
+from flexcv.interface import (CrossValidation, CrossValidationResults,
+                              MergedSummary)
+
 
 class TestCrossValidation(unittest.TestCase):
     def setUp(self):
@@ -253,5 +254,6 @@ class TestCrossValidation(unittest.TestCase):
 
         self.assertIsInstance(new_merged_result, MergedSummary)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     pass

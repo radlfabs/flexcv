@@ -17,7 +17,7 @@ class MetricsDict(dict):
     R²: The coefficient of determination
     MSE: Mean squared error
     MAE: Mean absolute error
-    
+
     We decided againt using the RMSE as a default metric, because we would run into trouble wherever we would average over it.
     RMSE should always be averaged as `sqrt(mean(MSE_values))` and not as `mean(sqrt(MSE_values))`.
     Also, the standard deviation would be calculated incorrectly if RMSE is included at this point.

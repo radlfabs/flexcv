@@ -1,7 +1,6 @@
 import rpy2.robjects.packages as rpackages
 from rpy2.robjects.vectors import StrVector
 
-
 if __name__ == "__main__":
     REQUIREMENTS = (
         "ggplot2",

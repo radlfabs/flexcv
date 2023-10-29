@@ -1,4 +1,5 @@
 from typing import Dict, Type
+
 from .funcs import empty_func
 
 """
@@ -41,7 +42,7 @@ class ModelConfigDict(Dict[str, Type]):
     n_jobs = {"n_jobs": 1}
     n_jobs_cv = 1
     params = {}
-    
+
     Usage:
         ```py
         {
@@ -72,13 +73,13 @@ class ModelConfigDict(Dict[str, Type]):
                     # name of the mixed effects model. It is used to identify the model in the results dictionary.
         }```
     """
-    
+
     def __init__(self, mapping=None):
         if mapping is None:
             mapping = {}
         super().__init__(mapping)
         self._set_defaults()
-        
+
     def _set_defaults(self):
         if not hasattr(self, "inner_cv"):
             self["inner_cv"] = False
@@ -157,8 +158,6 @@ def make_model_config_from_estimator(
             else "MixedModel",
         }
     )
-
-
 
 
 # EM parameters as fine tuned by SV and FR in call on 2023-09-04

@@ -1,11 +1,12 @@
-import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import shap
+import numpy as np
 import pandas as pd
-from xgboost import plot_importance
+import shap
 import statsmodels.api as sm
-from sklearn.inspection import permutation_importance as sk_permutation_importance
+from sklearn.inspection import \
+    permutation_importance as sk_permutation_importance
+from xgboost import plot_importance
 
 mpl.use("Agg")
 
@@ -28,9 +29,7 @@ def set_axes_params(ax) -> None:
     return None
 
 
-def plot_merf_training_stats(
-    run, model, model_name, num_clusters_to_plot=5
-) -> None:
+def plot_merf_training_stats(run, model, model_name, num_clusters_to_plot=5) -> None:
     """
     * Generalized log-likelihood across iterations
     * trace and determinant of Sigma_b across iterations
@@ -197,7 +196,6 @@ def plot_qq(
     run[f"{log_destination}{model_name}_QQ"].log(fig)
     del fig
     return None
-
 
 
 def permutation_importance(

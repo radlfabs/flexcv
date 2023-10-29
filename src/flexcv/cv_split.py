@@ -4,13 +4,9 @@ from typing import Callable, Iterator
 
 import pandas as pd
 from numpy import ndarray
-
-from sklearn.model_selection import StratifiedKFold
-from sklearn.model_selection import StratifiedGroupKFold
+from sklearn.model_selection import (BaseCrossValidator, GroupKFold, KFold,
+                                     StratifiedGroupKFold, StratifiedKFold)
 from sklearn.preprocessing import KBinsDiscretizer
-from sklearn.model_selection import BaseCrossValidator
-from sklearn.model_selection import KFold
-from sklearn.model_selection import GroupKFold
 
 ALLOWED_METHODS = [
     "KFOLD",
@@ -19,6 +15,7 @@ ALLOWED_METHODS = [
     "CUSTOMSTRATGROUP",
     "CUSTOMSTRAT",
 ]
+
 
 class CrossValMethod(Enum):
     """Enum class to assign CrossValMethods to the cross_val() function.
@@ -31,8 +28,8 @@ class CrossValMethod(Enum):
     CUSTOMSTRATGROUP: CustomStratifiedGroupKFold cross validation
 
     Details:
-    - KFOLD: Regular sklearn KFold cross validation. No grouping information is used. 
-    - CUSTOMSTRAT: Applies stratification on the target variable using a custom discretization of the target variable. 
+    - KFOLD: Regular sklearn KFold cross validation. No grouping information is used.
+    - CUSTOMSTRAT: Applies stratification on the target variable using a custom discretization of the target variable.
     I.e. uses the sklearn StratifiedKFold cross validation but for a continuous target variable instead of a multi-class target variable.
     - GROUP: Applies grouping information on the samples. I.e. uses the sklearn GroupKFold cross validation.
     - STRATGROUP: Uses the sklearn StratifiedGroupKFold cross validation.
@@ -52,10 +49,9 @@ class CrossValMethod(Enum):
         return ALLOWED_METHODS
 
 
-
 class CustomStratifiedGroupKFold(BaseCrossValidator):
-    """sklearn's StratifiedGroupKFold adapted for continuous target variables.
-    """
+    """sklearn's StratifiedGroupKFold adapted for continuous target variables."""
+
     def __init__(self, n_splits, shuffle=True, random_state=42, groups=None):
         self.n_splits = n_splits
         self.shuffle = shuffle
@@ -87,8 +83,9 @@ class CustomStratifiedGroupKFold(BaseCrossValidator):
 
 class CustomStratifiedKFold(BaseCrossValidator):
     """
-    sklearn's StratifiedKFold adapted for continuous target variables. 
+    sklearn's StratifiedKFold adapted for continuous target variables.
     """
+
     def __init__(self, n_splits, shuffle=True, random_state=42, groups=None):
         self.n_splits = n_splits
         self.shuffle = shuffle

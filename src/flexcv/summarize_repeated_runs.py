@@ -1,10 +1,11 @@
 import neptune
 import pandas as pd
 
+
 def get_repeated_cv_metadata(str_children="Instance of repeated run ", api_dict=None):
     """This function can be used to fetch metadata from repeated cross-validation runs.
     We use it to get the ids of the children runs and their descriptions.
-    
+
     Args:
         str_children (str): The string that is prepended to the description of each child run.
         api_dict (dict): A dictionary containing the Neptune.ai project name and the api token.
@@ -36,7 +37,9 @@ def get_repeated_cv_metadata(str_children="Instance of repeated run ", api_dict=
     metadata = pd.DataFrame(grouped_ids)
     # use the host ids to get their sys/description and make them a new column in the DataFrame
     host_ids = grouped_ids.index
-    descriptions = runs_table_df[runs_table_df["sys/id"].isin(host_ids)]["sys/description"]
+    descriptions = runs_table_df[runs_table_df["sys/id"].isin(host_ids)][
+        "sys/description"
+    ]
     descriptions.index = host_ids
     descriptions.index.name = "host id"
     descriptions.name = "description"
@@ -44,7 +47,7 @@ def get_repeated_cv_metadata(str_children="Instance of repeated run ", api_dict=
     metadata = metadata.join(pd.DataFrame(descriptions))
     # save to excel
     metadata.to_excel("repeated_cv_metadata.xlsx")
-    
+
 
 if __name__ == "__main__":
     api_dict = {

@@ -1,18 +1,19 @@
-from pprint import pformat
 from dataclasses import dataclass
+from pprint import pformat
 from typing import Any
+
+import matplotlib as mpl
 import numpy as np
 import pandas as pd
-import matplotlib as mpl
 
 mpl.use("Agg")
 import matplotlib.pyplot as plt
+import neptune.integrations.optuna as npt_utils
 import seaborn as sns
 from neptune.types import File
-import neptune.integrations.optuna as npt_utils
 from optuna.study import Study
 
-from .cv_metrics import MetricsDict, METRICS
+from .cv_metrics import METRICS, MetricsDict
 
 
 class CustomNeptuneCallback(npt_utils.NeptuneCallback):
@@ -20,7 +21,7 @@ class CustomNeptuneCallback(npt_utils.NeptuneCallback):
     The __call__ method is called after each trial and logs the best trial and the plots.
     The override is necessary because logging each trial is not feasible for multiple models, folds and trials.
     It would hit Neptune's namespace limits."""
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

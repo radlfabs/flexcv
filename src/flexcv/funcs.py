@@ -1,10 +1,10 @@
 import logging
-from functools import wraps
 import os
+from functools import wraps
 
+import matplotlib as mpl
 import numpy as np
 import pandas as pd
-import matplotlib as mpl
 
 mpl.use("Agg")
 import matplotlib.pyplot as plt

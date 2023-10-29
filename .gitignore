@@ -3,6 +3,7 @@
 /run_dfs
 /tmp_imgs
 settings.json
+/src/flexcv/__pycache__
 /__pycache__
 /.neptune
 /GUI
@@ -49,4 +50,4 @@ src/EasyFlexyML.egg-info/SOURCES.txt
 src/EasyFlexyML.egg-info/top_level.txt
 /flexcv-env
 /dev_env
-.pre-commit-config.yaml
+#.pre-commit-config.yaml
