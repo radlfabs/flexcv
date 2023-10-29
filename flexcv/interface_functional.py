@@ -373,8 +373,8 @@ class CrossValidation:
 
 if __name__ == "__main__":
     import numpy as np
-    from models import LinearModel
-    from data_generation import generate_regression
+    from .models import LinearModel
+    from .data_generation import generate_regression
     
     X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise=9.1e-2)
     model_map = ModelMappingDict(
@@ -399,3 +399,4 @@ if __name__ == "__main__":
     n_values = len(results["LinearModel"]["metrics"])
     r2_values = [results["LinearModel"]["metrics"][k]["r2"] for k in range(n_values)]
     print(f"Mean R2: {np.mean(r2_values)}")
+    results.summary.to_csv("results.csv")
