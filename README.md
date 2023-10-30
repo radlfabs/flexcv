@@ -29,7 +29,7 @@ The `flexcv` package provides the following features:
 
 First, clone this repository.
 
-To use `flexcv` you will need Python v 3.10 or v3.11. Some dependencies are not yet compatible with Python version 3.12. As soon as they update their compatibility we can support Python 3.12 as well.
+To use `flexcv` you will need Python 3.10 or 3.11. Some dependencies are not yet compatible with Python version 3.12. As soon as they update their compatibility we can support Python 3.12 as well.
 
 ##### Using conda
 
