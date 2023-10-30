@@ -98,7 +98,7 @@ class CrossValidation:
     def __str__(self) -> str:
         return pformat(self.config)
 
-    def set_dataframes(
+    def set_data(
         self,
         X: pd.DataFrame,
         y: pd.DataFrame | pd.Series,
@@ -170,9 +170,8 @@ class CrossValidation:
     ):
         # get values of CrossValMethod enums
         ALLOWED_METHODS = [method.value for method in CrossValMethod]
-        ALLOWED_ENUNMS = [method for method in CrossValMethod]
-        # check values
 
+        # check values
         if not (split_out.value in ALLOWED_METHODS):
             raise TypeError("split_out must be a CrossValMethod ")
         
@@ -209,17 +208,13 @@ class CrossValidation:
     def set_models(
         self,
         mapping: ModelMappingDict,
-        model_effects: str = "fixed",
     ):
         # check values
         if not isinstance(mapping, ModelMappingDict):
             raise TypeError("mapping must be a ModelMappingDict")
-        if not isinstance(model_effects, str):
-            raise TypeError("model_effects must be a string")
 
         # assign values
         self.config["mapping"] = mapping
-        self.config["model_effects"] = model_effects
         return self
 
     def set_inner_cv(
@@ -240,12 +235,15 @@ class CrossValidation:
 
     def set_mixed_effects(
         self,
+        model_mixed_effects: bool = False,
         em_max_iterations: int = 100,
         em_stopping_threshold: float = None,
         em_stopping_window: int = None,
         predict_known_groups_lmm: bool = True,
     ):
         # check values
+        if not isinstance(model_mixed_effects, bool):
+            raise TypeError("model_effects must be bool")
         if not isinstance(em_max_iterations, int):
             raise TypeError("em_max_iterations must be an integer")
         if em_stopping_threshold and not isinstance(em_stopping_threshold, float):
@@ -256,6 +254,7 @@ class CrossValidation:
             raise TypeError("predict_known_groups_lmm must be a boolean")
 
         # assign values
+        self.config["model_effects"] = "mixed" if model_mixed_effects else "fixed"
         self.config["em_max_iterations"] = em_max_iterations
         self.config["em_stopping_threshold"] = em_stopping_threshold
         self.config["em_stopping_window"] = em_stopping_window
@@ -389,7 +388,7 @@ if __name__ == "__main__":
     
     cv = CrossValidation()
     results = (
-        cv.set_dataframes(X, y, group, random_slopes)
+        cv.set_data(X, y, group, random_slopes)
         .set_models(model_map)
         .set_run(DummyRun())
         .perform()
