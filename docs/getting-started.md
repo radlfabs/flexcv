@@ -50,7 +50,7 @@ cv = CrossValidation()
 # now we can use method chaining to set up our configuration perform the cross validation
 results = (
     cv
-    .set_dataframes(X, y, group, dataset_name="ExampleData")
+    .set_data(X, y, group, dataset_name="ExampleData")
     .set_splits(method_outer_split=flexcv.CrossValMethod.GROUP, method_inner_split=flexcv.CrossValMethod.KFOLD)
     .set_models(model_map)
     .perform()
@@ -95,7 +95,7 @@ model_map = ModelMappingDict({
 cv = CrossValidation()
 # just before pass everything to CrossValidation using method chaining
 results = (
-    cv.set_dataframes(X, y)
+    cv.set_data(X, y)
     .set_models(model_map)
     .set_inner_cv(3)
     .set_splits(n_splits_out=3)

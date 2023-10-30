@@ -9,7 +9,7 @@ from flexcv.models import LinearModel
 from flexcv.funcs import empty_func
 
 def regression_with_summary():
-    dummy_run = Run()
+    
     X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise=9.1e-2)
 
     model_map = ModelMappingDict({
@@ -24,7 +24,7 @@ def regression_with_summary():
         
     cv = CrossValidation()
     results = (
-        cv.set_dataframes(X, y, group, random_slopes)
+        cv.set_data(X, y, group, random_slopes)
         .set_models(model_map)
         .set_run(Run())
         .perform()

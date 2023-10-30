@@ -11,7 +11,6 @@ from flexcv.run import Run
 
 def simple_regression():
 
-    dummy_run = Run()
     X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise=9.1e-2)
 
     model_map = ModelMappingDict(
@@ -35,9 +34,10 @@ def simple_regression():
 
     cv = CrossValidation()
     results = (
-        cv.set_dataframes(X, y, group, random_slopes)
+        cv.set_data(X, y, group, random_slopes)
         .set_splits(n_splits_out=3)
-        .set_models(model_map, model_effects="mixed")
+        .set_models(model_map)
+        .set_mixed_effects(True)
         .set_run(Run())
         .perform()
         .get_results()

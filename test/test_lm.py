@@ -23,7 +23,7 @@ def simple_regression():
     
     cv = CrossValidation()
     results = (
-        cv.set_dataframes(X, y, group, random_slopes)
+        cv.set_data(X, y, group, random_slopes)
         .set_models(model_map)
         .set_run(Run())
         .perform()

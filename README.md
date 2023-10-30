@@ -95,7 +95,7 @@ cv = CrossValidation()
 # now we can use method chaining to set up our configuration perform the cross validation
 results = (
     cv
-    .set_dataframes(X, y, group, dataset_name="ExampleData")
+    .set_data(X, y, group, dataset_name="ExampleData")
     .set_splits(method_outer_split=flexcv.CrossValMethod.GROUP, method_inner_split=flexcv.CrossValMethod.KFOLD)
     .set_models(model_map)
     .perform()

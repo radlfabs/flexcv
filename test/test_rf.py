@@ -21,15 +21,15 @@ def random_forest_regression():
             "n_jobs_cv": -1,
             "model": RandomForestRegressor,
             "params": {
-                "max_depth": optuna.distributions.IntDistribution(5, 100), 
+                "max_depth": optuna.distributions.IntDistribution(5, 100),
             },
             "post_processor": mp.rf_post,
         }),
     })
-        
+
     cv = CrossValidation()
     results = (
-        cv.set_dataframes(X, y)
+        cv.set_data(X, y)
         .set_models(model_map)
         .set_inner_cv(3)
         .set_splits(n_splits_out=3)
