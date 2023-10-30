@@ -1,12 +1,12 @@
-import pandas as pd
 import numpy as np
 
 from flexcv.data_generation import generate_regression
 from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
-from flexcv.interface_functional import CrossValidation
+from flexcv.cv_class import CrossValidation
 from flexcv.run import Run
 from flexcv.models import LinearModel
 from flexcv.funcs import empty_func
+
 
 def regression_with_summary():
     
@@ -31,6 +31,7 @@ def regression_with_summary():
         .get_results()
     )
     return results.summary
+
 
 def test_summary():
     """Test if the summary of the results is correct."""

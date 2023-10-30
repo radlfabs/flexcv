@@ -1,13 +1,12 @@
 import logging
 from dataclasses import dataclass
 from pprint import pformat
-from typing import Callable, Dict, Type
 
 import pandas as pd
 from neptune.metadata_containers.run import Run as NeptuneRun
 from neptune.types import File
 
-from .cross_validate import cross_validate
+from .cv_core import cross_validate
 from .cv_metrics import MetricsDict
 from .cv_objective import ObjectiveScorer
 from .cv_results import CrossValidationResults

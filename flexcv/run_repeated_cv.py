@@ -38,7 +38,8 @@ def aggregate_(repeated_runs) -> pd.DataFrame:
     def try_mean(x):
         try:
             return np.mean(x)
-        except:
+        except ValueError:
+            # entered if x contains str "NaN"
             # check if all elements in x are equal to "NaN"
             if np.all([element == "NaN" for element in x]):
                 return -99

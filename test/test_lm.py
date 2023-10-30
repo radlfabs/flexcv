@@ -1,12 +1,12 @@
-import pandas as pd
 import numpy as np
 
 from flexcv.data_generation import generate_regression
-from flexcv.interface_functional import CrossValidation
-from flexcv.interface_functional import ModelConfigDict
-from flexcv.interface_functional import ModelMappingDict
+from flexcv.cv_class import CrossValidation
+from flexcv.cv_class import ModelConfigDict
+from flexcv.cv_class import ModelMappingDict
 from flexcv.run import Run
 from flexcv.models import LinearModel
+
 
 def simple_regression():
 

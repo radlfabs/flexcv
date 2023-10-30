@@ -1,9 +1,8 @@
 import numpy as np
-import pandas as pd
 
 from flexcv.data_generation import generate_regression
 from flexcv.funcs import empty_func
-from flexcv.interface_functional import CrossValidation
+from flexcv.cv_class import CrossValidation
 from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
 from flexcv.models import LinearMixedEffectsModel, LinearModel
 from flexcv.run import Run
