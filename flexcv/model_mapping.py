@@ -122,58 +122,13 @@ class ModelMappingDict(Dict[str, ModelConfigDict]):
     pass
 
 
-from sklearn.base import BaseEstimator
-
-
-def make_model_config_from_estimator(
-    fixed_effects_model: BaseEstimator,
-    mixed_effects_model: BaseEstimator = None,
-    fixed_post_processing_fn: callable = None,
-    mixed_post_processing_fn: callable = None,
-) -> ModelConfigDict:
-    """Creates a model configuration dictionary from a sklearn model.
-    This function is used to create a model configuration dictionary from a sklearn model.
-    It is used in the `CrossValidation` class to create the model configuration dictionary from the model mapping dictionary.
-    Args:
-        model: A sklearn model.
-    Returns:
-        A model configuration dictionary.
-    """
-
-    if not mixed_effects_model:
-        mixed_effects_model = None
-
-    return ModelConfigDict(
-        {
-            "inner_cv": False,
-            "n_trials": 100,
-            "n_jobs_model": {"n_jobs": 1},
-            "n_jobs_cv": 1,
-            "model": fixed_effects_model.__class__,
-            "params": {},
-            "post_processor": fixed_post_processing_fn
-            if fixed_post_processing_fn
-            else empty_func,
-            "level_4_model": mixed_effects_model
-            if mixed_effects_model
-            else BaseEstimator,
-            "level_4_post_processor": mixed_post_processing_fn
-            if mixed_post_processing_fn
-            else empty_func,
-            "level_4_name": mixed_effects_model.__class__.__name__
-            if mixed_effects_model
-            else "MixedModel",
-        }
-    )
-
-
-MIXED_TO_BASE_MODEL_MAPPING: Dict[str, str] = {
-    "MixedLM": "LinearModel",
-    "MERF": "RandomForest",
-    "XGBEM": "XGBoost",
-    "EarthEM": "MARS",
-    "SVREM": "SVR",
-}
+def map_backwards(mapping) -> dict:
+    """Maps a model mapping backwards:
+    From the mixed effects model to the fixed effects model."""
+    # reduce the nested mapping to key: value["mixed_name"]
+    reduced_mapping = {key: value["mixed_name"] for key, value in mapping.items()}
+    # invert the mapping
+    return {value: key for key, value in reduced_mapping.items()}
 
 
 if __name__ == "__main__":
