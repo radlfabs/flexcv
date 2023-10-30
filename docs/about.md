@@ -10,7 +10,7 @@
 
 In addition, an interactive visualisation app was [released ](https://github.com/radlfabs/DS_Data_Visualization_2023_Fabian_Rosenthal)for the same dataset, which can be adapted to personal needs and to work with other datasets. Have a look at the [technical report](http://dx.doi.org/10.13140/RG.2.2.25156.19845), if you're interested in the capabilities.
 
-## Developers
+## Creators
 
 __Fabian Rosenthal__ developed the overall structure of the package, designed the interface, and implemented the core functionality, modules and documentation. As a novel addition to the methods for cross validation splits, he contributed a stratified split method for continuous target variables to ensure target distribution across folds.
 
