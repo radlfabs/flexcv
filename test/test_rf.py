@@ -10,22 +10,25 @@ import flexcv.model_postprocessing as mp
 
 
 def random_forest_regression():
-
     X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise=9.1e-2)
 
-    model_map = ModelMappingDict({
-        "RandomForest": ModelConfigDict({
-            "inner_cv": True,
-            "n_trials": 400,
-            "n_jobs_model": {"n_jobs": -1},
-            "n_jobs_cv": -1,
-            "model": RandomForestRegressor,
-            "params": {
-                "max_depth": optuna.distributions.IntDistribution(5, 100),
-            },
-            "post_processor": mp.rf_post,
-        }),
-    })
+    model_map = ModelMappingDict(
+        {
+            "RandomForest": ModelConfigDict(
+                {
+                    "inner_cv": True,
+                    "n_trials": 400,
+                    "n_jobs_model": {"n_jobs": -1},
+                    "n_jobs_cv": -1,
+                    "model": RandomForestRegressor,
+                    "params": {
+                        "max_depth": optuna.distributions.IntDistribution(5, 100),
+                    },
+                    "post_processor": mp.rf_post,
+                }
+            ),
+        }
+    )
 
     cv = CrossValidation()
     results = (

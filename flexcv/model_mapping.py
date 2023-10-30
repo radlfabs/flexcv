@@ -98,7 +98,7 @@ class ModelConfigDict(Dict[str, Type]):
             return True
         except KeyError:
             return False
-        
+
     def _check_key_set_default(self, key, default):
         if not self._has_key(key):
             self[key] = default

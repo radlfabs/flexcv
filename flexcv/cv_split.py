@@ -4,8 +4,13 @@ from typing import Callable, Iterator
 
 import pandas as pd
 from numpy import ndarray
-from sklearn.model_selection import (BaseCrossValidator, GroupKFold, KFold,
-                                     StratifiedGroupKFold, StratifiedKFold)
+from sklearn.model_selection import (
+    BaseCrossValidator,
+    GroupKFold,
+    KFold,
+    StratifiedGroupKFold,
+    StratifiedKFold,
+)
 from sklearn.preprocessing import KBinsDiscretizer
 
 

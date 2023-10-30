@@ -9,7 +9,6 @@ from flexcv.models import LinearModel
 
 
 def simple_regression():
-
     X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise=9.1e-2)
     model_map = ModelMappingDict(
         {
@@ -20,7 +19,7 @@ def simple_regression():
             ),
         }
     )
-    
+
     cv = CrossValidation()
     results = (
         cv.set_data(X, y, group, random_slopes)

@@ -173,20 +173,20 @@ class CrossValidation:
         # check values
         if not (split_out.value in ALLOWED_METHODS):
             raise TypeError("split_out must be a CrossValMethod ")
-        
+
         if not (split_in.value in ALLOWED_METHODS):
             raise TypeError("split_in must be a CrossValMethod")
-        
+
         if not isinstance(n_splits_out, int):
             raise TypeError("n_splits_out must be an integer")
         if not isinstance(n_splits_in, int):
             raise TypeError("n_splits_in must be an integer")
-        
+
         if not isinstance(scale_in, bool):
             raise TypeError("scale_in must be a boolean")
         if not isinstance(scale_out, bool):
             raise TypeError("scale_out must be a boolean")
-        
+
         if not isinstance(break_cross_val, bool):
             raise TypeError("break_cross_val must be a boolean")
         if metrics and not isinstance(metrics, MetricsDict):
@@ -373,7 +373,7 @@ if __name__ == "__main__":
     import numpy as np
     from .models import LinearModel
     from .data_generation import generate_regression
-    
+
     X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise=9.1e-2)
     model_map = ModelMappingDict(
         {
@@ -384,7 +384,7 @@ if __name__ == "__main__":
             ),
         }
     )
-    
+
     cv = CrossValidation()
     results = (
         cv.set_data(X, y, group, random_slopes)
@@ -393,7 +393,7 @@ if __name__ == "__main__":
         .perform()
         .get_results()
     )
-    
+
     n_values = len(results["LinearModel"]["metrics"])
     r2_values = [results["LinearModel"]["metrics"][k]["r2"] for k in range(n_values)]
     print(f"Mean R2: {np.mean(r2_values)}")

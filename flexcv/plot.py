@@ -4,8 +4,7 @@ import numpy as np
 import pandas as pd
 import shap
 import statsmodels.api as sm
-from sklearn.inspection import \
-    permutation_importance as sk_permutation_importance
+from sklearn.inspection import permutation_importance as sk_permutation_importance
 from xgboost import plot_importance
 
 mpl.use("Agg")

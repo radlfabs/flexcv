@@ -30,7 +30,7 @@ def add_summary_stats(df: pd.DataFrame) -> pd.DataFrame:
     df.loc["median"] = original_fold_slice.median(skipna=True)
     df.loc["std"] = original_fold_slice.std(skipna=True)
     return df
-    
+
 
 class CrossValidationResults(dict):
     """A summary of the results of CrossValidation.perform().
@@ -213,7 +213,6 @@ class MergedSummary(CrossValidationResults):
 
     def __add__(self, other):
         raise NotImplementedError
-    
 
 
 if __name__ == "__main__":

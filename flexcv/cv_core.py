@@ -13,8 +13,12 @@ from sklearn.utils.validation import check_random_state
 from statsmodels.tools.sm_exceptions import ConvergenceWarning
 from tqdm import tqdm
 
-from .cv_log import (CustomNeptuneCallback, SingleModelFoldResult,
-                     log_diagnostics, log_single_model_single_fold)
+from .cv_log import (
+    CustomNeptuneCallback,
+    SingleModelFoldResult,
+    log_diagnostics,
+    log_single_model_single_fold,
+)
 from .cv_metrics import MetricsDict, mse_wrapper
 from .cv_objective import ObjectiveScorer, objective_cv
 from .cv_split import CrossValMethod, make_cross_val_split
@@ -141,7 +145,7 @@ def cross_validate(
         y_test = y.iloc[test_index]  # type: ignore
 
         cluster_train = groups.iloc[train_index] if groups is not None else None  # type: ignore
-        cluster_test = groups.iloc[test_index]  if groups is not None else None  # type: ignore
+        cluster_test = groups.iloc[test_index] if groups is not None else None  # type: ignore
 
         if scale_out:
             # apply standard scaler but preserve the type pd.DataFrame

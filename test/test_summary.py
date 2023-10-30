@@ -9,19 +9,22 @@ from flexcv.funcs import empty_func
 
 
 def regression_with_summary():
-    
     X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise=9.1e-2)
 
-    model_map = ModelMappingDict({
-        "LinearModel": ModelConfigDict({
-            "inner_cv": False,
-            "n_jobs_model": {"n_jobs": 1},
-            "model": LinearModel,
-            "params": {},
-            "post_processor": empty_func,
-        }),
-    })
-        
+    model_map = ModelMappingDict(
+        {
+            "LinearModel": ModelConfigDict(
+                {
+                    "inner_cv": False,
+                    "n_jobs_model": {"n_jobs": 1},
+                    "model": LinearModel,
+                    "params": {},
+                    "post_processor": empty_func,
+                }
+            ),
+        }
+    )
+
     cv = CrossValidation()
     results = (
         cv.set_data(X, y, group, random_slopes)

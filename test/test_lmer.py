@@ -9,7 +9,6 @@ from flexcv.run import Run
 
 
 def simple_regression():
-
     X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise=9.1e-2)
 
     model_map = ModelMappingDict(
@@ -41,7 +40,7 @@ def simple_regression():
         .perform()
         .get_results()
     )
-    
+
     n_values = len(results["MixedLM"]["metrics"])
     r2_values = [results["MixedLM"]["metrics"][k]["r2"] for k in range(n_values)]
     return np.mean(r2_values)

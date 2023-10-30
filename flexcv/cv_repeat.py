@@ -61,7 +61,7 @@ def perform_repeats(cv: CrossValidation, n_repeats=3):
     repeated_id = repeated_run["sys/id"].fetch()
     desc = f"Instance of repeated run {repeated_id}."
 
-    # set numpy seed to 42. 
+    # set numpy seed to 42.
     # If you do not want to reproduce the repeated run, change the seed or remove the line
     np.random.seed(42)
 
@@ -83,14 +83,14 @@ def perform_repeats(cv: CrossValidation, n_repeats=3):
             cv
             .set_run(run=inner_run, random_seed=seed)
             .perform()
-            .get_results
+            .get_results()
         )
 
         # append the run id and the run metric to the lists
         run_ids.append(inner_id)
         run_results.append(results)
 
-    # run_dfs have the same column and index names and we 
+    # run_dfs have the same column and index names and we
     df = aggregate_(run_results)
     df.to_excel("repeated_cv.xlsx")  # save dataframe to excel file
     print(df)  # print dataframe to console
@@ -98,7 +98,9 @@ def perform_repeats(cv: CrossValidation, n_repeats=3):
     # log the repeated run results to neptune
     repeated_id = repeated_run["sys/id"].fetch()
     repeated_run["summary"].upload(File.as_html(df))
-    repeated_run["sys/description"] = f"Host run for repeated runs with {n_repeats} repeats. run_ids: {run_ids}"
+    repeated_run[
+        "sys/description"
+    ] = f"Host run for repeated runs with {n_repeats} repeats. run_ids: {run_ids}"
     repeated_run["RelatedRuns"] = ", ".join(run_ids)
     repeated_run["seeds"] = seeds
     repeated_run["mapping"] = cv.config["mapping"]
@@ -106,27 +108,27 @@ def perform_repeats(cv: CrossValidation, n_repeats=3):
 
 
 if __name__ == "__main__":
-
     from flexcv import CrossValidation
     from flexcv.data_generation import generate_regression
     from flexcv.models import LinearModel
     from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
-    
+
     # make sample data
     X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise=9.1e-2)
-    
+
     # create a model mapping
-    model_map = ModelMappingDict({
-        "LinearModel": ModelConfigDict({
-            "model": LinearModel,
-        }),
-    })
+    model_map = ModelMappingDict(
+        {
+            "LinearModel": ModelConfigDict(
+                {
+                    "model": LinearModel,
+                }
+            ),
+        }
+    )
 
     # instantiate our cross validation class
-    cv = (
-        CrossValidation()
-        .set_data(X, y, group, dataset_name="ExampleData")
-    )
-    
+    cv = CrossValidation().set_data(X, y, group, dataset_name="ExampleData")
+
     # call perform_repeats function
     perform_repeats(cv, 3)
