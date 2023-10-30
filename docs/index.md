@@ -10,6 +10,7 @@ Since we ware in a very early phase and currently preparing the package release,
 
 ## Features
 
+
 The `flexcv` package provides the following features:
 
 1. Cross-validation of model performance using different cross-validation splits that are dependent or independent of the clustering structures in your data.
@@ -19,10 +20,17 @@ The `flexcv` package provides the following features:
 5. Include random effects and random slopes in your models. We use the `merf` package for this purpose
 6. Easy usage of the state-of-the-art logging dashboard `neptune` to track all of your experiments.
 7. Easy local summary of all evaluation metrics in a single table.
-8. Wrapper classes for the R `earth` package to use the powerful regression splines in Python.
-9. Wrapper classes for the `statsmodels` package to use their mixed effects models inside of a `sklearn` Pipeline.
-10. Inner cross validation implementation that let's you push groups to the inner split in order to apply GroupKFold.
+8. Wrapper classes for the R `earth` package to use the powerful regression splines in Python. Read more about that package [here](https://www.rdocumentation.org/packages/earth/versions/5.3.2).
+9. Wrapper classes for the `statsmodels` package to use their mixed effects models inside of a `sklearn` Pipeline. Read more about that package [here](https://github.com/manifoldai/merf).
+10. Uses `merf` to apply correction for clustered data using the expectation maximization algorithm and supporting any `sklearn` BaseEstimator.
+11. Inner cross validation implementation that let's you push groups to the inner split, e.g. to apply GroupKFold.
+
+These are the core packages used under the hood in `flexcv`:
+
+1. `sklearn` - A very popular machine learning library. We use their Estimator API for models, the pipeline module, the StandardScaler, metrics and of course wrap around their cross validation split methods. Learn more [here](https://scikit-learn.org/stable/).
+2. `Optuna` - A state-of-the-art optimization package. We use it for parameter selection in the inner loop of our nested cross validation. Learn more about theoretical background and opportunities [here](https://optuna.org/).
+3. `neptune` - Awesome logging dashboard with lots of integrations. It is a charm in combination with `Optuna`. We used it to track all of our experiments. `Neptune` is quite deeply integrated into `flexcv`. Learn more about this great library [here](https://neptune.ai/).
 
 ## Contributions
 
-We welcome contributions to this repository. If you have any questions, please don't hesitate to get in contact.
+We welcome contributions to this repository. If you have any questions, please don't hesitate to get in contact by reaching out or filing a github issue.
