@@ -25,7 +25,7 @@ warnings.filterwarnings("ignore", module=r"matplotlib\..*")
 warnings.filterwarnings("ignore", module=r"xgboost\..*")
 warnings.simplefilter("ignore", ConvergenceWarning)
 logger = logging.getLogger(__name__)
-# add_module_handlers(logger)
+
 
 RANDOM_SEED = 42
 
@@ -141,22 +141,7 @@ def cross_validate(
         y_test = y.iloc[test_index]  # type: ignore
 
         cluster_train = groups.iloc[train_index] if groups is not None else None  # type: ignore
-        cluster_test = groups.iloc[test_index]  if groups is not None else None # type: ignore
-
-        #### ALTERNATIVE IMPLEMENTATION USING SCIKIT LEARTN PIPELINES ####
-
-        """
-        As a reminder: The Model Mapper has the following structure:
-
-        MODEL_MAPPING = {
-            "ExampleEstimator": {
-                "model": ExampleEstimator,
-                "params": {
-                    "example_param": [1, 2, 3]
-                    }
-            }
-        }
-        """
+        cluster_test = groups.iloc[test_index]  if groups is not None else None  # type: ignore
 
         if scale_out:
             # apply standard scaler but preserve the type pd.DataFrame
@@ -283,7 +268,6 @@ def cross_validate(
                     log_plot_contour=False,
                     log_plot_optimization_history=True,
                     log_plot_edf=False,
-                    # plots_update_freq=10,  # log every 10th trial
                     study_update_freq=10,  # log every 10th trial,
                 )
 
