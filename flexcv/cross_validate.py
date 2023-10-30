@@ -393,23 +393,22 @@ def cross_validate(
 
             # code that is run for effects == "mixed"
             # if effects == "mixed":
-            # look up level 4 model in mapping
+            # look up mixed effects model in mapping
             # get the model instance and load with the base estimator from the level 3 model
-            # fit the level 4 model
-            # predict with the level 4 model
-            # store the level 4 model in the all_models_dict
-            # store the level 4 model in the model_results_dict
-            # run the level 4 postprocessing
+            # fit the mixed effects model
+            # predict with the mixed effects model
+            # store the mixed effects model in the all_models_dict
+            # store the mixed effects model in the model_results_dict
+            # run the mixed effects model postprocessing
 
             if (model_effects == "mixed") and mapping[model_name]["mixed_name"]:
                 logger.info(f"Evaluating {mapping[model_name]['mixed_name']}...")
                 # tag the base prediction
                 y_pred_base = y_pred.copy()
-                y_pred_train_base = y_pred_train.copy()
 
                 if model_name == "LinearModel":
-                    model_4_instance = mapping[model_name]["mixed_model"]()
-                    fit_result = model_4_instance.fit(
+                    mixed_model_instance = mapping[model_name]["mixed_model"]()
+                    fit_result = mixed_model_instance.fit(
                         X=X_train_scaled,
                         y=y_train,
                         clusters=cluster_train,
@@ -417,7 +416,7 @@ def cross_validate(
                         re_formula=re_formula,
                     )
                 else:  # case MERF
-                    model_4_instance = mapping[model_name]["mixed_model"](
+                    mixed_model_instance = mapping[model_name]["mixed_model"](
                         fixed_effects_model=mapping[model_name]["model"](**best_params),
                         max_iterations=max_iterations,
                         gll_early_stop_threshold=em_stopping_threshold,
@@ -425,21 +424,21 @@ def cross_validate(
                         log_gll_per_iteration=False,
                     )
 
-                    fit_result = model_4_instance.fit(
+                    fit_result = mixed_model_instance.fit(
                         X=X_train_scaled,
                         y=y_train,
                         clusters=cluster_train,
                         Z=Z_train,
                     )
 
-                y_pred = model_4_instance.predict(
+                y_pred = mixed_model_instance.predict(
                     X=X_test_scaled,
                     clusters=cluster_test,
                     Z=Z_test,
                     predict_known_groups_lmm=predict_known_groups_lmm,
                 )
 
-                y_pred_train = model_4_instance.predict(
+                y_pred_train = mixed_model_instance.predict(
                     X=X_train_scaled,
                     clusters=cluster_train,
                     Z=Z_train,
