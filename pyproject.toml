@@ -35,7 +35,7 @@ requires-python = ">=3.10"
 [project.urls]
 "Homepage" = "https://github.com/radlfabs/flexcv"
 "Bug Tracker" = "https://github.com/radlfabs/flexcv/issues"
-"Docs" = "radlfabs.github.io/flexcv"
+"Docs" = "https://radlfabs.github.io/flexcv"
 
 [tool.setuptools.packages.find]
 where = ["."]
