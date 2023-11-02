@@ -23,7 +23,7 @@ class CrossValMethod(Enum):
     GROUP: GroupKFold cross validation
     STRATGROUP: StratifiedGroupKFold cross validation
     CUSTOMSTRATGROUP: CustomStratifiedGroupKFold cross validation
-
+    
     Details:
     - KFOLD: Regular sklearn KFold cross validation. No grouping information is used.
     - CUSTOMSTRAT: Applies stratification on the target variable using a custom discretization of the target variable.
@@ -32,6 +32,11 @@ class CrossValMethod(Enum):
     - STRATGROUP: Uses the sklearn StratifiedGroupKFold cross validation.
     - CUSTOMSTRATGROUP: Applies stratification to both the target variable and the grouping information.
     I.e. uses the sklearn StratifiedGroupKFold cross validation but for a continuous target variable instead of a multi-class target variable.
+
+    Args:
+
+    Returns:
+
     """
 
     KFOLD = "KFold"
@@ -54,6 +59,14 @@ class CustomStratifiedGroupKFold(BaseCrossValidator):
         """Generate indices to split data into training and test set.
         The data is first grouped by groups and then split into n_splits folds. The folds are made by preserving the percentage of samples for each class.
         This is a variation of StratifiedGroupKFold that uses a custom discretization of the target variable.
+
+        Args:
+          X: Features
+          y: target
+          groups: Grouping/clustering variable (Default value = None)
+
+        Returns:
+            Iterator[tuple[ndarray, ndarray]]: Iterator over the indices of the training and test set.
         """
         self.sgkf = StratifiedGroupKFold(
             n_splits=self.n_splits, shuffle=self.shuffle, random_state=self.random_state
@@ -70,13 +83,21 @@ class CustomStratifiedGroupKFold(BaseCrossValidator):
         return self.sgkf.split(X, y_cat, groups)
 
     def get_n_splits(self, X, y=None, groups=None):
+        """
+
+        Args:
+          X: 
+          y:  (Default value = None)
+          groups:  (Default value = None)
+
+        Returns:
+          int
+        """
         return self.n_splits
 
 
 class CustomStratifiedKFold(BaseCrossValidator):
-    """
-    sklearn's StratifiedKFold adapted for continuous target variables.
-    """
+    """sklearn's StratifiedKFold adapted for continuous target variables."""
 
     def __init__(self, n_splits, shuffle=True, random_state=42, groups=None):
         self.n_splits = n_splits
@@ -88,6 +109,14 @@ class CustomStratifiedKFold(BaseCrossValidator):
         """Generate indices to split data into training and test set.
         The data is first grouped by groups and then split into n_splits folds. The folds are made by preserving the percentage of samples for each class.
         This is a variation of StratifiedGroupKFold that uses a custom discretization of the target variable.
+
+        Args:
+          X: Features
+          y: target
+          groups: Grouping variable (Default value = None)
+
+        Returns:
+            Iterator[tuple[ndarray, ndarray]]: Iterator over the indices of the training and test set.
         """
         self.skf = StratifiedKFold(
             n_splits=self.n_splits, shuffle=self.shuffle, random_state=self.random_state
@@ -106,6 +135,16 @@ class CustomStratifiedKFold(BaseCrossValidator):
         return self.skf.split(X, y_concat)
 
     def get_n_splits(self, X, y=None, groups=None):
+        """
+
+        Args:
+          X: 
+          y:  (Default value = None)
+          groups:  (Default value = None)
+
+        Returns:
+         int
+        """
         return self.n_splits
 
 
@@ -116,20 +155,20 @@ def make_cross_val_split(
     n_splits: int = 5,
     random_state: int = 42,
 ) -> Callable[..., Iterator[tuple[ndarray, ndarray]]]:
-    """
-    This function creates and returns a callable cross validation splitter based on the specified method.
+    """This function creates and returns a callable cross validation splitter based on the specified method.
 
-    Parameters:
-    groups (pd.Series): A pandas series representing the grouping information of the samples.
-    method (CrossValMethod): An enumeration that represents the method of cross validation to use.
-    Must be one of KFOLD, GROUPKFOLD, or STRATGROUPKFOLD.
-    n_splits (int, optional): The number of splits to use for the cross validation. Defaults to 5.
+    Args:
+      groups: pd.Series | None: A pd.Series containing the grouping information for the samples.
+      method: CrossValMethod: A CrossValMethod enum value specifying the cross validation method to use.
+      n_splits: int: Number of splits (Default value = 5)
+      random_state: int: A random seed to control random processes (Default value = 42)
 
     Returns:
-    Callable: A callable cross validation splitter based on the specified method.
+      Callable: A callable cross validation splitter based on the specified method.
 
     Raises:
-    TypeError: If the given method is not one of KFOLD, GROUPKFOLD, or STRATGROUPKFOLD.
+      TypeError: If the given method is not one of KFOLD
+
     """
 
     match method:

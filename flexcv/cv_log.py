@@ -20,7 +20,13 @@ class CustomNeptuneCallback(npt_utils.NeptuneCallback):
     """This class inherits from NeptuneCallback and overrides the __call__ method.
     The __call__ method is called after each trial and logs the best trial and the plots.
     The override is necessary because logging each trial is not feasible for multiple models, folds and trials.
-    It would hit Neptune's namespace limits."""
+    It would hit Neptune's namespace limits.
+
+    Args:
+    
+    Returns:
+
+    """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -42,9 +48,32 @@ def log_diagnostics(
     namestring="out",
 ):
     """This function makes histograms of the features and target for diagnostic purposes.
-    All outputs are logged to neptune and the function returns None."""
+    All outputs are logged to neptune and the function returns None.
+
+    Args:
+      X_train: Training features.
+      X_test: Testing features.
+      y_train: Training target.
+      y_test: Testing target.
+      run: Neptune run object.
+      effects: Type of effects to be used. Either "fixed" or "mixed".
+      cluster_train: pd.Series: Training clustering or grouping variable (Default value = None)
+      cluster_test: pd.Series: Testing clustering or grouping variable (Default value = None)
+      namestring: A string to pass to logging. Use to separate folds: use "in" or "out" (Default value = "out")
+
+    Returns:
+        None
+    """
 
     def get_df_hist_fig(df):
+        """
+
+        Args:
+          df: 
+
+        Returns:
+
+        """
         fig, axes = plt.subplots(len(df.columns), 1, figsize=(5, 15))
         ax = axes.flatten()
 
@@ -56,6 +85,14 @@ def log_diagnostics(
         return fig
 
     def get_series_hist_fig(ser):
+        """
+
+        Args:
+          ser: 
+
+        Returns:
+
+        """
         fig, ax = plt.subplots()
         sns.histplot(ser, ax=ax)
         return fig
@@ -105,18 +142,41 @@ def log_single_model_single_fold(
     study: Study | None,
     metrics: MetricsDict = METRICS,
 ):
-    """
-    This function calculates R², MSE and MAE per default based on the y_true and y_pred passed.
+    """This function calculates R², MSE and MAE per default based on the y_true and y_pred passed.
     The metrics are appended to the dict containing results from all folds and this dict is also returned.
     The metrics and are logged to Neptune.ai as well.
     The parameters are tracked and the model is uploaded as a pickled File object.
     Finally, the index corresponding to the model with the median R² value is saved to the dict as well.
 
+    Args:
+      y_test: Target values for the test set.
+      y_pred: Predicted values for the test set.
+      y_train: Target values for the training set.
+      y_pred_train: Predicted values for the training set.
+      model_name: Name of the model.
+      best_model: Best model object.
+      best_params: Best parameters for the model.
+      k: int: Fold number.
+      run: Neptune run object.
+      results_all_folds: dict: Dictionary containing results from all folds.
+      study: Study | None: Optuna study object. If None, no inner CV was performed. (Default value = None)
+      metrics: MetricsDict: MetricsDict to use for evaluation (Default value = METRICS)
+
     Returns:
-    dict
+      : dict: Dictionary, updated with the results from the current fold and current model.
+
     """
 
     def res_vs_fitted_plot(y_test, y_pred):
+        """
+
+        Args:
+          y_test: 
+          y_pred: 
+
+        Returns:
+
+        """
         fig = plt.figure()
         residuals = y_test - y_pred
         plt.scatter(y_pred, residuals)
@@ -205,6 +265,11 @@ def log_single_model_single_fold(
 class SingleModelFoldResult:
     """This dataclass holds results corresponding to a single model fit in a single outer fold.
     This class is used in cross_validate to pass arguments to the model postprocessor and to easily log results.
+
+    Args:
+
+    Returns:
+
     """
 
     k: int

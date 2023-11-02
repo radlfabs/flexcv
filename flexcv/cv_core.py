@@ -62,31 +62,49 @@ def cross_validate(
     predict_known_groups_lmm: bool,
     diagnostics: bool,
 ) -> Dict[str, Dict[str, list]]:
-    """
-    This function performs a cross-validation for a given regression formula, using one or a number of specified machine learning models and a configurable cross-validation method.
+    """This function performs a cross-validation for a given regression formula, using one or a number of specified machine learning models and a configurable cross-validation method.
 
-    Parameters:
+    Args:
+      *: Use only keyword arguments for this function.
+      X: pd.DataFrame: Features.
+      y: pd.Series: Target.
+      target_name: str: Custom target name.
+      dataset_name: str: Custom dataset name.
+      run: NeptuneRun: A Run object to log to.
+      groups: pd.Series: The grouping or clustering variable.
+      slopes: pd.DataFrame | pd.Series: Random slopes variable(s)
+      split_out: CrossValMethod: Outer split strategy.
+      split_in: CrossValMethod: Inner split strategy.
+      break_cross_val: bool: If True, only the first outer fold is evaluated.
+      scale_in: bool: If True, the features are scaled in the inner cross-validation to zero mean and unit variance. This works independently of the outer scaling.
+      scale_out: bool: If True, the features are scaled in the outer cross-validation to zero mean and unit variance.
+      n_splits_out: int: Number of outer cross-validation folds.
+      n_splits_in: int: Number of inner cross-validation folds.
+      random_seed: int: Seed for all random number generators.
+      model_effects: str: If "fixed", only fixed effects are used. If "mixed", both fixed and random effects are used.
+      n_trials: int: Number of trials for the inner cross-validation, i.e. the number of hyperparameter combinations to sample from the distributions.
+      mapping: ModelMappingDict: The mapping providing model instances, hyperparameter distributions, and postprocessing functions.
+      metrics: MetricsDict: A dict of metrics to be used as the evaluation metric for the outer cross-validation.
+      objective_scorer: ObjectiveScorer: A custom objective scorer object to provide the evaluation metric for the inner cross-validation.
+      em_max_iterations: int: For use with MERF. Maximum number of iterations for the EM algorithm.
+      em_stopping_threshold: float: For use with MERF. Threshold for the early stopping criterion of the EM algorithm.
+      em_stopping_window: int: For use with MERF. Window size for the early stopping criterion of the EM algorithm.
+      predict_known_groups_lmm: bool: For use with Mixed Linear Models. If True, the model will predict the known groups in the test set.
+      diagnostics: bool: If True, diagnostics plots are logged to Neptune.
 
-    RunConfiguration: RunConfigurator object. Holds information on the cross-validation method, number of splits, and the machine learning models to be used.
-    DataSetSelection: SelectedDataSet object. Contains information on the re-feature, if any, to be used.
-    df: pd.DataFrame. The dataframe containing the data.
-    formula: str. The regression formula to be used.
-    plot_correlation: bool, optional (default=False). Whether to plot a heatmap of the feature correlations or not.
-    run: NeptuneRun, optional. An optional NeptuneRun object to log information during the run.
     Returns:
-
-    A dictionary containing the results of the cross-validation, organized by machine learning models.
-    results_all_folds: Dict[str, Dict[str, list]] = {
-        model_name: {
-            "model": [],
-            "parameters": [],
-            "results": [],
-            "r2": [],
-            "y_pred": [],
-            "y_test": [],
-            "shap_values": [],
-            "median_index": [],
-        }
+      A dictionary containing the results of the cross-validation, organized by machine learning models.
+      results_all_folds: Dict[str, Dict[str, list]] = {
+      model_name: {
+      "model": [],
+      "parameters": [],
+      "results": [],
+      "r2": [],
+      "y_pred": [],
+      "y_test": [],
+      "shap_values": [],
+      "median_index": [],
+      }
 
     """
     if objective_scorer is None:

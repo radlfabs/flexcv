@@ -8,9 +8,14 @@ import pandas as pd
 
 
 def pformat_dict(d, indent=""):
-    """
-    Pretty-print a dictionary, only printing values that are themselves dictionaries.
-    :param d: dictionary to print
+    """Pretty-print a dictionary, only printing values that are themselves dictionaries.
+
+    Args:
+      d: dictionary to print
+      indent: str: Level of indentation for use with recursion (Default value = "")
+
+    Returns:
+
     """
     formatted = ""
     for key, value in d.items():
@@ -20,10 +25,16 @@ def pformat_dict(d, indent=""):
 
 
 def add_summary_stats(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Add summary statistics to a pandas DataFrame.
-    :param df: input DataFrame
-    :return: DataFrame with summary statistics
+    """Add summary statistics to a pandas DataFrame.
+    Calculates the mean, median and standard deviation on copies slices of the original data and adds them as rows to the DataFrame.
+    This makes sure, that the summary statistics are not sequentially dependent on each other. 
+    
+    Args:
+      df: pd.DataFrame: Input data.
+
+    Returns:
+      pd.DataFrame: Data with added summary statistics
+
     """
     original_fold_slice = df.copy(deep=True)
     df.loc["mean"] = original_fold_slice.mean(skipna=True)
@@ -65,8 +76,12 @@ class CrossValidationResults(dict):
     This class is a wrapper around this dictionary which provides a summary of the results.
     _make_summary computes the mean, median and standard deviation of the metrics for each model.
     _make_summary is called the first time the summary property is accessed and the result is cached.
-
+    
     _get_model returns the model instance corresponding to the given model name.
+
+    Args:
+
+    Returns:
 
     """
 
@@ -80,6 +95,7 @@ class CrossValidationResults(dict):
 
     @property
     def summary(self):
+        """ """
         if self._summary is None:
             self._summary = self._make_summary()
         return self._summary
@@ -107,6 +123,11 @@ class CrossValidationResults(dict):
             "metric_2": [metric_value_2_fold_1, metric_value_2_fold_2, ...],
             ...
         }
+
+        Args:
+
+        Returns:
+
         """
         model_dfs = []
         for model in self.keys():
@@ -138,6 +159,14 @@ class CrossValidationResults(dict):
         """Returns the model with the best metric value for the given metric.
         Direction can be "min" or "max" and determines whether the best model is the one with the lowest or highest metric value.
         E.g. for MSE, direction should be "min" and for R2, direction should be "max".
+
+        Args:
+          model_name: str: Name of the model (Default value = None)
+          metric_name: Name for the metric (Default value = "mse")
+          direction: Minimize or maximize. (Default value = "min")
+
+        Returns:
+            model: The model with the best metric value for the given metric.
         """
         assert direction in [
             "min",
@@ -167,24 +196,64 @@ class CrossValidationResults(dict):
         return self[best_model_name]["model"][best_metric_index]
 
     def get_predictions(self, model_name, fold_id):
-        """Returns the predictions for the given model and fold."""
+        """Returns the predictions for the given model and fold.
+
+        Args:
+          model_name: 
+          fold_id: 
+
+        Returns:
+
+        """
         return self[model_name]["y_pred"][fold_id]
 
     def get_true_values(self, model_name, fold_id):
-        """Returns the true values for the given model and fold."""
+        """Returns the true values for the given model and fold.
+
+        Args:
+          model_name: 
+          fold_id: 
+
+        Returns:
+
+        """
         return self[model_name]["y_test"][fold_id]
 
     def get_training_predictions(self, model_name, fold_id):
-        """Returns the predictions for the given model and fold."""
+        """Returns the predictions for the given model and fold.
+
+        Args:
+          model_name: 
+          fold_id: 
+
+        Returns:
+
+        """
         return self[model_name]["y_pred_train"][fold_id]
 
     def get_training_true_values(self, model_name, fold_id):
-        """Returns the true values for the given model and fold."""
+        """Returns the true values for the given model and fold.
+
+        Args:
+          model_name: 
+          fold_id: 
+
+        Returns:
+
+        """
         return self[model_name]["y_train"][fold_id]
 
     def get_params(self, model_name, fold_id):
         """Returns the parameters for the given model and fold.
-        If the key is not found, returns None and will not raise an error."""
+        If the key is not found, returns None and will not raise an error.
+
+        Args:
+          model_name: 
+          fold_id: 
+
+        Returns:
+
+        """
         return self[model_name].get("parameters", [None])[fold_id]
 
     def __add__(self, other):
@@ -195,6 +264,7 @@ class CrossValidationResults(dict):
 
 
 class MergedSummary(CrossValidationResults):
+    """ """
     def __init__(
         self,
         cv_results_1,
@@ -205,6 +275,7 @@ class MergedSummary(CrossValidationResults):
 
     @property
     def summary(self):
+        """ """
         return self._merge()
 
     def _merge(self):

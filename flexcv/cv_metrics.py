@@ -6,6 +6,16 @@ def mse_wrapper(y_valid, y_pred, y_train_in, y_pred_train):
     """This function is only used to calculate the objective function value for the hyperparameter optimization.
     In order to allow for customized objective functions it takes the validation and training data and the corresponding predictions as arguments.
     This can be useful to avoid overfitting. The sklearn MSE function had to be wrapped accordingly
+
+    Args:
+      y_valid: Target in the validation set.
+      y_pred: Predictions for the validation set.
+      y_train_in: Target in the training set.
+      y_pred_train: Predictions for the training set.
+
+    Returns:
+        float: Mean squared error.
+
     """
     return mean_squared_error(y_valid, y_pred)
 
@@ -17,10 +27,15 @@ class MetricsDict(dict):
     R²: The coefficient of determination
     MSE: Mean squared error
     MAE: Mean absolute error
-
+    
     We decided againt using the RMSE as a default metric, because we would run into trouble wherever we would average over it.
     RMSE should always be averaged as `sqrt(mean(MSE_values))` and not as `mean(sqrt(MSE_values))`.
     Also, the standard deviation would be calculated incorrectly if RMSE is included at this point.
+
+    Args:
+
+    Returns:
+
     """
 
     def __init__(self):
