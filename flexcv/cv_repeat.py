@@ -3,12 +3,31 @@ import logging
 import numpy as np
 import pandas as pd
 from neptune.types import File
+import neptune
 
 from .cv_class import CrossValidation
 from .funcs import add_module_handlers
 from .run import Run
 
 logger = logging.getLogger(__name__)
+
+
+def init_repeated_runs(n_repeats, neptune_credentials) -> tuple:
+    """Initialize a repeated run and n_repeats children runs.
+    The children runs are linked to the parent run via the "HostRun" key.
+    The children runs are initialized with the same credentials as the parent run.
+    
+    Args:
+        n_repeats (int): Number of repeated runs.
+        use_neptune (bool): Whether to use neptune or not.
+        neptune_credentials (dict): Credentials for neptune.
+        
+    Returns:
+        tuple[Run, list[Run]]: parent_run (Run), children_runs (list of n_repeats runs)
+    """
+    parent_run = neptune.init_run(**neptune_credentials)
+    children_runs = [neptune.init_run(**neptune_credentials) for _ in range(n_repeats)]
+    return parent_run, children_runs
 
 
 def aggregate_(repeated_runs) -> pd.DataFrame:
@@ -55,60 +74,95 @@ def aggregate_(repeated_runs) -> pd.DataFrame:
     return pd.concat(results)
 
 
-def perform_repeats(cv: CrossValidation, n_repeats=3):
-    add_module_handlers(logger)
-    repeated_run = Run()  # neptune.init_run(**your_credentials)
-    repeated_id = repeated_run["sys/id"].fetch()
-    desc = f"Instance of repeated run {repeated_id}."
+class RepeatedResult():
+    def __init__(self, df):
+        self._summary_df = df
+    
+    @property
+    def summary(self):
+        return self._summary_df
 
-    # set numpy seed to 42.
-    # If you do not want to reproduce the repeated run, change the seed or remove the line
-    np.random.seed(42)
 
-    # generate a list of random seeds to use in the repeated loop
-    # the random seeds are used to generate the random folds in the repeated loop
-    seeds = np.random.randint(42000, size=n_repeats).tolist()
+class RepeatedCV(CrossValidation):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.n_repeats = 3
+        self.seeds = None
 
-    run_ids = []
-    run_results = []
-    for seed in seeds:
-        # create a new run for each repeat
-        # neptune will log every inner run as well as the host run
-        inner_run = Run()  # neptune.init_run(**your_credentials)
-        inner_id = inner_run["sys/id"].fetch()
-        inner_run["HostRun"] = repeated_id
-        inner_run["seed"] = seed
+    def set_n_repeats(self, n_repeats):
+        self.n_repeats = n_repeats
+        return self
+    
+    def set_neptune(self, neptune_credentials):
+        self.neptune_credentials = neptune_credentials
+        parent_run, children_runs = init_repeated_runs(self.n_repeats, neptune_credentials)
+        self.parent_run = parent_run
+        self.children_runs = children_runs
+        return self
+    
+    def set_seeds(self, seeds=None, seed=42):
+        np.random.seed(seed)
+        self.seeds = np.random.randint(42000, size=self.n_repeats).tolist()
+        self.seeds = seeds
+        return self
+    
+    def set_run(self, parent_run=None, children_run=None):
+        self.parent_run = parent_run
+        self.children_run = children_run
+        return self
+    
+    def _perform_repeats(self):
+        add_module_handlers(logger)
+        repeated_run = self.parent_run  # neptune.init_run(**your_credentials)
+        repeated_id = repeated_run["sys/id"].fetch()
+        desc = f"Instance of repeated run {repeated_id}."
 
-        results = (
-            cv
-            .set_run(run=inner_run, random_seed=seed)
-            .perform()
-            .get_results()
-        )
+        run_ids = []
+        run_results = []
+        for seed, inner_run in zip(self.seeds, self.children_runs):
+            inner_id = inner_run["sys/id"].fetch()
+            inner_run["HostRun"] = repeated_id
+            inner_run["seed"] = seed
 
-        # append the run id and the run metric to the lists
-        run_ids.append(inner_id)
-        run_results.append(results)
+            results = (
+                self
+                .set_run(run=inner_run, random_seed=seed)
+                .perform()
+                .get_results()
+            )
 
-    # run_dfs have the same column and index names and we
-    df = aggregate_(run_results)
-    df.to_excel("repeated_cv.xlsx")  # save dataframe to excel file
-    print(df)  # print dataframe to console
+            # append the run id and the run metric to the lists
+            run_ids.append(inner_id)
+            run_results.append(results)
 
-    # log the repeated run results to neptune
-    repeated_id = repeated_run["sys/id"].fetch()
-    repeated_run["summary"].upload(File.as_html(df))
-    repeated_run[
-        "sys/description"
-    ] = f"Host run for repeated runs with {n_repeats} repeats. run_ids: {run_ids}"
-    repeated_run["RelatedRuns"] = ", ".join(run_ids)
-    repeated_run["seeds"] = seeds
-    repeated_run["mapping"] = cv.config["mapping"]
-    repeated_run.stop()
+        # run_dfs have the same column and index names and we
+        df = aggregate_(run_results)
+
+        # log the repeated run results to neptune
+        repeated_id = repeated_run["sys/id"].fetch()
+        repeated_run["summary"].upload(File.as_html(df))
+        repeated_run[
+            "sys/description"
+        ] = f"Host run for repeated runs with {self.n_repeats} repeats. run_ids: {run_ids}"
+        repeated_run["RelatedRuns"] = ", ".join(run_ids)
+        repeated_run["seeds"] = self.seeds
+        repeated_run["mapping"] = self.config["mapping"]
+        repeated_run.stop()
+        return df
+    
+    def perform(self):
+        if self.seeds is None:
+            self.set_seeds()
+        summary_df = self._perform_repeats()
+        self._summary_df = summary_df
+        return self
+
+    def get_results(self):
+        return RepeatedResult(self._summary_df)
 
 
 if __name__ == "__main__":
-    from flexcv import CrossValidation
+    
     from flexcv.data_generation import generate_regression
     from flexcv.models import LinearModel
     from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
@@ -127,8 +181,16 @@ if __name__ == "__main__":
         }
     )
 
-    # instantiate our cross validation class
-    cv = CrossValidation().set_data(X, y, group, dataset_name="ExampleData")
+    credentials = {}
+    
+    rcv = (
+        RepeatedCV()
+        .set_data(X, y, group, dataset_name="ExampleData")
+        .set_models(model_map)
+        .set_n_repeats(3)
+        .set_neptune(credentials)
+        .perform()
+        .get_results()
+    )
 
-    # call perform_repeats function
-    perform_repeats(cv, 3)
+    rcv.summary.to_excel("repeated_cv.xlsx")  # save dataframe to excel file
