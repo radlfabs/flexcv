@@ -29,8 +29,10 @@ dependencies = [
   "statsmodels == 0.14.0",
   "tqdm == 4.66.1",
   "xgboost == 2.0.1",
+  "mkdocstrings-python",
 ]
 requires-python = ">=3.10"
+
 
 [project.urls]
 "Homepage" = "https://github.com/radlfabs/flexcv"
