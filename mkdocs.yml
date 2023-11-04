@@ -4,7 +4,7 @@ nav:
   - Getting Started: getting-started.md
   - Tutorial: tutorial.md
   - User Guide: user-guide.md
-  - API Reference: api-reference.md
+  - Reference: reference.md
   - About: about.md
 
 theme:
