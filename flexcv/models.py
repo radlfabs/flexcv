@@ -19,17 +19,8 @@ warnings.simplefilter("ignore", ConvergenceWarning)
 logger = logging.getLogger(__name__)
 
 
-def log_funcname(func):
-    @wraps(func)
-    def wrapper_function(*args, **kwargs):
-        logger.info(f"Calling {func.__name__} model function.")
-        results = func(*args, **kwargs)
-        return results
-
-    return wrapper_function
-
-
 class BaseLinearModel(BaseEstimator, RegressorMixin):
+    """Base class for the Linear Model and the Linear Mixed Effects Model."""
     def __init__(self, re_formula=None, verbose=0, *args, **kwargs):
         self.re_formula = re_formula
         self.verbose = verbose
@@ -37,9 +28,19 @@ class BaseLinearModel(BaseEstimator, RegressorMixin):
         self.params = {}
 
     def get_params(self, deep=True):
+        """Return the parameters of the model.
+
+        Args:
+          deep: This argument is not used. (Default value = True)
+
+        Returns:
+            dict: Parameter names mapped to their values.
+
+        """
         return self.params
 
     def get_summary(self):
+        """Creates a html summary table of the model."""
         lmer_summary = self.md_.summary()  # type: ignore
         try:
             html_tables = ""
@@ -57,22 +58,15 @@ class LinearModel(BaseLinearModel):
         super().__init__(*args, **kwargs)
 
     def fit(self, X, y, **kwargs):
-        """
-        Fit the LMER_LLS model to the given training data.
+        """Fit the LM to the given training data.
 
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            The training input samples.
-        y : array-like of shape (n_samples,)
-            The target values.
-        **kwargs : dict
-            Additional parameters to pass to the underlying model's `fit` method.
+        Args:
+          X(array-like of shape (n_samples, n_features)): The training input samples.
+          y(array-like of shape (n_samples,)): The target values.
+          **kwargs(dict): Additional parameters to pass to the underlying model's `fit` method.
 
-        Returns
-        -------
-        self : object
-            Returns self.
+        Returns:
+          object: Returns self.
 
         Notes
         -----
@@ -95,37 +89,38 @@ class LinearModel(BaseLinearModel):
         return self
 
     def predict(self, X, **kwargs):
-        """Returns
-        -------
-        An array of fitted values.  Note that these predicted values
-        only reflect the fixed effects mean structure of the model.
+        """
+
+        Args:
+          X: 
+          **kwargs: 
+
+        Returns:
+          An array of fitted values.  Note that these predicted values: 
+
+        
         """
         check_is_fitted(self, ["X_", "y_", "md_"])
         return self.md_.predict(exog=X)
 
 
 class LinearMixedEffectsModel(BaseLinearModel):
+    """Wrapper class for the Linear Mixed Effects Model from statsmodels."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def fit(self, X, y, re_formula, **kwargs):
-        """
-        Fit the LMER_LLS model to the given training data.
+        """Fit the LMER model to the given training data.
 
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            The training input samples.
-        y : array-like of shape (n_samples,)
-            The target values.
-        clusters : array-like of shape (n_samples,)
-        **kwargs : dict
-            Additional parameters to pass to the underlying model's `fit` method.
+        Args:
+          X(array-like of shape (n_samples, n_features)): The training input samples.
+          y(array-like of shape (n_samples,)): The target values.
+          clusters(array-like of shape (n_samples,)): 
+          **kwargs(dict): Additional parameters to pass to the underlying model's `fit` method.
+          re_formula: 
 
-        Returns
-        -------
-        self : object
-            Returns self.
+        Returns:
+          object: Returns self.
 
         Notes
         -----
@@ -163,10 +158,17 @@ class LinearMixedEffectsModel(BaseLinearModel):
         return self
 
     def predict(self, X, **kwargs):
-        """Returns
-        -------
-        An array of fitted values.  Note that these predicted values
-        only reflect the fixed effects mean structure of the model.
+        """
+        Make predictions using the fitted model.
+
+        Args:
+          X: Features
+          **kwargs: Any other keyword arguments to pass to the underlying model's `predict` method. This is necessary to prevent raising an error when passing the `clusters` argument.
+
+        Returns:
+          An array of fitted values.
+
+        
         """
         check_is_fitted(self, ["X_", "y_", "md_"])
         clusters = kwargs["clusters"]
@@ -200,7 +202,7 @@ class LinearMixedEffectsModel(BaseLinearModel):
 class EarthRegressor(BaseEstimator, RegressorMixin):
     """Wrapper Class for Earth Regressor in R.
     More Details see https://cran.r-project.org/web/packages/earth/earth.pdf.
-
+    
     Hyperparameters:
         degree: int, default=1
             Degree of the splines. 1 for linear, 2 for quadratic, etc.
@@ -230,6 +232,11 @@ class EarthRegressor(BaseEstimator, RegressorMixin):
             Pruning can take a while if "exhaustive" is chosen and the model is big (more than about 30 terms).
             The current version of the leaps package used during pruning does not allow user interrupts
             (i.e., you have to kill your R session to interrupt; in Windows use the Task Manager or from the command line use taskkill).
+
+    Args:
+
+    Returns:
+
     """
 
     def __init__(
@@ -259,6 +266,15 @@ class EarthRegressor(BaseEstimator, RegressorMixin):
         self.random_state = random_state
 
     def fit(self, X, y):
+        """Fit a EARTH model to the given training data.
+
+        Args:
+          X: Features.
+          y: Target values.
+
+        Returns:
+            object: Returns self.
+        """
         if np.iscomplexobj(X) or np.iscomplexobj(y):
             raise ValueError("Complex data not supported")
         # ro.r('sink(nullfile())')
@@ -330,6 +346,14 @@ class EarthRegressor(BaseEstimator, RegressorMixin):
         return self
 
     def predict(self, X):
+        """Make predicitons using the fitted model.
+
+        Args:
+          X: Features
+
+        Returns:
+            An array of fitted values.
+        """
         if np.iscomplexobj(X):
             raise ValueError("Complex data not supported")
         ro.r(
@@ -368,6 +392,13 @@ class EarthRegressor(BaseEstimator, RegressorMixin):
         return self.is_fitted_
 
     def get_params(self, deep=False):
+        """Returns the parameters of the model.
+
+        Args:
+          deep:  (Default value = False)
+        Returns:
+            dict: Parameter names mapped to their values.
+        """
         return {
             "degree": self.degree,
             "nprune": self.nprune,
@@ -383,9 +414,11 @@ class EarthRegressor(BaseEstimator, RegressorMixin):
         }
 
     def get_rmodel(self):
+        """Returns the R model object."""
         return self.model_
 
     def make_r_plots(self):
+        """Creates plots of the model in R and saves them to disk."""
         Path("tmp_imgs").mkdir(parents=True, exist_ok=True)
         for i in range(1, 5):
             ro.r["png"](f"tmp_imgs/mars_plot_{i}.png", width=1024, height=1024)
@@ -393,6 +426,7 @@ class EarthRegressor(BaseEstimator, RegressorMixin):
             ro.r["dev.off"]()
 
     def calc_variable_importance(self):
+        """Calculates the variable importance of the model."""
         ro.globalenv["ev"] = ro.r["evimp"](self.model_, trim=False)
         imp = ro.r("as.data.frame(unclass(ev[,c(3,4,6)]))")
         imp_df: pd.DataFrame = ro.conversion.rpy2py(imp)
@@ -406,6 +440,14 @@ class EarthRegressor(BaseEstimator, RegressorMixin):
         return imp_df
 
     def get_variable_importance(self, features):
+        """Returns the variable importance of the model.
+
+        Args:
+          features: 
+
+        Returns:
+
+        """
         self.var_imp_.index = features
         return self.var_imp_
 

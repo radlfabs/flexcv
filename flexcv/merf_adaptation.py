@@ -24,6 +24,16 @@ logger = logging.getLogger(__name__)
 
 
 def compute_y_star(data_class, b_hat_df, cluster_id):
+    """
+
+    Args:
+      data_class: 
+      b_hat_df: 
+      cluster_id: 
+
+    Returns:
+
+    """
     return data_class.y_by_cluster[cluster_id] - data_class.Z_by_cluster[
         cluster_id
     ].dot(b_hat_df.loc[cluster_id])
@@ -32,6 +42,20 @@ def compute_y_star(data_class, b_hat_df, cluster_id):
 def compute_m_step(
     EmData, cluster_id, sigma2_hat_sum, D_hat_sum, sigma2_hat, D_hat, b_hat_df
 ):
+    """
+
+    Args:
+      EmData: 
+      cluster_id: 
+      sigma2_hat_sum: 
+      D_hat_sum: 
+      sigma2_hat: 
+      D_hat: 
+      b_hat_df: 
+
+    Returns:
+
+    """
     indices_i = EmData.indices_by_cluster[cluster_id]
     y_i = EmData.y_by_cluster[cluster_id]
     Z_i = EmData.Z_by_cluster[cluster_id]
@@ -87,22 +111,22 @@ def compute_m_step(
 
 @dataclass
 class EMDataClass:
+    """ """
     pass
 
 
 class MERF(BaseEstimator):
-    """
-    This is the core class to instantiate, train, and predict using a mixed effects random forest model.
+    """This is the core class to instantiate, train, and predict using a mixed effects random forest model.
     It roughly adheres to the sklearn estimator API.
     Note that the user must pass in an already instantiated fixed_effects_model that adheres to the
     sklearn regression estimator API, i.e. must have a fit() and predict() method defined.
-
+    
     It assumes a data model of the form:
-
+    
     .. math::
-
+    
         y = f(X) + b_i Z + e
-
+    
     * y is the target variable. The current code only supports regression for now, e.g. continuously varying scalar value
     * X is the fixed effect features. Assume p dimensional
     * f(.) is the nonlinear fixed effects mode, e.g. random forest
@@ -111,11 +135,13 @@ class MERF(BaseEstimator):
     * i is the cluster index. Assume k clusters in the training.
     * bi is the random effect coefficients. They are different per cluster i but are assumed to be drawn from the same distribution ~N(0, Sigma_b) where Sigma_b is learned from the data.
 
-
     Args:
-        fixed_effects_model (sklearn.base.RegressorMixin): instantiated model class
-        gll_early_stop_threshold (float): early stopping threshold on GLL improvement
-        max_iterations (int): maximum number of EM iterations to train
+      fixed_effects_model: sklearn.base.RegressorMixin: instantiated model class
+      gll_early_stop_threshold: float: early stopping threshold on GLL improvement
+      max_iterations: int: maximum number of EM iterations to train
+
+    Returns:
+
     """
 
     def __init__(
@@ -146,19 +172,20 @@ class MERF(BaseEstimator):
         self.val_loss_history = []
 
     def predict(self, X: np.ndarray, Z: np.ndarray, clusters: pd.Series, **kwargs):
-        """
-        Predict using trained MERF.  For known clusters the trained random effect correction is applied.
+        """Predict using trained MERF.  For known clusters the trained random effect correction is applied.
         For unknown clusters the pure fixed effect (RF) estimate is used.
 
         Args:
-            X (np.ndarray): fixed effect covariates
-            Z (np.ndarray): random effect covariates
-            clusters (pd.Series): cluster assignments for samples
+          X: np.ndarray: fixed effect covariates
+          Z: np.ndarray: random effect covariates
+          clusters: pd.Series: cluster assignments for samples
+          **kwargs: Any other keyword argument. This is important to not raise during flexcv's cross validation.
 
         Returns:
-            np.ndarray: the predictions y_hat
+          np.ndarray: the predictions y_hat
+
         """
-        if type(clusters) != pd.Series:
+        if not isinstance(clusters, pd.Series):
             raise TypeError("clusters must be a pandas Series.")
 
         if self.trained_fe_model is None:
@@ -203,17 +230,24 @@ class MERF(BaseEstimator):
         *args,
         **kwargs,
     ):
-        """
-        Fit MERF using Expectation-Maximization algorithm.
+        """Fit MERF using Expectation-Maximization algorithm.
 
         Args:
-            X (np.ndarray): fixed effect covariates
-            Z (np.ndarray): random effect covariates
-            clusters (pd.Series): cluster assignments for samples
-            y (np.ndarray): response/target variable
+          y(np.ndarray): response/target variable
+          X: np.ndarray: fixed effect covariates
+          Z: np.ndarray: random effect covariates
+          clusters: pd.Series: cluster assignments for samples
+          y: np.ndarray: target values
+          X_val: np.ndarray: validation fixed effects covariates (Default value = None)
+          Z_val: np.ndarray: validation re covariates (Default value = None)
+          clusters_val: pd.Series: validation cluster assignments for samples (Default value = None)
+          y_val: np.ndarray: validation target values (Default value = None)
+          *args: any other positional argument
+          **kwargs: any other keyword argument
 
         Returns:
-            MERF: fitted model
+          MERF: fitted model
+
         """
 
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Input Checks ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -410,20 +444,30 @@ class MERF(BaseEstimator):
         return self
 
     def score(self, X, Z, clusters, y):
+        """Score is not implented.
+
+        Args:
+          X: 
+          Z: 
+          clusters: 
+          y: 
+
+        Returns:
+
+        """
         raise NotImplementedError()
 
     def get_bhat_history_df(self):
-        """
-        This function does a complicated reshape and re-indexing operation to get the
+        """This function does a complicated reshape and re-indexing operation to get the
         list of dataframes for the b_hat_history into a multi-indexed dataframe.  This
         dataframe is easier to work with in plotting utilities and other downstream
         analyses than the list of dataframes b_hat_history.
 
         Args:
-            b_hat_history (list): list of dataframes of bhat at every iteration
 
         Returns:
-            pd.DataFrame: multi-index dataframe with outer index as iteration, inner index as cluster
+          pd.DataFrame: multi-index dataframe with outer index as iteration, inner index as cluster
+
         """
         # Step 1 - vertical stack all the arrays at each iteration into a single numpy array
         b_array = np.vstack(self.b_hat_history)

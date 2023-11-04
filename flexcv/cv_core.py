@@ -93,8 +93,11 @@ def cross_validate(
       diagnostics: bool: If True, diagnostics plots are logged to Neptune.
 
     Returns:
-      A dictionary containing the results of the cross-validation, organized by machine learning models.
-      results_all_folds: Dict[str, Dict[str, list]] = {
+      results_all_folds: Dict[str, Dict[str, list]] : A dictionary containing the results of the cross-validation, organized by machine learning models.
+    
+    The function returns a nested dictionary with the following structure:
+    ```python
+    results_all_folds = {
       model_name: {
       "model": [],
       "parameters": [],
@@ -104,7 +107,8 @@ def cross_validate(
       "y_test": [],
       "shap_values": [],
       "median_index": [],
-      }
+    }
+    ```
 
     """
     if objective_scorer is None:

@@ -21,56 +21,53 @@ add_module_handlers(logger)
 
 @dataclass
 class CrossValidation:
-    """Functional interface for cross validation.
-    
-    This class is a functional interface for cross validation. It allows you to
-    configure the cross validation and then run it. It also allows you to log
-    the configuration and results to Neptune.
+    """This class is the central interface to interact with `flexcv`.
+    Use this dataclass to configure your cross validation run with it's `set_***()` methods.
+    You can use method chaining to set multiple configurations at once. 
+    This allows you to provide extensive configuration with few lines of code. 
+    It also helps you to log the configuration and results to Neptune.
     
     Example:
+    ```python
+    >>> import flexcv
+    >>> import neptune
+    >>> X = pd.DataFrame({"x": [1, 2, 3, 4, 5], "z": [1, 2, 3, 4, 5]})
+    >>> y = pd.Series([1, 2, 3, 4, 5])
+    >>> mapping = flexcv.ModelMappingDict(
+    ...     {
+    ...         "LinearModel": flexcv.ModelConfigDict(
+    ...             {
+    ...                 "model": "LinearRegression",
+    ...                 "kwargs": {"fit_intercept": True},
+    ...             }
+    ...         ),
+    ...     }
+    ... )
+    >>> run = neptune.init_run()
+    >>> cv = CrossValidation()
+    >>> results = (
+    ...     cv
+    ...     .with_data(X, y)
+    ...     .with_models(mapping)
+    ...     .log(run)
+    ...     .perform()
+    ...     .get_results()
+    ... )
+    ```
     
     Methods:
-        set_data: Sets the data for cross validation.
-        set_splits: Sets the cross validation strategy.
-        set_models: Sets the models to be cross validated.
-        set_inner_cv: Sets the inner cross validation strategy.
-        set_mixed_effects: Sets the mixed effects parameters.
-        set_run: Sets the run parameters.
-        perform: Performs cross validation.
-        _log: Logs the configuration to Neptune.
-    
-    Properties:
-        results: Returns the results of cross validation.
-
-    Args:
+        set_data: Sets the data for cross validation. Pass your dataframes and series here.
+        set_splits: Sets the cross validation strategy for inner and outer folds. You may need to import `flexcv.CrossValMethod`. 
+        set_models: Sets the models to be cross validated. Pass hyperparameter distributions for model tuning here. You may need to import `flexcv.ModelMappingDict` and `flexcv.ModelConfigDict`.
+        set_inner_cv: Sets the inner cross validation configuration. Pass arguments regarding the hyperparameter optimization process.  
+        set_mixed_effects: Sets the mixed effects parameters. Control if mixed effects are modeled and set arguments regarding the Expectation Maximization algorithm.
+        set_run: Sets the run parameters. Pass your Neptune run object here.
+        perform: Performs cross validation. Just call this method without args to trigger the nested cross validation run.
 
     Returns:
       CrossValidation: CrossValidation object.
 
-    >>> import flexcv
-        >>> import neptune
-        >>> X = pd.DataFrame({"x": [1, 2, 3, 4, 5], "z": [1, 2, 3, 4, 5]})
-        >>> y = pd.Series([1, 2, 3, 4, 5])
-        >>> mapping = flexcv.ModelMappingDict(
-        ...     {
-        ...         "LinearModel": flexcv.ModelConfigDict(
-        ...             {
-        ...                 "model": "LinearRegression",
-        ...                 "kwargs": {"fit_intercept": True},
-        ...             }
-        ...         ),
-        ...     }
-        ... )
-        >>> run = neptune.init_run()
-        >>> cv = CrossValidation()
-        >>> results = (
-        ...     cv
-        ...     .with_data(X, y)
-        ...     .with_models(mapping)
-        ...     .log(run)
-        ...     .perform()
-        ...     .get_results()
-        ... )
+
     """
 
     def __init__(self) -> None:
@@ -129,16 +126,10 @@ class CrossValidation:
         Args:
           X: pd.DataFrame: The features. Must not contain the target or groups.
           y: pd.DataFrame | pd.Series: The target variable.
-          groups: pd.DataFrame | pd.Series: The grouping/clustering variable. (Default value = None)
+          groups: pd.DataFrame | pd.Series:  The grouping/clustering variable. (Default value = None) (Default value = None)
           slopes: pd.DataFrame | pd.Series: The random slopes variable(s) (Default value = None)
-          target_name: str: Customize the target's name (Default value = "")
-          dataset_name: str: Customize your datasdet's name (Default value = "")
-          X: pd.DataFrame: 
-          y: pd.DataFrame | pd.Series: 
-          groups: pd.DataFrame | pd.Series:  (Default value = None)
-          slopes: pd.DataFrame | pd.Series:  (Default value = None)
-          target_name: str:  (Default value = "")
-          dataset_name: str:  (Default value = "")
+          target_name: str: Customize the target's name. This string will be used in logging. (Default value = "")
+          dataset_name: str: Customize your datasdet's name. This string will be used in logging. (Default value = "")
 
         Returns:
           CrossValidation: self
@@ -216,14 +207,6 @@ class CrossValidation:
           scale_in: bool: Whether or not the Features of the inner loop will be scaled to mean 0 and variance 1 (Default value = True)
           break_cross_val: bool: If True, the outer loop we break after first iteration. Use for debugging (Default value = False)
           metrics: MetricsDict: A dict containint evaluation metrics for the outer loop results. See MetricsDict for Details. (Default value = None)
-          split_out: CrossValMethod:  (Default value = CrossValMethod.KFOLD)
-          split_in: CrossValMethod:  (Default value = CrossValMethod.KFOLD)
-          n_splits_out: int:  (Default value = 5)
-          n_splits_in: int:  (Default value = 5)
-          scale_out: bool:  (Default value = True)
-          scale_in: bool:  (Default value = True)
-          break_cross_val: bool:  (Default value = False)
-          metrics: MetricsDict:  (Default value = None)
 
         Returns:
           CrossValidation: self
@@ -298,8 +281,6 @@ class CrossValidation:
         Args:
           n_trials: int: Number of trials to sample from the parameter distributions (Default value = 100)
           objective_scorer: ObjectiveScorer: Callable to provide the optimization objective value. Is called during Optuna SearchCV (Default value = None)
-          n_trials: int:  (Default value = 100)
-          objective_scorer: ObjectiveScorer:  (Default value = None)
 
         Returns:
           CrossValidation: self
@@ -332,11 +313,6 @@ class CrossValidation:
           em_stopping_threshold: float: For use with EM. Threshold of GLL residuals for early stopping (Default value = None)
           em_stopping_window: int: For use with EM. Number of consecutive iterations to be below threshold for early stopping (Default value = None)
           predict_known_groups_lmm: bool: For use with LMER, whether or not known groups should be predicted (Default value = True)
-          model_mixed_effects: bool:  (Default value = False)
-          em_max_iterations: int:  (Default value = 100)
-          em_stopping_threshold: float:  (Default value = None)
-          em_stopping_window: int:  (Default value = None)
-          predict_known_groups_lmm: bool:  (Default value = True)
 
         Returns:
           CrossValidation: self
@@ -374,9 +350,6 @@ class CrossValidation:
           run: NeptuneRun: The run object to use for logging (Default value = None)
           diagnostics: bool: If True, extended diagnostic plots are logged (Default value = False)
           random_seed: int: Seed for random processes (Default value = 42)
-          run: NeptuneRun:  (Default value = None)
-          diagnostics: bool:  (Default value = False)
-          random_seed: int:  (Default value = 42)
 
         Returns:
 
@@ -402,7 +375,6 @@ class CrossValidation:
 
         Args:
           run: NeptuneRun: The run to log to (Default value = None)
-          run: NeptuneRun:  (Default value = None)
 
         Returns:
           CrossValidation: self
@@ -475,7 +447,10 @@ class CrossValidation:
 
     @run_padding
     def perform(self):
-        """ """
+        """Perform the cross validation according to the configuration passed by the user.
+        Checks if a neptune run object has been set. If the user did not provide a neptune run object, a dummy run is instantiated.
+        All logs and plots will be logged to the dummy run and will be lost.
+        However, the cross validation results is created and can be returned via the `CrossValidation.results` property."""
         if not hasattr(self.config, "run"):
             self.config["run"] = DummyRun()
         run = self.config["run"]
@@ -488,12 +463,12 @@ class CrossValidation:
         return self
 
     def get_results(self) -> CrossValidationResults:
-        """ """
+        """Returns a CrossValidationResults object. This results object is a wrapper class around the results dict from the cross_validate function."""
         return self.results_
 
     @property
     def results(self) -> CrossValidationResults:
-        """ """
+        """Returns a CrossValidationResults object. This results object is a wrapper class around the results dict from the cross_validate function."""
         return self.results_
 
 

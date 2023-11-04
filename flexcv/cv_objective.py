@@ -10,16 +10,16 @@ class ObjectiveScorer(
     Callable[[np.ndarray, np.ndarray, np.ndarray, np.ndarray], float]
 ):
     """Callable class that wraps a scorer function to be used as an objective function.
-    The scorer function must take the following arguments:
-    y_valid: ndarray
-        The validation target values.
-    y_pred: ndarray
-        The predicted target values.
-    y_train_in: ndarray
-        The training target values.
-    y_pred_train: ndarray
-        The predicted training target values.
-    and return a float value.
+    The scorer function must match the following signature. Instantiating the class will check the signature.
+    
+    Args:
+        y_valid: ndarray: The validation target values.
+        y_pred: ndarray: The predicted target values.
+        y_train_in: ndarray: The training target values.
+        y_pred_train: ndarray: The predicted training target values.
+        
+    Returns:
+        float: The objective function value.
     
     ### Inner CV pseudo code
     For hyperparameter tuning (inner cv loop) we use the following hierarchy:
@@ -95,11 +95,11 @@ def custom_scorer(y_valid, y_pred, y_train_in, y_pred_train) -> float:
     ```python
     objective_cv(
     if n_jobs == -1:
-    parallel_objective(
-    some_kind_of_scorer
-    )
+        parallel_objective(
+            some_kind_of_scorer
+        )
     else:
-    objective(some_king_of_scorer)
+        objective(some_king_of_scorer)
     ```
 
     """
@@ -134,31 +134,25 @@ def objective(
     Returns the negative validation and training MSEs as well as the negative objective function value, since optuna maximizes the objective function.
     
     Args:
-        X_train_in: DataFrame or ndarray
-            The training data.
-        y_train_in: DataFrame or ndarray
-            The training target values.
-        X_valid: DataFrame or ndarray
-            The validation data.
-        y_valid: DataFrame or ndarray
-            The validation target values.
-        pipe: Pipeline
-            The pipeline to be used for the training.
+        X_train_in: DataFrame or ndarray: The training data.
+        y_train_in: DataFrame or ndarray: The training target values.
+        X_valid: DataFrame or ndarray: The validation data.
+        y_valid: DataFrame or ndarray: The validation target values.
+        pipe: Pipeline: The pipeline to be used for the training.
 
     Returns:
-      tuple
-      The negative validation MSE, the negative training MSE and the negative objective function value.
+        tuple: The negative validation MSE, the negative training MSE and the negative objective function value.
       
     ### Inner CV pseudo code
     For hyperparameter tuning (inner cv loop) we use the following hierarchy:
     ```python
     objective_cv(
     if n_jobs == -1:
-    parallel_objective(
-    some_kind_of_scorer
-    )
+        parallel_objective(
+            some_kind_of_scorer
+        )
     else:
-    objective(some_king_of_scorer)
+        objective(some_king_of_scorer)
     ```
 
     """
@@ -199,17 +193,17 @@ def parallel_objective(
       tuple
       The validation MSE, the training MSE and the objective function value.
       
-      ### Inner CV pseudo code
-      For hyperparameter tuning (inner cv loop) we use the following hierarchy:
-      ```python
-      objective_cv(
-      if n_jobs == -1:
-      parallel_objective(
-      some_kind_of_scorer
-      )
-      else:
-      objective(some_king_of_scorer)
-      ```
+    ### Inner CV pseudo code
+    For hyperparameter tuning (inner cv loop) we use the following hierarchy:
+    ```python
+    objective_cv(
+    if n_jobs == -1:
+        parallel_objective(
+            some_kind_of_scorer
+        )
+    else:
+        objective(some_king_of_scorer)
+    ```
 
     """
     X_train_in = X.iloc[train_idx]
@@ -234,31 +228,30 @@ def objective_cv(
     If n_jobs is 1, the objective function is called sequentially.
 
     Args:
-      The: parameters to be set in the pipeline
+      trial: Optuna trial object.
+      cross_val_split: function: Function that returns the indices for the cross validation split.
+      pipe: Pipeline: The pipeline to be used for the training.
+      params: dict: Dictionary containing the parameters to be set in the pipeline.
       X: DataFrame or ndarray: Features.
       y: DataFrame or ndarray: Target.
       run: Run: neptune run object
       n_jobs: int: Sklearn n_jobs parameter to control if CV is run in parallel or sequentially
       objective_scorer: ObjectiveScorer: Callable class that wraps a scorer function to be used as an objective function.
-      trial: Optuna trial object.
-      cross_val_split: function: Function that returns the indices for the cross validation split.
-      pipe: Pipeline: The pipeline to be used for the training.
-      params: dict: Dictionary containing the parameters to be set in the pipeline.
+      
 
     Returns:
-      float
-      The mean objective function value. Note: We average per default. If you would like to use the RMSE as the objective function, you have to average the MSEs and then take the square root.
+      float: The mean objective function value. Note: We average per default. If you would like to use the RMSE as the objective function, you have to average the MSEs and then take the square root.
       
     ### Pseudo code
     For hyperparameter tuning (inner cv loop) we use the following hierarchy:
     ```python
     objective_cv(
     if n_jobs == -1:
-    parallel_objective(
-    some_kind_of_scorer
-    )
+      parallel_objective(
+        some_kind_of_scorer
+        )
     else:
-    objective(some_king_of_scorer)
+      objective(some_king_of_scorer)
     ```
 
     """

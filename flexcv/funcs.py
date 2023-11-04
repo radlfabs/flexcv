@@ -13,11 +13,28 @@ import seaborn as sns
 logger = logging.getLogger(__name__)
 
 
-def empty_func(*args, **kwargs):
+def empty_func(*args, **kwargs) -> None:
+    """A function that does nothing.
+
+    Args:
+      *args: Any argument is accepted.
+      **kwargs: Any keayword argument is accepted.
+
+    Returns:
+      None
+    """
     pass
 
 
-def add_module_handlers(logger: logging.Logger):
+def add_module_handlers(logger: logging.Logger) -> None:
+    """Adds handlers to the logger for the module.
+
+    Args:
+      logger: logging.Logger: The logger for the module.
+
+    Returns:
+      None
+    """
     logger = logging.getLogger()  # Get the root logger
     logger.setLevel(logging.INFO)
 
@@ -32,16 +49,31 @@ def add_module_handlers(logger: logging.Logger):
     logger.addHandler(c_handler)
 
 
-def get_fixed_effects_formula(target_name, X_data):
+def get_fixed_effects_formula(target_name, X_data) -> str:
     """Returns the fixed effects formula for the dataset
-    Scheme: "target ~ column1 + column2 + ..."""
+    Scheme: "target ~ column1 + column2 + ...
+
+    Args:
+      target_name: str: The name of the target variable in the dataset.
+      X_data: pd.DataFrame: The feature matrix.
+
+    Returns:
+      str: str: The fixed effects formula.
+    """
     start = f"{target_name} ~ {X_data.columns[0]} + "
     end = " + ".join(X_data.columns[1:])
     return start + end
 
 
 def get_re_formula(random_slopes_data):
-    """Scheme: ~ random_slope1 + random_slope2 + ..."""
+    """Returns a random effects formula for use in statsmodels. Scheme: ~ random_slope1 + random_slope2 + ...
+
+    Args:
+      random_slopes_data: pd.Series | pd.DataFrame: The random slopes data.
+
+    Returns:
+      str: The random effects formula.
+    """
     if random_slopes_data is None:
         return ""
     elif isinstance(random_slopes_data, pd.DataFrame):
@@ -53,8 +85,26 @@ def get_re_formula(random_slopes_data):
 
 
 def run_padding(func):
+    """Decorator to add padding to the output of a function.
+    Helps to visually separate the output of different functions.
+
+    Args:
+      func: Any callable.
+      
+    Returns:
+      Any: Return value of the passed callable.
+    """
     @wraps(func)
     def wrapper_function(*args, **kwargs):
+        """
+
+        Args:
+          *args: 
+          **kwargs: 
+
+        Returns:
+
+        """
         print()
         print("~" * 10, "STARTING RUN", "~" * 10)
         print()

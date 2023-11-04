@@ -51,28 +51,28 @@ def log_diagnostics(
     All outputs are logged to neptune and the function returns None.
 
     Args:
-      X_train: Training features.
-      X_test: Testing features.
-      y_train: Training target.
-      y_test: Testing target.
+      X_train: pd.DataFrame: Training features.
+      X_test: pd.DataFrame: Testing features.
+      y_train: pd.Series: Training target.
+      y_test: pd.Series: Testing target.
       run: Neptune run object.
-      effects: Type of effects to be used. Either "fixed" or "mixed".
+      effects: str: Type of effects to be used. Either "fixed" or "mixed".
       cluster_train: pd.Series: Training clustering or grouping variable (Default value = None)
       cluster_test: pd.Series: Testing clustering or grouping variable (Default value = None)
-      namestring: A string to pass to logging. Use to separate folds: use "in" or "out" (Default value = "out")
+      namestring: str: A string to pass to logging. Use to separate folds: use "in" or "out" (Default value = "out")
 
     Returns:
         None
     """
 
     def get_df_hist_fig(df):
-        """
+        """Generates a histogram for each column in the dataframe.
 
         Args:
-          df: 
+          df: pd.DataFrame: The data to plot histograms for.
 
         Returns:
-
+          matplotlib.figure.Figure: The figure object containing the histograms as subplots.
         """
         fig, axes = plt.subplots(len(df.columns), 1, figsize=(5, 15))
         ax = axes.flatten()
@@ -266,9 +266,18 @@ class SingleModelFoldResult:
     """This dataclass holds results corresponding to a single model fit in a single outer fold.
     This class is used in cross_validate to pass arguments to the model postprocessor and to easily log results.
 
-    Args:
-
-    Returns:
+    Parameters:
+        k: int: Fold number.
+        model_name: Name of the model.
+        best_model: Best model object.
+        best_params: Best parameters for the model.
+        y_pred: Predicted values for the test set.
+        y_test: Target values for the test set.
+        X_test: Test features.
+        y_train: Target values for the training set.
+        y_pred_train: Predicted values for the training set.
+        X_train: Training features.
+        fit_result: Any: Result of the fit method of the model.
 
     """
 

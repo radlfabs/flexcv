@@ -17,6 +17,19 @@ logger = logging.getLogger(__name__)
 
 
 def lm_post(results_all_folds, fold_result, run, *args, **kwargs):
+    """Postprocessing function for the linear regression model.
+    Logs the summary of the model, the VIF and the plots to neptune.
+
+    Args:
+      results_all_folds: dict of results for all folds
+      fold_result: dataclass containing the results for the current fold
+      run: neptune run object
+      *args: any additional arguments
+      **kwargs: any additional keyword arguments
+
+    Returns:
+      dict: updated results dictionary
+    """
     # LM is the only one where the regular logging wont work with get_params()
     # therefore, we need to get the summary via the model object and simply overwrite the empty logs
     params = fold_result.fit_result.get_summary()
@@ -36,6 +49,19 @@ def lm_post(results_all_folds, fold_result, run, *args, **kwargs):
 
 
 def lmer_post(results_all_folds, fold_result, run, *args, **kwargs):
+    """Postprocessing function for the linear mixed effects model.
+    Logs the summary of the model to neptune.
+
+    Args:
+      results_all_folds: dict of results for all folds
+      fold_result: dataclass containing the results for the current fold
+      run: neptune run object
+      *args: any additional arguments
+      **kwargs: any additional keyword arguments
+
+    Returns:
+      dict: updated results dictionary
+    """
     # LM is the only one where the regular logging wont work with get_params()
     # therefore, we need to get the summary via the model object and simply overwrite the empty logs
     params = fold_result.fit_result.get_summary()
@@ -48,6 +74,20 @@ def lmer_post(results_all_folds, fold_result, run, *args, **kwargs):
 
 
 def rf_post(results_all_folds, fold_result, run, *args, **kwargs):
+    """Postprocessing function for the random forest model.
+    Logs the parameters to Neptune.
+    Generates beeswarm plots from SHAP explainers for the training and test data and logs them to Neptune.
+
+    Args:
+      results_all_folds: dict of results for all folds
+      fold_result: dataclass containing the results for the current fold
+      run: neptune run object
+      *args: any additional arguments
+      **kwargs: any additional keyword arguments
+
+    Returns:
+      dict: updated results dictionary
+    """
     run[f"{fold_result.model_name}/BestParams/{fold_result.k}"] = pformat(
         fold_result.best_params
     )
@@ -79,6 +119,20 @@ def rf_post(results_all_folds, fold_result, run, *args, **kwargs):
 
 
 def xgboost_post(results_all_folds, fold_result, run, *args, **kwargs):
+    """Postprocessing function for the xgboost model.
+    Logs the parameters to Neptune.
+    Generates beeswarm plots from SHAP explainers for the training and test data and logs them to Neptune.
+    
+    Args:
+      results_all_folds: dict of results for all folds
+      fold_result: dataclass containing the results for the current fold
+      run: neptune run object
+      *args: any additional arguments
+      **kwargs: any additional keyword arguments
+
+    Returns:
+      dict: updated results dictionary
+    """
     explainer = shap.TreeExplainer(fold_result.best_model)
     shap_values = explainer.shap_values(fold_result.X_train)
     shap_explainer = explainer(fold_result.X_train)
@@ -111,16 +165,21 @@ def xgboost_post(results_all_folds, fold_result, run, *args, **kwargs):
 
 
 def mars_post(results_all_folds, fold_result, run, *args, **kwargs):
-    with plt.style.context("ggplot"):
-        # try:
-        #     Path("tmp_imgs").mkdir(parents=True, exist_ok=True)
+    """Postprocessing function for the MARS model.
+    Logs the parameters to Neptune.
+    Creates a variable importance table and logs barplots to neptune. 
 
-        #     for i in range(1, 5):
-        #         run[f"MARS/Plots/{fold_result.k}/{i}"].upload(
-        #             File(f"tmp_imgs/mars_plot_{i}.png")
-        #         )
-        # except Exception as e:
-        #     logger.info(e)
+    Args:
+      results_all_folds: dict of results for all folds
+      fold_result: dataclass containing the results for the current fold
+      run: neptune run object
+      *args: any additional arguments
+      **kwargs: any additional keyword arguments
+
+    Returns:
+      dict: updated results dictionary
+    """
+    with plt.style.context("ggplot"):
 
         imp_df: pd.DataFrame = fold_result.best_model.get_variable_importance(
             kwargs["features"]
@@ -149,6 +208,20 @@ def mars_post(results_all_folds, fold_result, run, *args, **kwargs):
 
 
 def svr_post(results_all_folds, fold_result, run, *args, **kwargs):
+    """Postprocessing function for the SVR model.
+    Logs the parameters to Neptune.
+    Logs permutation importance plots to Neptune.
+
+    Args:
+      results_all_folds: dict of results for all folds
+      fold_result: dataclass containing the results for the current fold
+      run: neptune run object
+      *args: any additional arguments
+      **kwargs: any additional keyword arguments
+
+    Returns:
+      dict: updated results dictionary
+    """
     with plt.style.context("ggplot"):
         run[f"{fold_result.model_name}/BestParams/{fold_result.k}"] = pformat(
             fold_result.best_params
@@ -170,6 +243,20 @@ def svr_post(results_all_folds, fold_result, run, *args, **kwargs):
 def expectation_maximation_post(
     results_all_folds, fold_result, y_pred_base, run, *args, **kwargs
 ):
+    """Postprocessing function for the expectation maximization model (MERF).
+    Logs training and test plots to Neptune.
+
+    Args:
+      results_all_folds: 
+      fold_result: 
+      y_pred_base: 
+      run: 
+      *args: 
+      **kwargs: 
+
+    Returns:
+
+    """
     run[f"{fold_result.model_name}/BestParams/{fold_result.k}"] = pformat(
         {
             "max_iterations": fold_result.fit_result.max_iterations,

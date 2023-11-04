@@ -41,7 +41,6 @@ class ModelConfigDict(Dict[str, Type]):
     n_trials = 100
     n_jobs = {"n_jobs": 1}
     n_jobs_cv = 1
-    params = {}
 
     Usage:
         ```py
@@ -72,6 +71,10 @@ class ModelConfigDict(Dict[str, Type]):
             "mixed_name": "MixedLM"
                     # name of the mixed effects model. It is used to identify the model in the results dictionary.
         }```
+
+    Args:
+    Returns:
+
     """
 
     def __init__(self, mapping=None):
@@ -80,7 +83,8 @@ class ModelConfigDict(Dict[str, Type]):
         super().__init__(mapping)
         self._set_defaults()
 
-    def _set_defaults(self):
+    def _set_defaults(self) -> None:
+        """Sets default values for the model configuration dict. This allows us to use the dict without having to pass all the keys every time."""
         # check if dict key exists, if not, set default value
         self._check_key_set_default("inner_cv", False)
         self._check_key_set_default("n_trials", 100)
@@ -92,14 +96,31 @@ class ModelConfigDict(Dict[str, Type]):
         if self._has_key("mixed_model") and not self._has_key("mixed_name"):
             self["mixed_name"] = self["mixed_model"].__repr__()
 
-    def _has_key(self, key):
+    def _has_key(self, key) -> bool:
+        """Method to check if a key exists in the dict.
+
+        Args: 
+          key: The key to check for.
+
+        Returns:
+          bool: True if the key exists, False otherwise.
+        """
         try:
             self[key]
             return True
         except KeyError:
             return False
 
-    def _check_key_set_default(self, key, default):
+    def _check_key_set_default(self, key, default) -> None:
+        """Checks if a key exists in the dict and sets a default value if it doesn't.
+
+        Args:
+          key: The key to check for.
+          default: The default value to set if the key doesn't exist.
+
+        Returns:
+          None
+        """
         if not self._has_key(key):
             self[key] = default
 
@@ -117,6 +138,11 @@ class ModelMappingDict(Dict[str, ModelConfigDict]):
         ),
         )
     ```
+
+    Args:
+
+    Returns:
+
     """
 
     pass
@@ -124,7 +150,14 @@ class ModelMappingDict(Dict[str, ModelConfigDict]):
 
 def map_backwards(mapping) -> dict:
     """Maps a model mapping backwards:
-    From the mixed effects model to the fixed effects model."""
+    From the mixed effects model to the fixed effects model.
+
+    Args:
+      mapping: The model mapping to map backwards.
+
+    Returns:
+      dict: The reversed mapped model mapping.
+    """
     # reduce the nested mapping to key: value["mixed_name"]
     reduced_mapping = {key: value["mixed_name"] for key, value in mapping.items()}
     # invert the mapping
