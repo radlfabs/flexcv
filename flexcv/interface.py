@@ -1,3 +1,7 @@
+"""
+This module contains the CrossValidation class. This class is the central interface to interact with `flexcv`.
+"""
+
 import logging
 from dataclasses import dataclass
 from pprint import pformat
@@ -6,12 +10,12 @@ import pandas as pd
 from neptune.metadata_containers.run import Run as NeptuneRun
 from neptune.types import File
 
-from .cv_core import cross_validate
-from .cv_metrics import MetricsDict
-from .cv_objective import ObjectiveScorer
-from .cv_results import CrossValidationResults
-from .cv_split import CrossValMethod
-from .funcs import add_module_handlers, run_padding
+from .core import cross_validate
+from .metrics import MetricsDict
+from .model_selection import ObjectiveScorer
+from .results_handling import CrossValidationResults
+from .split import CrossValMethod
+from .utilities import add_module_handlers, run_padding
 from .model_mapping import ModelConfigDict, ModelMappingDict
 from .run import Run as DummyRun
 
@@ -28,32 +32,32 @@ class CrossValidation:
     It also helps you to log the configuration and results to Neptune.
     
     Example:
-    ```python
-    >>> import flexcv
-    >>> import neptune
-    >>> X = pd.DataFrame({"x": [1, 2, 3, 4, 5], "z": [1, 2, 3, 4, 5]})
-    >>> y = pd.Series([1, 2, 3, 4, 5])
-    >>> mapping = flexcv.ModelMappingDict(
-    ...     {
-    ...         "LinearModel": flexcv.ModelConfigDict(
-    ...             {
-    ...                 "model": "LinearRegression",
-    ...                 "kwargs": {"fit_intercept": True},
-    ...             }
-    ...         ),
-    ...     }
-    ... )
-    >>> run = neptune.init_run()
-    >>> cv = CrossValidation()
-    >>> results = (
-    ...     cv
-    ...     .with_data(X, y)
-    ...     .with_models(mapping)
-    ...     .log(run)
-    ...     .perform()
-    ...     .get_results()
-    ... )
-    ```
+        ```python
+        >>> import flexcv
+        >>> import neptune
+        >>> X = pd.DataFrame({"x": [1, 2, 3, 4, 5], "z": [1, 2, 3, 4, 5]})
+        >>> y = pd.Series([1, 2, 3, 4, 5])
+        >>> mapping = flexcv.ModelMappingDict(
+        ...     {
+        ...         "LinearModel": flexcv.ModelConfigDict(
+        ...             {
+        ...                 "model": "LinearRegression",
+        ...                 "kwargs": {"fit_intercept": True},
+        ...             }
+        ...         ),
+        ...     }
+        ... )
+        >>> run = neptune.init_run()
+        >>> cv = CrossValidation()
+        >>> results = (
+        ...     cv
+        ...     .with_data(X, y)
+        ...     .with_models(mapping)
+        ...     .log(run)
+        ...     .perform()
+        ...     .get_results()
+        ... )
+        ```
     
     Methods:
         set_data: Sets the data for cross validation. Pass your dataframes and series here.
@@ -65,7 +69,7 @@ class CrossValidation:
         perform: Performs cross validation. Just call this method without args to trigger the nested cross validation run.
 
     Returns:
-      CrossValidation: CrossValidation object.
+      : CrossValidation: CrossValidation object.
 
 
     """
@@ -475,7 +479,7 @@ class CrossValidation:
 if __name__ == "__main__":
     import numpy as np
     from .models import LinearModel
-    from .data_generation import generate_regression
+    from .synthesizer import generate_regression
 
     X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise=9.1e-2)
     model_map = ModelMappingDict(

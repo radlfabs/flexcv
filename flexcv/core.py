@@ -13,16 +13,16 @@ from sklearn.utils.validation import check_random_state
 from statsmodels.tools.sm_exceptions import ConvergenceWarning
 from tqdm import tqdm
 
-from .cv_log import (
+from .logging import (
     CustomNeptuneCallback,
     SingleModelFoldResult,
     log_diagnostics,
     log_single_model_single_fold,
 )
-from .cv_metrics import MetricsDict, mse_wrapper
-from .cv_objective import ObjectiveScorer, objective_cv
-from .cv_split import CrossValMethod, make_cross_val_split
-from .funcs import get_fixed_effects_formula, get_re_formula
+from .metrics import MetricsDict, mse_wrapper
+from .model_selection import ObjectiveScorer, objective_cv
+from .split import CrossValMethod, make_cross_val_split
+from .utilities import get_fixed_effects_formula, get_re_formula
 from .model_mapping import ModelMappingDict
 
 warnings.filterwarnings("ignore", module=r"matplotlib\..*")
@@ -93,22 +93,23 @@ def cross_validate(
       diagnostics: bool: If True, diagnostics plots are logged to Neptune.
 
     Returns:
-      results_all_folds: Dict[str, Dict[str, list]] : A dictionary containing the results of the cross-validation, organized by machine learning models.
+      Dict[str, Dict[str, list]] : A dictionary containing the results of the cross-validation, organized by machine learning models.
     
     The function returns a nested dictionary with the following structure:
-    ```python
-    results_all_folds = {
-      model_name: {
-      "model": [],
-      "parameters": [],
-      "results": [],
-      "r2": [],
-      "y_pred": [],
-      "y_test": [],
-      "shap_values": [],
-      "median_index": [],
-    }
-    ```
+    Usage:
+        ```python
+        results_all_folds = {
+        model_name: {
+        "model": [],
+        "parameters": [],
+        "results": [],
+        "r2": [],
+        "y_pred": [],
+        "y_test": [],
+        "shap_values": [],
+        "median_index": [],
+        }
+        ```
 
     """
     if objective_scorer is None:

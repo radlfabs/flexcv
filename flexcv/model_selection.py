@@ -1,3 +1,19 @@
+"""
+This module implements customization of the objective function for the hyperparameter optimization.
+In order to use a custom objective function, we implemented the inner cv loop as follows:
+Pseudo Code:
+    ```python
+    objective_cv(
+        if n_jobs == -1:
+            parallel_objective(
+                some_kind_of_scorer
+            )
+        else:
+            objective(some_king_of_scorer)
+    ```
+
+"""
+
 import inspect
 import multiprocessing
 from typing import Callable
@@ -21,22 +37,6 @@ class ObjectiveScorer(
     Returns:
         float: The objective function value.
     
-    ### Inner CV pseudo code
-    For hyperparameter tuning (inner cv loop) we use the following hierarchy:
-    ```python
-    objective_cv(
-        if n_jobs == -1:
-            parallel_objective(
-                some_kind_of_scorer
-            )
-        else:
-            objective(some_king_of_scorer)
-    ```
-
-    Args:
-
-    Returns:
-
     """
 
     def __init__(
@@ -89,18 +89,17 @@ def custom_scorer(y_valid, y_pred, y_train_in, y_pred_train) -> float:
 
     Returns:
       float: The objective function value.
-      
-    ### Inner CV pseudo code
+
     For hyperparameter tuning (inner cv loop) we use the following hierarchy:
-    ```python
-    objective_cv(
-    if n_jobs == -1:
-        parallel_objective(
-            some_kind_of_scorer
-        )
-    else:
-        objective(some_king_of_scorer)
-    ```
+        ```python
+        objective_cv(
+        if n_jobs == -1:
+            parallel_objective(
+                some_kind_of_scorer
+            )
+        else:
+            objective(some_king_of_scorer)
+        ```
 
     """
 
@@ -143,17 +142,16 @@ def objective(
     Returns:
         tuple: The negative validation MSE, the negative training MSE and the negative objective function value.
       
-    ### Inner CV pseudo code
-    For hyperparameter tuning (inner cv loop) we use the following hierarchy:
-    ```python
-    objective_cv(
-    if n_jobs == -1:
-        parallel_objective(
-            some_kind_of_scorer
-        )
-    else:
-        objective(some_king_of_scorer)
-    ```
+    Inner CV pseudo code:
+        ```python
+        objective_cv(
+        if n_jobs == -1:
+            parallel_objective(
+                some_kind_of_scorer
+            )
+        else:
+            objective(some_king_of_scorer)
+        ```
 
     """
 
@@ -193,17 +191,16 @@ def parallel_objective(
       tuple
       The validation MSE, the training MSE and the objective function value.
       
-    ### Inner CV pseudo code
-    For hyperparameter tuning (inner cv loop) we use the following hierarchy:
-    ```python
-    objective_cv(
-    if n_jobs == -1:
-        parallel_objective(
-            some_kind_of_scorer
-        )
-    else:
-        objective(some_king_of_scorer)
-    ```
+    Inner CV pseudo code:
+        ```python
+        objective_cv(
+        if n_jobs == -1:
+            parallel_objective(
+                some_kind_of_scorer
+            )
+        else:
+            objective(some_king_of_scorer)
+        ```
 
     """
     X_train_in = X.iloc[train_idx]
@@ -242,17 +239,16 @@ def objective_cv(
     Returns:
       float: The mean objective function value. Note: We average per default. If you would like to use the RMSE as the objective function, you have to average the MSEs and then take the square root.
       
-    ### Pseudo code
-    For hyperparameter tuning (inner cv loop) we use the following hierarchy:
-    ```python
-    objective_cv(
-    if n_jobs == -1:
-      parallel_objective(
-        some_kind_of_scorer
-        )
-    else:
-      objective(some_king_of_scorer)
-    ```
+    Inner CV pseudo code:
+        ```python
+        objective_cv(
+        if n_jobs == -1:
+        parallel_objective(
+            some_kind_of_scorer
+            )
+        else:
+        objective(some_king_of_scorer)
+        ```
 
     """
 

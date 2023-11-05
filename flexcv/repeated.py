@@ -5,8 +5,8 @@ import pandas as pd
 from neptune.types import File
 import neptune
 
-from .cv_class import CrossValidation
-from .funcs import add_module_handlers
+from .interface import CrossValidation
+from .utilities import add_module_handlers
 from .run import Run
 
 logger = logging.getLogger(__name__)
@@ -97,10 +97,6 @@ def aggregate_(repeated_runs) -> pd.DataFrame:
 class RepeatedResult():
     """Class for results of repeated cross-validation.
     Implements a summary property that returns a DataFrame with aggregated metrics.
-
-    Args:
-
-    Returns:
 
     """
     def __init__(self, df):
@@ -284,7 +280,7 @@ class RepeatedCV(CrossValidation):
 
 if __name__ == "__main__":
     
-    from flexcv.data_generation import generate_regression
+    from flexcv.synthesizer import generate_regression
     from flexcv.models import LinearModel
     from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
 

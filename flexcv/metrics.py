@@ -1,4 +1,8 @@
-import numpy as np
+"""
+This module implements the MetricsDict class and it's default metrics.
+It is used to specify which metrics to calculate in the outer loop of the cross-validation.
+"""
+
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 

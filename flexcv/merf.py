@@ -1,15 +1,13 @@
-# This file is a modified version of the MERF implementation by the authors of the paper:
-# MERF: Mixed-effects random forests for clustered data
-# https://www.tandfonline.com/doi/abs/10.1080/00949655.2012.741599
-# Github: https://github.com/manifoldai/merf
-# Blog post: https://towardsdatascience.com/mixed-effects-random-forests-6ecbb85cb177
-# Copyright (c) 2019 Manifold
-# Licensed under the MIT License
-
-
 """
-Mixed Effects Random Forest model.
+This file is a modified version of the MERF implementation by the authors of the paper:
+MERF: Mixed-effects random forests for clustered data
+https://www.tandfonline.com/doi/abs/10.1080/00949655.2012.741599
+Github: https://github.com/manifoldai/merf
+Blog post: https://towardsdatascience.com/mixed-effects-random-forests-6ecbb85cb177
+Copyright (c) 2019 Manifold
+Licensed under the MIT License
 """
+
 import logging
 from dataclasses import dataclass
 

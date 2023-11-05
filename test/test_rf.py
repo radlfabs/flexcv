@@ -2,8 +2,8 @@ import numpy as np
 import optuna
 from sklearn.ensemble import RandomForestRegressor
 
-from flexcv.data_generation import generate_regression
-from flexcv.cv_class import CrossValidation
+from flexcv.synthesizer import generate_regression
+from flexcv.interface import CrossValidation
 from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
 from flexcv.run import Run
 import flexcv.model_postprocessing as mp

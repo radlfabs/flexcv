@@ -1,3 +1,8 @@
+"""
+This module contains functions for logging results to Neptune.ai.
+The functions are called during performing cross validation and are used to construct the results metrics dict.
+"""
+
 from dataclasses import dataclass
 from pprint import pformat
 from typing import Any
@@ -13,7 +18,7 @@ import seaborn as sns
 from neptune.types import File
 from optuna.study import Study
 
-from .cv_metrics import METRICS, MetricsDict
+from .metrics import METRICS, MetricsDict
 
 
 class CustomNeptuneCallback(npt_utils.NeptuneCallback):
@@ -21,17 +26,20 @@ class CustomNeptuneCallback(npt_utils.NeptuneCallback):
     The __call__ method is called after each trial and logs the best trial and the plots.
     The override is necessary because logging each trial is not feasible for multiple models, folds and trials.
     It would hit Neptune's namespace limits.
-
-    Args:
-    
-    Returns:
-
     """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def __call__(self, study, trial):
+        """Logs only the best trial and the plots.
+        Args:
+          study: optuna.study: Optuna study object.
+          trial: optuna.trial: Optuna trial object.
+          
+        Returns:
+          None
+        """
         self._log_best_trials(study)
         self._log_plots(study, trial)
 

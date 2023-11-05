@@ -1,5 +1,7 @@
-# has default summary stats and takes in optionals
-# is returned by CrossValidation.perform()
+"""
+This module provides a CrossValidationResults class which can be used to summarize the results of CrossValidation.perform().
+"""
+
 
 import operator
 
@@ -46,7 +48,7 @@ def add_summary_stats(df: pd.DataFrame) -> pd.DataFrame:
 class CrossValidationResults(dict):
     """A summary of the results of CrossValidation.perform().
     Cross validate returns a dictionary of results for each model with the form:
-    ```py
+    ```python
     {
         "model_name_1": {
             "model": [model_1_fold_1, model_1_fold_2, ...],
@@ -73,15 +75,14 @@ class CrossValidationResults(dict):
         },
         ...
     }
+    ```
     This class is a wrapper around this dictionary which provides a summary of the results.
-    _make_summary computes the mean, median and standard deviation of the metrics for each model.
-    _make_summary is called the first time the summary property is accessed and the result is cached.
-    
-    _get_model returns the model instance corresponding to the given model name.
+    `_make_summary` computes the mean, median and standard deviation of the metrics for each model.
+    `_make_summary` is called the first time the summary property is accessed and the result is cached.
+    `_get_model` returns the model instance corresponding to the given model name.
 
-    Args:
-
-    Returns:
+    Properties:
+        summary: pd.DataFrame: Summary of the results.
 
     """
 

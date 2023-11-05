@@ -10,7 +10,7 @@ def select_random_columns(df: pd.DataFrame, n: int) -> pd.DataFrame:
       n: int: Number of columns to select.
 
     Returns:
-      DataFrame containing n randomly selected columns
+      : pd.DataFrame: A DataFrame containing n randomly selected columns
 
     """
     column_names = df.columns.tolist()
@@ -19,7 +19,7 @@ def select_random_columns(df: pd.DataFrame, n: int) -> pd.DataFrame:
 
 
 def generate_regression(
-    m_features: int, n_samples: int, n_groups: int = 5, n_slopes=1, noise_level=0.1
+    m_features: int, n_samples: int, n_groups: int=5, n_slopes: int=1, noise_level: float=0.1
 ) -> tuple[pd.DataFrame, pd.Series, pd.Series, pd.DataFrame]:
     """Generate a dataset for linear regression using the numpy default rng.
 
@@ -31,11 +31,8 @@ def generate_regression(
       noise_level: float: The data will be generated with added standard normal noise which is multiplied with noise_level. (Default value = 0.1)
 
     Returns:
-      tuple of pandas DataFrames and Series:
-      X: feature matrix
-      y: response vector
-      group: group labels
-      random_slopes: random slopes
+      : tuple: A tuple containing the following elements:
+        (The feature matrix DataFrame, the target vector Series, the group labels Series, the random slopes DataFrame)
 
     """
     FIXED_LEVEL = 0.01

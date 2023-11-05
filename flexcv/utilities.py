@@ -1,14 +1,7 @@
 import logging
-import os
 from functools import wraps
-
-import matplotlib as mpl
-import numpy as np
 import pandas as pd
 
-mpl.use("Agg")
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 logger = logging.getLogger(__name__)
 

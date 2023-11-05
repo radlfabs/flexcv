@@ -1,9 +1,9 @@
 import numpy as np
 
-from flexcv.data_generation import generate_regression
-from flexcv.cv_class import CrossValidation
-from flexcv.cv_class import ModelConfigDict
-from flexcv.cv_class import ModelMappingDict
+from flexcv.synthesizer import generate_regression
+from flexcv.interface import CrossValidation
+from flexcv.interface import ModelConfigDict
+from flexcv.interface import ModelMappingDict
 from flexcv.run import Run
 from flexcv.models import LinearModel
 

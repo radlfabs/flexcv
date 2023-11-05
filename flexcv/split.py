@@ -17,25 +17,15 @@ from sklearn.preprocessing import KBinsDiscretizer
 class CrossValMethod(Enum):
     """Enum class to assign CrossValMethods to the cross_val() function.
     This is useful to return the correct splitting function depending on the cross val method.
-    Implemented methods are:
-    KFOLD: KFold cross validation
-    CUSTOMSTRAT: CustomStratifiedKFold cross validation
-    GROUP: GroupKFold cross validation
-    STRATGROUP: StratifiedGroupKFold cross validation
-    CUSTOMSTRATGROUP: CustomStratifiedGroupKFold cross validation
     
-    Details:
-    - KFOLD: Regular sklearn KFold cross validation. No grouping information is used.
-    - CUSTOMSTRAT: Applies stratification on the target variable using a custom discretization of the target variable.
-    I.e. uses the sklearn StratifiedKFold cross validation but for a continuous target variable instead of a multi-class target variable.
-    - GROUP: Applies grouping information on the samples. I.e. uses the sklearn GroupKFold cross validation.
-    - STRATGROUP: Uses the sklearn StratifiedGroupKFold cross validation.
-    - CUSTOMSTRATGROUP: Applies stratification to both the target variable and the grouping information.
-    I.e. uses the sklearn StratifiedGroupKFold cross validation but for a continuous target variable instead of a multi-class target variable.
-
-    Args:
-
-    Returns:
+    Members:
+        - `KFOLD`: Regular sklearn `KFold` cross validation. No grouping information is used.
+        - `CUSTOMSTRAT`: Applies stratification on the target variable using a custom discretization of the target variable.
+        I.e. uses the sklearn `StratifiedKFold` cross validation but for a continuous target variable instead of a multi-class target variable.
+        - `GROUP`: Applies grouping information on the samples. I.e. uses the sklearn `GroupKFold` cross validation.
+        - `STRATGROUP`: Uses the sklearn `StratifiedGroupKFold` cross validation.
+        - `CUSTOMSTRATGROUP`: Applies stratification to both the target variable and the grouping information.
+        I.e. uses the sklearn `StratifiedGroupKFold` cross validation but for a continuous target variable instead of a multi-class target variable.
 
     """
 
