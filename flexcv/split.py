@@ -1,3 +1,9 @@
+"""
+In order to switch cross validation split methods dynamically we need to implement a function that returns the correct cross validation split function.
+This is necessary because the split methods may have different numbers of arguments.
+This module also implements a custom stratified cross validation split method for continuous target variables and a custom stratified group cross validation split method for continuous target variables that incorporates grouping information.
+"""
+
 from enum import Enum
 from functools import partial
 from typing import Callable, Iterator
