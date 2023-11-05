@@ -1,22 +1,27 @@
 # Reference
 
-On this page you will find the complete and detailled reference for the `flexcv` API in the future. Building a project needs some time. Please, be patient.
+## ::: flexcv.interface
 
-## ::: flexcv.cv_class
+## ::: flexcv.results_handling
 
-## ::: flexcv.cv_core
+## ::: flexcv.model_mapping
 
-## ::: flexcv.cv_log
+## ::: flexcv.split
 
-## ::: flexcv.cv_metrics
+## ::: flexcv.repeated
 
-## ::: flexcv.cv_objective
+## ::: flexcv.model_selection
 
-## ::: flexcv.cv_repeat
+## ::: flexcv.metrics
 
-## ::: flexcv.cv_results
+## ::: flexcv.core
 
-## ::: flexcv.cv_split
+## ::: flexcv.logging
 
-## ::: flexcv.funcs
+## ::: flexcv.plot
 
+## ::: flexcv.utilities
+
+## ::: flexcv.model_postprocessing
+
+## ::: flexcv.synthesizer

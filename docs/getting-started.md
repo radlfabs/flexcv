@@ -54,7 +54,7 @@ First we will use a LinearModel on a randomly generated regression dataset. Beca
 # import the most important object
 from flexcv import CrossValidation
 # import the function for data generation
-from flexcv.data_generation import generate_regression
+from flexcv.synthesizer import generate_regression
 # import the model class
 from flexcv.models import LinearModel
   
