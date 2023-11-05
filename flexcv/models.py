@@ -207,7 +207,7 @@ class EarthRegressor(BaseEstimator, RegressorMixin):
     """Wrapper Class for Earth Regressor in R.
     For more Details see https://cran.r-project.org/web/packages/earth/earth.pdf.
     
-    Hyperparameters:
+    Parameters:
         degree: int, default=1
             Degree of the splines. 1 for linear, 2 for quadratic, etc.
         nprune: int, default=None
