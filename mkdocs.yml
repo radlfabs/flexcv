@@ -4,7 +4,7 @@ nav:
   - Getting Started: getting-started.md
   - Tutorial: tutorial.md
   - User Guide: user-guide.md
-  - API Reference: api-reference.md
+  - Reference: reference.md
   - About: about.md
 
 theme:
@@ -33,11 +33,16 @@ theme:
         name: Switch to system preference
 
 plugins:
-- search # TODO deactivate search in source code
+- search 
+# do not search in source code
+- search:
+    exclude: [flexcv]
 - mkdocstrings:
     handlers:
       python:
         paths: [.]
+        options:
+          show_root_heading: true
 
 
 
