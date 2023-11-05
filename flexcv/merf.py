@@ -25,9 +25,9 @@ def compute_y_star(data_class, b_hat_df, cluster_id):
     """
 
     Args:
-      data_class: 
-      b_hat_df: 
-      cluster_id: 
+      data_class:
+      b_hat_df:
+      cluster_id:
 
     Returns:
 
@@ -43,13 +43,13 @@ def compute_m_step(
     """
 
     Args:
-      EmData: 
-      cluster_id: 
-      sigma2_hat_sum: 
-      D_hat_sum: 
-      sigma2_hat: 
-      D_hat: 
-      b_hat_df: 
+      EmData:
+      cluster_id:
+      sigma2_hat_sum:
+      D_hat_sum:
+      sigma2_hat:
+      D_hat:
+      b_hat_df:
 
     Returns:
 
@@ -110,6 +110,7 @@ def compute_m_step(
 @dataclass
 class EMDataClass:
     """ """
+
     pass
 
 
@@ -118,13 +119,13 @@ class MERF(BaseEstimator):
     It roughly adheres to the sklearn estimator API.
     Note that the user must pass in an already instantiated fixed_effects_model that adheres to the
     sklearn regression estimator API, i.e. must have a fit() and predict() method defined.
-    
+
     It assumes a data model of the form:
-    
+
     .. math::
-    
+
         y = f(X) + b_i Z + e
-    
+
     * y is the target variable. The current code only supports regression for now, e.g. continuously varying scalar value
     * X is the fixed effect features. Assume p dimensional
     * f(.) is the nonlinear fixed effects mode, e.g. random forest
@@ -445,10 +446,10 @@ class MERF(BaseEstimator):
         """Score is not implented.
 
         Args:
-          X: 
-          Z: 
-          clusters: 
-          y: 
+          X:
+          Z:
+          clusters:
+          y:
 
         Returns:
 

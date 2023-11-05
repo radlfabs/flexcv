@@ -94,7 +94,7 @@ def cross_validate(
 
     Returns:
         (Dict[str, Dict[str, list]]) : A dictionary containing the results of the cross-validation, organized by machine learning models.
-    
+
     The function returns a nested dictionary with the following structure:
     Usage:
         ```python

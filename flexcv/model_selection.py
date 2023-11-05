@@ -27,16 +27,16 @@ class ObjectiveScorer(
 ):
     """Callable class that wraps a scorer function to be used as an objective function.
     The scorer function must match the following signature. Instantiating the class will check the signature.
-    
+
     Args:
         y_valid: ndarray: The validation target values.
         y_pred: ndarray: The predicted target values.
         y_train_in: ndarray: The training target values.
         y_pred_train: ndarray: The predicted training target values.
-        
+
     Returns:
         (float): The objective function value.
-    
+
     """
 
     def __init__(
@@ -131,7 +131,7 @@ def objective(
     Predicts the validation data and calculates the MSE for both the validation and training data.
     Then applies the objective scorer to the validation MSE and the training MSE which returns the objective function value.
     Returns the negative validation and training MSEs as well as the negative objective function value, since optuna maximizes the objective function.
-    
+
     Args:
         X_train_in: DataFrame or ndarray: The training data.
         y_train_in: DataFrame or ndarray: The training target values.
@@ -141,7 +141,7 @@ def objective(
 
     Returns:
         (tuple): A tuple containing the negative validation MSE, the negative training MSE and the negative objective function value.
-      
+
     Inner CV pseudo code:
         ```python
         objective_cv(
@@ -189,7 +189,7 @@ def parallel_objective(
 
     Returns:
       (tuple): A tuple containing the validation MSE, the training MSE and the objective function value.
-      
+
     Inner CV pseudo code:
         ```python
         objective_cv(
@@ -233,11 +233,11 @@ def objective_cv(
       run: Run: neptune run object
       n_jobs: int: Sklearn n_jobs parameter to control if CV is run in parallel or sequentially
       objective_scorer: ObjectiveScorer: Callable class that wraps a scorer function to be used as an objective function.
-      
+
 
     Returns:
       (float): The mean objective function value. Note: We average per default. If you would like to use the RMSE as the objective function, you have to average the MSEs and then take the square root.
-      
+
     Inner CV pseudo code:
         ```python
         objective_cv(

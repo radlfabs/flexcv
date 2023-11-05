@@ -19,7 +19,11 @@ def select_random_columns(df: pd.DataFrame, n: int) -> pd.DataFrame:
 
 
 def generate_regression(
-    m_features: int, n_samples: int, n_groups: int=5, n_slopes: int=1, noise_level: float=0.1
+    m_features: int,
+    n_samples: int,
+    n_groups: int = 5,
+    n_slopes: int = 1,
+    noise_level: float = 0.1,
 ) -> tuple[pd.DataFrame, pd.Series, pd.Series, pd.DataFrame]:
     """Generate a dataset for linear regression using the numpy default rng.
 

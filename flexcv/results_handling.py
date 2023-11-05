@@ -24,13 +24,13 @@ def pformat_dict(d, indent=""):
         formatted.join(f"{indent}{key}")
         if isinstance(value, dict):
             pformat_dict(value, indent + "  ")
-    
+
 
 def add_summary_stats(df: pd.DataFrame) -> pd.DataFrame:
     """Add summary statistics to a pandas DataFrame.
     Calculates the mean, median and standard deviation on copies slices of the original data and adds them as rows to the DataFrame.
-    This makes sure, that the summary statistics are not sequentially dependent on each other. 
-    
+    This makes sure, that the summary statistics are not sequentially dependent on each other.
+
     Args:
       df: pd.DataFrame: Input data.
 
@@ -127,7 +127,7 @@ class CrossValidationResults(dict):
             "metric_2": [metric_value_2_fold_1, metric_value_2_fold_2, ...],
             ...
         }
-        ```	
+        ```
 
         """
         model_dfs = []
@@ -267,6 +267,7 @@ class CrossValidationResults(dict):
 
 class MergedSummary(CrossValidationResults):
     """ """
+
     def __init__(
         self,
         cv_results_1,

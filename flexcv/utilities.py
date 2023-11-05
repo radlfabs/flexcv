@@ -83,10 +83,11 @@ def run_padding(func):
 
     Args:
       func: Any callable.
-      
+
     Returns:
       (Any): Return value of the passed callable.
     """
+
     @wraps(func)
     def wrapper_function(*args, **kwargs):
         print()

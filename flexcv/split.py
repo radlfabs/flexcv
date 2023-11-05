@@ -23,7 +23,7 @@ from sklearn.preprocessing import KBinsDiscretizer
 class CrossValMethod(Enum):
     """Enum class to assign CrossValMethods to the cross_val() function.
     This is useful to return the correct splitting function depending on the cross val method.
-    
+
     Members:
         - `KFOLD`: Regular sklearn `KFold` cross validation. No grouping information is used.
         - `CUSTOMSTRAT`: Applies stratification on the target variable using a custom discretization of the target variable.
@@ -130,7 +130,7 @@ class CustomStratifiedKFold(BaseCrossValidator):
         """
 
         Args:
-          X: 
+          X:
           y:  (Default value = None)
           groups:  (Default value = None)
 

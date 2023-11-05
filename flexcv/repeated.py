@@ -52,8 +52,8 @@ def try_mean(x):
             return -99
         else:
             return -999
-            
-            
+
+
 def aggregate_(repeated_runs) -> pd.DataFrame:
     """Aggregate the results of repeated runs into a single DataFrame.
     Therefore, the nested dict structure of the results is flattened.
@@ -94,18 +94,19 @@ def aggregate_(repeated_runs) -> pd.DataFrame:
     return pd.concat(results)
 
 
-class RepeatedResult():
+class RepeatedResult:
     """Class for results of repeated cross-validation.
     Implements a summary property that returns a DataFrame with aggregated metrics.
     """
+
     def __init__(self, df):
         """Constructor method for RepeatedResult class.
-        
+
         Args:
             df(pd.DataFrame): DataFrame with aggregated metrics.
         """
         self._summary_df = df
-    
+
     @property
     def summary(self):
         """Summary property that returns a DataFrame with aggregated metrics.
@@ -127,6 +128,7 @@ class RepeatedCV(CrossValidation):
       - perform method that performs repeated cross-validation
 
     """
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.n_repeats = 3
@@ -144,7 +146,7 @@ class RepeatedCV(CrossValidation):
         """
         self.n_repeats = n_repeats
         return self
-    
+
     def set_neptune(self, neptune_credentials):
         """Set your neptune credentials and initialize the repeated runs automatically.
         If you do not want to pass your credentials explicitly, use set_run and call init_repeated_runs from outside the class yourself.
@@ -157,11 +159,13 @@ class RepeatedCV(CrossValidation):
 
         """
         self.neptune_credentials = neptune_credentials
-        parent_run, children_runs = init_repeated_runs(self.n_repeats, neptune_credentials)
+        parent_run, children_runs = init_repeated_runs(
+            self.n_repeats, neptune_credentials
+        )
         self.parent_run = parent_run
         self.children_runs = children_runs
         return self
-    
+
     def set_seeds(self, seeds=None, generator_seed=42):
         """Set the seeds for the repeated runs.
         If no seeds are passed, a list of seeds is generated randomly.
@@ -179,7 +183,7 @@ class RepeatedCV(CrossValidation):
         self.seeds = np.random.randint(42000, size=self.n_repeats).tolist()
         self.seeds = seeds
         return self
-    
+
     def set_run(self, parent_run=None, children_run=None):
         """Use this method if you want to pass your own parent run and children runs.
 
@@ -194,7 +198,7 @@ class RepeatedCV(CrossValidation):
         self.parent_run = parent_run
         self.children_run = children_run
         return self
-    
+
     def _perform_repeats(self):
         """Performs repeated cross-validation.
 
@@ -215,10 +219,7 @@ class RepeatedCV(CrossValidation):
             inner_run["seed"] = seed
 
             results = (
-                self
-                .set_run(run=inner_run, random_seed=seed)
-                .perform()
-                .get_results()
+                self.set_run(run=inner_run, random_seed=seed).perform().get_results()
             )
 
             # append the run id and the run metric to the lists
@@ -239,7 +240,7 @@ class RepeatedCV(CrossValidation):
         repeated_run["mapping"] = self.config["mapping"]
         repeated_run.stop()
         return df
-    
+
     def perform(self):
         """Wrapper method to perform repeated cross-validation.
 
@@ -263,35 +264,34 @@ class RepeatedCV(CrossValidation):
 
 
 if __name__ == "__main__":
-    
-  from flexcv.synthesizer import generate_regression
-  from flexcv.models import LinearModel
-  from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
+    from flexcv.synthesizer import generate_regression
+    from flexcv.models import LinearModel
+    from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
 
-  # make sample data
-  X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise=9.1e-2)
+    # make sample data
+    X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise=9.1e-2)
 
-  # create a model mapping
-  model_map = ModelMappingDict(
-      {
-          "LinearModel": ModelConfigDict(
-              {
-                  "model": LinearModel,
-              }
-          ),
-      }
-  )
+    # create a model mapping
+    model_map = ModelMappingDict(
+        {
+            "LinearModel": ModelConfigDict(
+                {
+                    "model": LinearModel,
+                }
+            ),
+        }
+    )
 
-  credentials = {}
-  
-  rcv = (
-      RepeatedCV()
-      .set_data(X, y, group, dataset_name="ExampleData")
-      .set_models(model_map)
-      .set_n_repeats(3)
-      .set_neptune(credentials)
-      .perform()
-      .get_results()
-  )
+    credentials = {}
 
-  rcv.summary.to_excel("repeated_cv.xlsx")  # save dataframe to excel file
+    rcv = (
+        RepeatedCV()
+        .set_data(X, y, group, dataset_name="ExampleData")
+        .set_models(model_map)
+        .set_n_repeats(3)
+        .set_neptune(credentials)
+        .perform()
+        .get_results()
+    )
+
+    rcv.summary.to_excel("repeated_cv.xlsx")  # save dataframe to excel file

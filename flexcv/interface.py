@@ -27,10 +27,10 @@ add_module_handlers(logger)
 class CrossValidation:
     """This class is the central interface to interact with `flexcv`.
     Use this dataclass to configure your cross validation run with it's `set_***()` methods.
-    You can use method chaining to set multiple configurations at once. 
-    This allows you to provide extensive configuration with few lines of code. 
+    You can use method chaining to set multiple configurations at once.
+    This allows you to provide extensive configuration with few lines of code.
     It also helps you to log the configuration and results to Neptune.
-    
+
     Example:
         ```python
         >>> import flexcv
@@ -58,12 +58,12 @@ class CrossValidation:
         ...     .get_results()
         ... )
         ```
-    
+
     Methods:
         set_data: Sets the data for cross validation. Pass your dataframes and series here.
-        set_splits: Sets the cross validation strategy for inner and outer folds. You may need to import `flexcv.CrossValMethod`. 
+        set_splits: Sets the cross validation strategy for inner and outer folds. You may need to import `flexcv.CrossValMethod`.
         set_models: Sets the models to be cross validated. Pass hyperparameter distributions for model tuning here. You may need to import `flexcv.ModelMappingDict` and `flexcv.ModelConfigDict`.
-        set_inner_cv: Sets the inner cross validation configuration. Pass arguments regarding the hyperparameter optimization process.  
+        set_inner_cv: Sets the inner cross validation configuration. Pass arguments regarding the hyperparameter optimization process.
         set_mixed_effects: Sets the mixed effects parameters. Control if mixed effects are modeled and set arguments regarding the Expectation Maximization algorithm.
         set_run: Sets the run parameters. Pass your Neptune run object here.
         perform: Performs cross validation. Just call this method without args to trigger the nested cross validation run.
@@ -455,10 +455,10 @@ class CrossValidation:
         Checks if a neptune run object has been set. If the user did not provide a neptune run object, a dummy run is instantiated.
         All logs and plots will be logged to the dummy run and will be lost.
         However, the cross validation results is created and can be returned via the `CrossValidation.results` property.
-        
+
         Args:
             None
-            
+
         Returns:
             (CrossValidation): self
         """

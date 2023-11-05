@@ -210,9 +210,10 @@ def permutation_importance(
         X: array-like: The features.
         y: array-like: The target.
         features: array-like | list: The feature names.
-        
+
     Returns:
-        (tuple[plt.Figure, pd.DataFrame]): A tuple containing the figure and the permutation importance dataframe."""
+        (tuple[plt.Figure, pd.DataFrame]): A tuple containing the figure and the permutation importance dataframe.
+    """
     fig = plt.figure()
     perm_importance = sk_permutation_importance(
         model, X, y, n_repeats=10, random_state=42, n_jobs=-1

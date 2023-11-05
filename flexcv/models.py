@@ -25,6 +25,7 @@ logger = logging.getLogger(__name__)
 
 class BaseLinearModel(BaseEstimator, RegressorMixin):
     """Base class for the Linear Model and the Linear Mixed Effects Model."""
+
     def __init__(self, re_formula=None, verbose=0, *args, **kwargs):
         self.re_formula = re_formula
         self.verbose = verbose
@@ -45,7 +46,7 @@ class BaseLinearModel(BaseEstimator, RegressorMixin):
 
     def get_summary(self):
         """Creates a html summary table of the model.
-        
+
         Returns:
             (str): HTML table of the model summary."""
         lmer_summary = self.md_.summary()  # type: ignore
@@ -102,9 +103,9 @@ class LinearModel(BaseLinearModel):
           **kwargs: Used to prevent raising an error when passing the `clusters` argument.
 
         Returns:
-          (array-like): An array of fitted values. 
+          (array-like): An array of fitted values.
 
-        
+
         """
         check_is_fitted(self, ["X_", "y_", "md_"])
         return self.md_.predict(exog=X)
@@ -112,6 +113,7 @@ class LinearModel(BaseLinearModel):
 
 class LinearMixedEffectsModel(BaseLinearModel):
     """Wrapper class for the Linear Mixed Effects Model from statsmodels."""
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -121,9 +123,9 @@ class LinearMixedEffectsModel(BaseLinearModel):
         Args:
           X(array-like of shape (n_samples, n_features)): The training input samples.
           y(array-like of shape (n_samples,)): The target values.
-          clusters(array-like of shape (n_samples,)): 
+          clusters(array-like of shape (n_samples,)):
           **kwargs(dict): Additional parameters to pass to the underlying model's `fit` method.
-          re_formula: 
+          re_formula:
 
         Returns:
           (object): Returns self.
@@ -206,7 +208,7 @@ class LinearMixedEffectsModel(BaseLinearModel):
 class EarthRegressor(BaseEstimator, RegressorMixin):
     """Wrapper Class for Earth Regressor in R.
     For more Details see https://cran.r-project.org/web/packages/earth/earth.pdf.
-    
+
     Parameters:
         degree: int, default=1
             Degree of the splines. 1 for linear, 2 for quadratic, etc.
@@ -416,7 +418,7 @@ class EarthRegressor(BaseEstimator, RegressorMixin):
 
     def get_rmodel(self):
         """Returns the R model object.
-        
+
         Returns:
             (object): The R model object."""
         return self.model_
@@ -431,7 +433,7 @@ class EarthRegressor(BaseEstimator, RegressorMixin):
 
     def calc_variable_importance(self):
         """Calculates the variable importance of the model.
-        
+
         Returns:
             (pandas.DataFrame): A DataFrame containing the variable importance."""
         ro.globalenv["ev"] = ro.r["evimp"](self.model_, trim=False)

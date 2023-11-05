@@ -36,7 +36,7 @@ class CustomNeptuneCallback(npt_utils.NeptuneCallback):
         Args:
           study: optuna.study: Optuna study object.
           trial: optuna.trial: Optuna trial object.
-          
+
         Returns:
           (None)
         """

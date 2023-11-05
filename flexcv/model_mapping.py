@@ -106,7 +106,7 @@ class ModelConfigDict(Dict[str, Type]):
     def _has_key(self, key) -> bool:
         """Method to check if a key exists in the dict.
 
-        Args: 
+        Args:
           key: str | int : The key to check for.
 
         Returns:
