@@ -35,7 +35,7 @@ class ObjectiveScorer(
         y_pred_train: ndarray: The predicted training target values.
         
     Returns:
-        float: The objective function value.
+        (float): The objective function value.
     
     """
 
@@ -88,7 +88,7 @@ def custom_scorer(y_valid, y_pred, y_train_in, y_pred_train) -> float:
       y_pred_train: Inner predicted target values
 
     Returns:
-      float: The objective function value.
+      (float): The objective function value.
 
     For hyperparameter tuning (inner cv loop) we use the following hierarchy:
         ```python
@@ -140,7 +140,7 @@ def objective(
         pipe: Pipeline: The pipeline to be used for the training.
 
     Returns:
-        tuple: The negative validation MSE, the negative training MSE and the negative objective function value.
+        (tuple): A tuple containing the negative validation MSE, the negative training MSE and the negative objective function value.
       
     Inner CV pseudo code:
         ```python
@@ -188,8 +188,7 @@ def parallel_objective(
             The pipeline to be used for the training.
 
     Returns:
-      tuple
-      The validation MSE, the training MSE and the objective function value.
+      (tuple): A tuple containing the validation MSE, the training MSE and the objective function value.
       
     Inner CV pseudo code:
         ```python
@@ -237,7 +236,7 @@ def objective_cv(
       
 
     Returns:
-      float: The mean objective function value. Note: We average per default. If you would like to use the RMSE as the objective function, you have to average the MSEs and then take the square root.
+      (float): The mean objective function value. Note: We average per default. If you would like to use the RMSE as the objective function, you have to average the MSEs and then take the square root.
       
     Inner CV pseudo code:
         ```python

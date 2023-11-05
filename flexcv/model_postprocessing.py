@@ -21,14 +21,14 @@ def lm_post(results_all_folds, fold_result, run, *args, **kwargs):
     Logs the summary of the model, the VIF and the plots to neptune.
 
     Args:
-      results_all_folds: dict of results for all folds
-      fold_result: dataclass containing the results for the current fold
-      run: neptune run object
-      *args: any additional arguments
-      **kwargs: any additional keyword arguments
+      results_all_folds:dict: A dict of results for all folds
+      fold_result: dataclass: A dataclass containing the results for the current fold
+      run: neptune.run: neptune run object
+      *args:: any additional arguments
+      **kwargs:: any additional keyword arguments
 
     Returns:
-      dict: updated results dictionary
+      (dict): updated results dictionary
     """
     # LM is the only one where the regular logging wont work with get_params()
     # therefore, we need to get the summary via the model object and simply overwrite the empty logs
@@ -53,14 +53,14 @@ def lmer_post(results_all_folds, fold_result, run, *args, **kwargs):
     Logs the summary of the model to neptune.
 
     Args:
-      results_all_folds: dict of results for all folds
-      fold_result: dataclass containing the results for the current fold
-      run: neptune run object
-      *args: any additional arguments
-      **kwargs: any additional keyword arguments
+      results_all_folds:dict: A dict of results for all folds
+      fold_result: dataclass: A dataclass containing the results for the current fold
+      run: neptune.run: neptune run object
+      *args:: any additional arguments
+      **kwargs:: any additional keyword arguments
 
     Returns:
-      dict: updated results dictionary
+      (dict): updated results dictionary
     """
     # LM is the only one where the regular logging wont work with get_params()
     # therefore, we need to get the summary via the model object and simply overwrite the empty logs
@@ -79,14 +79,14 @@ def rf_post(results_all_folds, fold_result, run, *args, **kwargs):
     Generates beeswarm plots from SHAP explainers for the training and test data and logs them to Neptune.
 
     Args:
-      results_all_folds: dict of results for all folds
-      fold_result: dataclass containing the results for the current fold
-      run: neptune run object
-      *args: any additional arguments
-      **kwargs: any additional keyword arguments
+      results_all_folds:dict: A dict of results for all folds
+      fold_result: dataclass: A dataclass containing the results for the current fold
+      run: neptune.run: neptune run object
+      *args:: any additional arguments
+      **kwargs:: any additional keyword arguments
 
     Returns:
-      dict: updated results dictionary
+      (dict): updated results dictionary
     """
     run[f"{fold_result.model_name}/BestParams/{fold_result.k}"] = pformat(
         fold_result.best_params
@@ -124,14 +124,14 @@ def xgboost_post(results_all_folds, fold_result, run, *args, **kwargs):
     Generates beeswarm plots from SHAP explainers for the training and test data and logs them to Neptune.
     
     Args:
-      results_all_folds: dict of results for all folds
-      fold_result: dataclass containing the results for the current fold
-      run: neptune run object
-      *args: any additional arguments
-      **kwargs: any additional keyword arguments
+      results_all_folds:dict: A dict of results for all folds
+      fold_result: dataclass: A dataclass containing the results for the current fold
+      run: neptune.run: neptune run object
+      *args:: any additional arguments
+      **kwargs:: any additional keyword arguments
 
     Returns:
-      dict: updated results dictionary
+      (dict): updated results dictionary
     """
     explainer = shap.TreeExplainer(fold_result.best_model)
     shap_values = explainer.shap_values(fold_result.X_train)
@@ -170,14 +170,14 @@ def mars_post(results_all_folds, fold_result, run, *args, **kwargs):
     Creates a variable importance table and logs barplots to neptune. 
 
     Args:
-      results_all_folds: dict of results for all folds
-      fold_result: dataclass containing the results for the current fold
-      run: neptune run object
-      *args: any additional arguments
-      **kwargs: any additional keyword arguments
+      results_all_folds:dict: A dict of results for all folds
+      fold_result: dataclass: A dataclass containing the results for the current fold
+      run: neptune.run: neptune run object
+      *args:: any additional arguments
+      **kwargs:: any additional keyword arguments
 
     Returns:
-      dict: updated results dictionary
+      (dict): updated results dictionary
     """
     with plt.style.context("ggplot"):
 
@@ -213,14 +213,14 @@ def svr_post(results_all_folds, fold_result, run, *args, **kwargs):
     Logs permutation importance plots to Neptune.
 
     Args:
-      results_all_folds: dict of results for all folds
-      fold_result: dataclass containing the results for the current fold
-      run: neptune run object
-      *args: any additional arguments
-      **kwargs: any additional keyword arguments
+      results_all_folds:dict: A dict of results for all folds
+      fold_result: dataclass: A dataclass containing the results for the current fold
+      run: neptune.run: neptune run object
+      *args:: any additional arguments
+      **kwargs:: any additional keyword arguments
 
     Returns:
-      dict: updated results dictionary
+      (dict): updated results dictionary
     """
     with plt.style.context("ggplot"):
         run[f"{fold_result.model_name}/BestParams/{fold_result.k}"] = pformat(
@@ -247,15 +247,14 @@ def expectation_maximation_post(
     Logs training and test plots to Neptune.
 
     Args:
-      results_all_folds: 
-      fold_result: 
-      y_pred_base: 
-      run: 
-      *args: 
-      **kwargs: 
+      results_all_folds:dict: A dict of results for all folds
+      fold_result: dataclass: A dataclass containing the results for the current fold
+      run: neptune.run: neptune run object
+      *args:: any additional arguments
+      **kwargs:: any additional keyword arguments
 
     Returns:
-
+      (dict): updated results dictionary
     """
     run[f"{fold_result.model_name}/BestParams/{fold_result.k}"] = pformat(
         {

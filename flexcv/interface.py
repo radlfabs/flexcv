@@ -69,7 +69,7 @@ class CrossValidation:
         perform: Performs cross validation. Just call this method without args to trigger the nested cross validation run.
 
     Returns:
-      : CrossValidation: CrossValidation object.
+      (CrossValidation): CrossValidation object.
 
 
     """
@@ -136,7 +136,7 @@ class CrossValidation:
           dataset_name: str: Customize your datasdet's name. This string will be used in logging. (Default value = "")
 
         Returns:
-          CrossValidation: self
+            (CrossValidation): self
 
         """
         # check values
@@ -213,7 +213,7 @@ class CrossValidation:
           metrics: MetricsDict: A dict containint evaluation metrics for the outer loop results. See MetricsDict for Details. (Default value = None)
 
         Returns:
-          CrossValidation: self
+          (CrossValidation): self
 
         """
         # get values of CrossValMethod enums
@@ -261,10 +261,9 @@ class CrossValidation:
 
         Args:
           mapping: ModelMappingDict: Dict of model names and model configurations. See ModelMappingDict for more information.
-          mapping: ModelMappingDict: 
 
         Returns:
-          CrossValidation: self
+          (CrossValidation): self
 
         """
         # check values
@@ -287,7 +286,7 @@ class CrossValidation:
           objective_scorer: ObjectiveScorer: Callable to provide the optimization objective value. Is called during Optuna SearchCV (Default value = None)
 
         Returns:
-          CrossValidation: self
+          (CrossValidation): self
 
         """
         # check values
@@ -319,7 +318,7 @@ class CrossValidation:
           predict_known_groups_lmm: bool: For use with LMER, whether or not known groups should be predicted (Default value = True)
 
         Returns:
-          CrossValidation: self
+          (CrossValidation): self
 
         """
         # check values
@@ -356,6 +355,7 @@ class CrossValidation:
           random_seed: int: Seed for random processes (Default value = 42)
 
         Returns:
+            (CrossValidation): self
 
         """
         # check values
@@ -381,7 +381,7 @@ class CrossValidation:
           run: NeptuneRun: The run to log to (Default value = None)
 
         Returns:
-          CrossValidation: self
+          (CrossValidation): self
 
         """
         if not run:
@@ -454,7 +454,14 @@ class CrossValidation:
         """Perform the cross validation according to the configuration passed by the user.
         Checks if a neptune run object has been set. If the user did not provide a neptune run object, a dummy run is instantiated.
         All logs and plots will be logged to the dummy run and will be lost.
-        However, the cross validation results is created and can be returned via the `CrossValidation.results` property."""
+        However, the cross validation results is created and can be returned via the `CrossValidation.results` property.
+        
+        Args:
+            None
+            
+        Returns:
+            (CrossValidation): self
+        """
         if not hasattr(self.config, "run"):
             self.config["run"] = DummyRun()
         run = self.config["run"]
@@ -467,12 +474,12 @@ class CrossValidation:
         return self
 
     def get_results(self) -> CrossValidationResults:
-        """Returns a CrossValidationResults object. This results object is a wrapper class around the results dict from the cross_validate function."""
+        """Returns a `CrossValidationResults` object. This results object is a wrapper class around the results dict from the `cross_validate` function."""
         return self.results_
 
     @property
     def results(self) -> CrossValidationResults:
-        """Returns a CrossValidationResults object. This results object is a wrapper class around the results dict from the cross_validate function."""
+        """Returns a `CrossValidationResults` object. This results object is a wrapper class around the results dict from the `cross_validate` function."""
         return self.results_
 
 

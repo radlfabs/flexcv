@@ -1,3 +1,5 @@
+"""This module provides functions for plotting and logging plots to neptune."""
+
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
@@ -200,6 +202,17 @@ def plot_qq(
 def permutation_importance(
     model, model_name, X, y, features
 ) -> tuple[plt.Figure, pd.DataFrame]:
+    """
+    Calculates and plots the permutation importance of a model.
+    Args:
+        model: object: The model to calculate the permutation importance for.
+        model_name: str: The name of the model.
+        X: array-like: The features.
+        y: array-like: The target.
+        features: array-like | list: The feature names.
+        
+    Returns:
+        (tuple[plt.Figure, pd.DataFrame]): A tuple containing the figure and the permutation importance dataframe."""
     fig = plt.figure()
     perm_importance = sk_permutation_importance(
         model, X, y, n_repeats=10, random_state=42, n_jobs=-1

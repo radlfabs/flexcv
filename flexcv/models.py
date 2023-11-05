@@ -1,3 +1,7 @@
+"""This module implements wrapper classes for the Linear Model and the Linear Mixed Effects Model from statsmodels.
+It also implements a wrapper class for the Earth Regressor from R. `rpy2` is used to call the R functions from Python.
+"""
+
 import gc
 import logging
 import warnings
@@ -34,13 +38,16 @@ class BaseLinearModel(BaseEstimator, RegressorMixin):
           deep: This argument is not used. (Default value = True)
 
         Returns:
-            dict: Parameter names mapped to their values.
+            (dict): Parameter names mapped to their values.
 
         """
         return self.params
 
     def get_summary(self):
-        """Creates a html summary table of the model."""
+        """Creates a html summary table of the model.
+        
+        Returns:
+            (str): HTML table of the model summary."""
         lmer_summary = self.md_.summary()  # type: ignore
         try:
             html_tables = ""
@@ -66,11 +73,10 @@ class LinearModel(BaseLinearModel):
           **kwargs(dict): Additional parameters to pass to the underlying model's `fit` method.
 
         Returns:
-          object: Returns self.
+          (object): Returns the model after fit.
 
-        Notes
-        -----
-        This method fits a OLS class on the X data.
+        Notes:
+            This method fits a OLS class on the X data.
         """
         assert (
             X.shape[0] == y.shape[0]
@@ -89,14 +95,14 @@ class LinearModel(BaseLinearModel):
         return self
 
     def predict(self, X, **kwargs):
-        """
+        """Make predictions using the fitted model.
 
         Args:
-          X: 
-          **kwargs: 
+          X: array-like: Features
+          **kwargs: Used to prevent raising an error when passing the `clusters` argument.
 
         Returns:
-          An array of fitted values.  Note that these predicted values: 
+          (array-like): An array of fitted values. 
 
         
         """
@@ -120,11 +126,10 @@ class LinearMixedEffectsModel(BaseLinearModel):
           re_formula: 
 
         Returns:
-          object: Returns self.
+          (object): Returns self.
 
-        Notes
-        -----
-        This method fits a MixedLM to the data.
+        Notes:
+            This method fits a LMER class on the X data.
         """
         assert (
             X.shape[0] == y.shape[0]
@@ -162,13 +167,12 @@ class LinearMixedEffectsModel(BaseLinearModel):
         Make predictions using the fitted model.
 
         Args:
-          X: Features
+          X: array-like: Features
           **kwargs: Any other keyword arguments to pass to the underlying model's `predict` method. This is necessary to prevent raising an error when passing the `clusters` argument.
 
         Returns:
-          An array of fitted values.
+          (array-like): An array of fitted values.
 
-        
         """
         check_is_fitted(self, ["X_", "y_", "md_"])
         clusters = kwargs["clusters"]
@@ -201,7 +205,7 @@ class LinearMixedEffectsModel(BaseLinearModel):
 
 class EarthRegressor(BaseEstimator, RegressorMixin):
     """Wrapper Class for Earth Regressor in R.
-    More Details see https://cran.r-project.org/web/packages/earth/earth.pdf.
+    For more Details see https://cran.r-project.org/web/packages/earth/earth.pdf.
     
     Hyperparameters:
         degree: int, default=1
@@ -233,9 +237,6 @@ class EarthRegressor(BaseEstimator, RegressorMixin):
             The current version of the leaps package used during pruning does not allow user interrupts
             (i.e., you have to kill your R session to interrupt; in Windows use the Task Manager or from the command line use taskkill).
 
-    Args:
-
-    Returns:
 
     """
 
@@ -269,11 +270,11 @@ class EarthRegressor(BaseEstimator, RegressorMixin):
         """Fit a EARTH model to the given training data.
 
         Args:
-          X: Features.
-          y: Target values.
+          X: array-like: Features.
+          y: array-like: Target values.
 
         Returns:
-            object: Returns self.
+           (object): Returns self.
         """
         if np.iscomplexobj(X) or np.iscomplexobj(y):
             raise ValueError("Complex data not supported")
@@ -349,10 +350,10 @@ class EarthRegressor(BaseEstimator, RegressorMixin):
         """Make predicitons using the fitted model.
 
         Args:
-          X: Features
+          X: array-like: Features
 
         Returns:
-            An array of fitted values.
+            (array-like): An array of fitted values.
         """
         if np.iscomplexobj(X):
             raise ValueError("Complex data not supported")
@@ -395,9 +396,9 @@ class EarthRegressor(BaseEstimator, RegressorMixin):
         """Returns the parameters of the model.
 
         Args:
-          deep:  (Default value = False)
+          deep: bool: This argument is not used.  (Default value = False)
         Returns:
-            dict: Parameter names mapped to their values.
+            (dict): Parameter names mapped to their values.
         """
         return {
             "degree": self.degree,
@@ -414,11 +415,14 @@ class EarthRegressor(BaseEstimator, RegressorMixin):
         }
 
     def get_rmodel(self):
-        """Returns the R model object."""
+        """Returns the R model object.
+        
+        Returns:
+            (object): The R model object."""
         return self.model_
 
     def make_r_plots(self):
-        """Creates plots of the model in R and saves them to disk."""
+        """Creates plots of the model in R and saves them to disk. They are saved to disk in the `tmp_imgs` folder."""
         Path("tmp_imgs").mkdir(parents=True, exist_ok=True)
         for i in range(1, 5):
             ro.r["png"](f"tmp_imgs/mars_plot_{i}.png", width=1024, height=1024)
@@ -426,7 +430,10 @@ class EarthRegressor(BaseEstimator, RegressorMixin):
             ro.r["dev.off"]()
 
     def calc_variable_importance(self):
-        """Calculates the variable importance of the model."""
+        """Calculates the variable importance of the model.
+        
+        Returns:
+            (pandas.DataFrame): A DataFrame containing the variable importance."""
         ro.globalenv["ev"] = ro.r["evimp"](self.model_, trim=False)
         imp = ro.r("as.data.frame(unclass(ev[,c(3,4,6)]))")
         imp_df: pd.DataFrame = ro.conversion.rpy2py(imp)
@@ -443,10 +450,10 @@ class EarthRegressor(BaseEstimator, RegressorMixin):
         """Returns the variable importance of the model.
 
         Args:
-          features: 
+          features: array-like: The feature names.
 
         Returns:
-
+            (pandas.DataFrame): A DataFrame containing the variable importance.
         """
         self.var_imp_.index = features
         return self.var_imp_

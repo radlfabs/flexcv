@@ -107,10 +107,10 @@ class ModelConfigDict(Dict[str, Type]):
         """Method to check if a key exists in the dict.
 
         Args: 
-          key: The key to check for.
+          key: str | int : The key to check for.
 
         Returns:
-          bool: True if the key exists, False otherwise.
+          (bool): True if the key exists, False otherwise.
         """
         try:
             self[key]
@@ -122,11 +122,11 @@ class ModelConfigDict(Dict[str, Type]):
         """Checks if a key exists in the dict and sets a default value if it doesn't.
 
         Args:
-          key: The key to check for.
-          default: The default value to set if the key doesn't exist.
+          key: str | int: The key to check for.
+          default: str | int:  The default value to set if the key doesn't exist.
 
         Returns:
-          None
+          (None)
         """
         if not self._has_key(key):
             self[key] = default
@@ -155,10 +155,10 @@ def map_backwards(mapping) -> dict:
     From the mixed effects model to the fixed effects model.
 
     Args:
-      mapping: The model mapping to map backwards.
+      mapping: dict: The model mapping to map backwards.
 
     Returns:
-      dict: The reversed mapped model mapping.
+      (dict): The reversed mapped model mapping.
     """
     # reduce the nested mapping to key: value["mixed_name"]
     reduced_mapping = {key: value["mixed_name"] for key, value in mapping.items()}

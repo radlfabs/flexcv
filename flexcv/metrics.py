@@ -18,7 +18,7 @@ def mse_wrapper(y_valid, y_pred, y_train_in, y_pred_train):
       y_pred_train: array-like: Predictions for the training set.
 
     Returns:
-        float: Mean squared error.
+        (float): Mean squared error.
 
     """
     return mean_squared_error(y_valid, y_pred)
@@ -37,7 +37,7 @@ class MetricsDict(dict):
     Also, the standard deviation would be calculated incorrectly if RMSE is included at this point.
 
     Parameters:
-        dict: A dictionary that maps metric names to functions.
+        :dict: A dictionary that maps metric names to functions.
     """
 
     def __init__(self):

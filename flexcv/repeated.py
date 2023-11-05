@@ -23,7 +23,7 @@ def init_repeated_runs(n_repeats, neptune_credentials) -> tuple:
       neptune_credentials(dict): Credentials for neptune.
 
     Returns:
-      tuple[Run, list[Run]]: parent_run (Run), children_runs (list of n_repeats runs)
+      (tuple[Run, list[Run]]): parent_run (Run), children_runs (list of n_repeats runs)
 
     """
     parent_run = neptune.init_run(**neptune_credentials)
@@ -37,10 +37,10 @@ def try_mean(x):
     If x contains "NaN" and other values, -999 is returned.
 
     Args:
-      x: Input array.
+      x: array-like: Input array.
 
     Returns:
-      float: Mean of the input array.
+      (float): Mean of the input array.
 
     """
     try:
@@ -60,15 +60,15 @@ def aggregate_(repeated_runs) -> pd.DataFrame:
     First, the model results are averaged over folds of individual runs.
     Second, the repeated (indicidual) runs are averaged.
     The summary statistics are returned as a DataFrame with the following structure:
-    index: [aggregate]_[metric_name]
-    columns: [model_name]
-    values: [metric_value]
+    * index: [aggregate]_[metric_name]
+    * columns: [model_name]
+    * values: [metric_value]
 
     Args:
-      repeated_runs: List of results of repeated runs.
+      repeated_runs: list: List of results of repeated runs.
 
     Returns:
-      pd.DataFrame: Summary statistics of repeated runs.
+      (pd.DataFrame): Summary statistics of repeated runs.
 
     """
 
@@ -97,7 +97,6 @@ def aggregate_(repeated_runs) -> pd.DataFrame:
 class RepeatedResult():
     """Class for results of repeated cross-validation.
     Implements a summary property that returns a DataFrame with aggregated metrics.
-
     """
     def __init__(self, df):
         """Constructor method for RepeatedResult class.
@@ -111,10 +110,8 @@ class RepeatedResult():
     def summary(self):
         """Summary property that returns a DataFrame with aggregated metrics.
 
-        Args:
-
         Returns:
-          pd.DataFrame: DataFrame with aggregated metrics.
+          (pd.DataFrame): DataFrame with aggregated metrics.
 
         """
         return self._summary_df
@@ -122,13 +119,12 @@ class RepeatedResult():
 
 class RepeatedCV(CrossValidation):
     """Class for repeated cross-validation. Inherits from CrossValidation.
-    Implements
-    - set_n_repeats method that sets the number of repeated runs
-    - set_seeds method that sets the random seeds for the repeated runs
-    - set_neptune method that sets the neptune credentials for the repeated runs and initializes them
-    - in contrast to CrossValidation, the set_run method takes in a parent run and a list of children runs
-    - perform method that performs repeated cross-validation
-
+    Implements:
+      - set_n_repeats method that sets the number of repeated runs
+      - set_seeds method that sets the random seeds for the repeated runs
+      - set_neptune method that sets the neptune credentials for the repeated runs and initializes them
+      - in contrast to CrossValidation, the set_run method takes in a parent run and a list of children runs
+      - perform method that performs repeated cross-validation
 
     """
     def __init__(self, **kwargs):
@@ -141,10 +137,9 @@ class RepeatedCV(CrossValidation):
 
         Args:
           n_repeats(int): Number of repeated runs.
-          n_repeats: int: 
 
         Returns:
-          RepeatedCV: self
+          (RepeatedCV): self
 
         """
         self.n_repeats = n_repeats
@@ -158,7 +153,7 @@ class RepeatedCV(CrossValidation):
           neptune_credentials(dict): Your API token and project name.
 
         Returns:
-          RepeatedCV: self
+          (RepeatedCV): self
 
         """
         self.neptune_credentials = neptune_credentials
@@ -174,12 +169,11 @@ class RepeatedCV(CrossValidation):
         Therefore, the random seed for the repeated runs is set to the same value for each repeated run and is deterministic.
 
         Args:
-          seeds: (Default value = None)
-          generator_seed: (Default value = 42)
+          seeds:list[int]: The list of seeds to use in the repeats. (Default value = None)
+          generator_seed: Seed to control generation of a list of seeds. (Default value = 42)
 
         Returns:
-          RepeatedCV: self
-
+          (RepeatedCV): self
         """
         np.random.seed(generator_seed)
         self.seeds = np.random.randint(42000, size=self.n_repeats).tolist()
@@ -190,11 +184,11 @@ class RepeatedCV(CrossValidation):
         """Use this method if you want to pass your own parent run and children runs.
 
         Args:
-          parent_run: (Default value = None)
-          children_run: (Default value = None)
+          parent_run: neptune.run: A run to track the repeated meta data. (Default value = None)
+          children_run: list[neptune.run]: A list of runs to track the single runs. (Default value = None)
 
         Returns:
-          RepeatedCV: self
+          (RepeatedCV): self
 
         """
         self.parent_run = parent_run
@@ -204,10 +198,8 @@ class RepeatedCV(CrossValidation):
     def _perform_repeats(self):
         """Performs repeated cross-validation.
 
-        Args:
-
         Returns:
-          pd.DataFrame: DataFrame with aggregated metrics.
+          (pd.DataFrame): DataFrame with aggregated metrics.
 
         """
         add_module_handlers(logger)
@@ -251,10 +243,8 @@ class RepeatedCV(CrossValidation):
     def perform(self):
         """Wrapper method to perform repeated cross-validation.
 
-        Args:
-
         Returns:
-          RepeatedCV: self
+          (RepeatedCV): self
 
         """
         if self.seeds is None:
@@ -266,11 +256,8 @@ class RepeatedCV(CrossValidation):
     def get_results(self):
         """Returns the results of repeated cross-validation.
 
-        Args:
-
         Returns:
-          RepeatedResult: RepeatedResult object with summary property that returns a DataFrame with aggregated metrics.
-
+          (RepeatedResult): RepeatedResult object with summary property that returns a DataFrame with aggregated metrics.
         """
         return RepeatedResult(self._summary_df)
 

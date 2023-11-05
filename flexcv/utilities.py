@@ -14,7 +14,7 @@ def empty_func(*args, **kwargs) -> None:
       **kwargs: Any keayword argument is accepted.
 
     Returns:
-      None
+      (None)
     """
     pass
 
@@ -26,7 +26,7 @@ def add_module_handlers(logger: logging.Logger) -> None:
       logger: logging.Logger: The logger for the module.
 
     Returns:
-      None
+      (None)
     """
     logger = logging.getLogger()  # Get the root logger
     logger.setLevel(logging.INFO)
@@ -51,7 +51,7 @@ def get_fixed_effects_formula(target_name, X_data) -> str:
       X_data: pd.DataFrame: The feature matrix.
 
     Returns:
-      str: str: The fixed effects formula.
+      (str): The fixed effects formula.
     """
     start = f"{target_name} ~ {X_data.columns[0]} + "
     end = " + ".join(X_data.columns[1:])
@@ -65,7 +65,7 @@ def get_re_formula(random_slopes_data):
       random_slopes_data: pd.Series | pd.DataFrame: The random slopes data.
 
     Returns:
-      str: The random effects formula.
+      (str): The random effects formula.
     """
     if random_slopes_data is None:
         return ""
@@ -85,19 +85,10 @@ def run_padding(func):
       func: Any callable.
       
     Returns:
-      Any: Return value of the passed callable.
+      (Any): Return value of the passed callable.
     """
     @wraps(func)
     def wrapper_function(*args, **kwargs):
-        """
-
-        Args:
-          *args: 
-          **kwargs: 
-
-        Returns:
-
-        """
         print()
         print("~" * 10, "STARTING RUN", "~" * 10)
         print()

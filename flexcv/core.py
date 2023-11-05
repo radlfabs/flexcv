@@ -93,7 +93,7 @@ def cross_validate(
       diagnostics: bool: If True, diagnostics plots are logged to Neptune.
 
     Returns:
-      Dict[str, Dict[str, list]] : A dictionary containing the results of the cross-validation, organized by machine learning models.
+        (Dict[str, Dict[str, list]]) : A dictionary containing the results of the cross-validation, organized by machine learning models.
     
     The function returns a nested dictionary with the following structure:
     Usage:

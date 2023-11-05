@@ -10,7 +10,7 @@ def select_random_columns(df: pd.DataFrame, n: int) -> pd.DataFrame:
       n: int: Number of columns to select.
 
     Returns:
-      : pd.DataFrame: A DataFrame containing n randomly selected columns
+      (pd.DataFrame): A DataFrame containing n randomly selected columns
 
     """
     column_names = df.columns.tolist()
@@ -31,8 +31,8 @@ def generate_regression(
       noise_level: float: The data will be generated with added standard normal noise which is multiplied with noise_level. (Default value = 0.1)
 
     Returns:
-      : tuple: A tuple containing the following elements:
-        (The feature matrix DataFrame, the target vector Series, the group labels Series, the random slopes DataFrame)
+      (tuple): A tuple containing the following elements:
+                (The feature matrix DataFrame, the target vector Series, the group labels Series, the random slopes DataFrame)
 
     """
     FIXED_LEVEL = 0.01

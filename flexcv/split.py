@@ -57,12 +57,12 @@ class CustomStratifiedGroupKFold(BaseCrossValidator):
         This is a variation of StratifiedGroupKFold that uses a custom discretization of the target variable.
 
         Args:
-          X: Features
-          y: target
-          groups: Grouping/clustering variable (Default value = None)
+          X: array-like: Features
+          y: array-like: target
+          groups: array-like: Grouping/clustering variable (Default value = None)
 
         Returns:
-            Iterator[tuple[ndarray, ndarray]]: Iterator over the indices of the training and test set.
+            (Iterator[tuple[ndarray, ndarray]]): Iterator over the indices of the training and test set.
         """
         self.sgkf = StratifiedGroupKFold(
             n_splits=self.n_splits, shuffle=self.shuffle, random_state=self.random_state
@@ -80,14 +80,10 @@ class CustomStratifiedGroupKFold(BaseCrossValidator):
 
     def get_n_splits(self, X, y=None, groups=None):
         """
-
-        Args:
-          X: 
-          y:  (Default value = None)
-          groups:  (Default value = None)
+        Returns the number of splitting iterations in the cross-validator.
 
         Returns:
-          int
+          (int): The number of splitting iterations in the cross-validator.
         """
         return self.n_splits
 
@@ -107,12 +103,12 @@ class CustomStratifiedKFold(BaseCrossValidator):
         This is a variation of StratifiedGroupKFold that uses a custom discretization of the target variable.
 
         Args:
-          X: Features
-          y: target
-          groups: Grouping variable (Default value = None)
+          X:: Features
+          y:: target
+          groups:: Grouping variable (Default value = None)
 
         Returns:
-            Iterator[tuple[ndarray, ndarray]]: Iterator over the indices of the training and test set.
+            (Iterator[tuple[ndarray, ndarray]]): Iterator over the indices of the training and test set.
         """
         self.skf = StratifiedKFold(
             n_splits=self.n_splits, shuffle=self.shuffle, random_state=self.random_state
@@ -139,7 +135,7 @@ class CustomStratifiedKFold(BaseCrossValidator):
           groups:  (Default value = None)
 
         Returns:
-         int
+         (int) : The number of splitting iterations in the cross-validator.
         """
         return self.n_splits
 
@@ -160,7 +156,7 @@ def make_cross_val_split(
       random_state: int: A random seed to control random processes (Default value = 42)
 
     Returns:
-      Callable: A callable cross validation splitter based on the specified method.
+      (Callable): A callable cross validation splitter based on the specified method.
 
     Raises:
       TypeError: If the given method is not one of KFOLD

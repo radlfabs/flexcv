@@ -10,7 +10,7 @@ import pandas as pd
 
 
 def pformat_dict(d, indent=""):
-    """Pretty-print a dictionary, only printing values that are themselves dictionaries.
+    """Pretty-format a dictionary, only printing values that are themselves dictionaries.
 
     Args:
       d: dictionary to print
@@ -24,7 +24,7 @@ def pformat_dict(d, indent=""):
         formatted.join(f"{indent}{key}")
         if isinstance(value, dict):
             pformat_dict(value, indent + "  ")
-
+    
 
 def add_summary_stats(df: pd.DataFrame) -> pd.DataFrame:
     """Add summary statistics to a pandas DataFrame.
@@ -35,7 +35,7 @@ def add_summary_stats(df: pd.DataFrame) -> pd.DataFrame:
       df: pd.DataFrame: Input data.
 
     Returns:
-      pd.DataFrame: Data with added summary statistics
+      (pd.DataFrame): Data with added summary statistics
 
     """
     original_fold_slice = df.copy(deep=True)
@@ -96,7 +96,7 @@ class CrossValidationResults(dict):
 
     @property
     def summary(self):
-        """ """
+        """Property that returns a pandas dataframe with the fold values, mean, median and standard deviation of the metrics for each model."""
         if self._summary is None:
             self._summary = self._make_summary()
         return self._summary
@@ -106,6 +106,7 @@ class CrossValidationResults(dict):
         Columns: model names
         Multiindex from tuples: (fold id, metric)
         1. It reorders the data from
+        ```python
         "metrics": [
                 {
                     "metric_1_fold_1": metric_value_1_fold_1,
@@ -118,16 +119,15 @@ class CrossValidationResults(dict):
                     ...
                 },
             ],
+        ```
         to the form
+        ```python
         "metrics": {
             "metric_1": [metric_value_1_fold_1, metric_value_1_fold_2, ...],
             "metric_2": [metric_value_2_fold_1, metric_value_2_fold_2, ...],
             ...
         }
-
-        Args:
-
-        Returns:
+        ```	
 
         """
         model_dfs = []
@@ -163,11 +163,11 @@ class CrossValidationResults(dict):
 
         Args:
           model_name: str: Name of the model (Default value = None)
-          metric_name: Name for the metric (Default value = "mse")
-          direction: Minimize or maximize. (Default value = "min")
+          metric_name: str: Name for the metric (Default value = "mse")
+          direction: str: Minimize or maximize. (Default value = "min")
 
         Returns:
-            model: The model with the best metric value for the given metric.
+            (object): The model with the best metric value for the given metric.
         """
         assert direction in [
             "min",
@@ -200,10 +200,11 @@ class CrossValidationResults(dict):
         """Returns the predictions for the given model and fold.
 
         Args:
-          model_name: 
-          fold_id: 
+          model_name: str: The name of the model.
+          fold_id: int: The id of the fold.
 
         Returns:
+          (array-like): The predictions for the given model and fold.
 
         """
         return self[model_name]["y_pred"][fold_id]
@@ -212,11 +213,11 @@ class CrossValidationResults(dict):
         """Returns the true values for the given model and fold.
 
         Args:
-          model_name: 
-          fold_id: 
+          model_name: str: The name of the model.
+          fold_id:  int: The id of the fold.
 
         Returns:
-
+            (array-like): The true values for the given model and fold.
         """
         return self[model_name]["y_test"][fold_id]
 
@@ -224,11 +225,11 @@ class CrossValidationResults(dict):
         """Returns the predictions for the given model and fold.
 
         Args:
-          model_name: 
-          fold_id: 
+          model_name:  str: The name of the model.
+          fold_id:  int: The id of the fold.
 
         Returns:
-
+            (array-like): The training predictions for the given model and fold.
         """
         return self[model_name]["y_pred_train"][fold_id]
 
@@ -236,11 +237,11 @@ class CrossValidationResults(dict):
         """Returns the true values for the given model and fold.
 
         Args:
-          model_name: 
-          fold_id: 
+          model_name: str: The name of the model.
+          fold_id: int: The id of the fold.
 
         Returns:
-
+            (array-like): The training true values for the given model and fold.
         """
         return self[model_name]["y_train"][fold_id]
 
@@ -249,11 +250,11 @@ class CrossValidationResults(dict):
         If the key is not found, returns None and will not raise an error.
 
         Args:
-          model_name: 
-          fold_id: 
+          model_name: str: The name of the model.
+          fold_id: int: The id of the fold.
 
         Returns:
-
+            (dict): The parameters for the given model and fold.
         """
         return self[model_name].get("parameters", [None])[fold_id]
 

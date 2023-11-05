@@ -38,7 +38,7 @@ class CustomNeptuneCallback(npt_utils.NeptuneCallback):
           trial: optuna.trial: Optuna trial object.
           
         Returns:
-          None
+          (None)
         """
         self._log_best_trials(study)
         self._log_plots(study, trial)
@@ -70,7 +70,7 @@ def log_diagnostics(
       namestring: str: A string to pass to logging. Use to separate folds: use "in" or "out" (Default value = "out")
 
     Returns:
-        None
+        (None)
     """
 
     def get_df_hist_fig(df):
@@ -80,7 +80,7 @@ def log_diagnostics(
           df: pd.DataFrame: The data to plot histograms for.
 
         Returns:
-          matplotlib.figure.Figure: The figure object containing the histograms as subplots.
+          (matplotlib.figure.Figure): The figure object containing the histograms as subplots.
         """
         fig, axes = plt.subplots(len(df.columns), 1, figsize=(5, 15))
         ax = axes.flatten()
@@ -93,13 +93,13 @@ def log_diagnostics(
         return fig
 
     def get_series_hist_fig(ser):
-        """
+        """Get a histogram for a series.
 
         Args:
-          ser: 
+          ser: pd.Series: The data to plot a histogram for.
 
         Returns:
-
+            (matplotlib.figure.Figure): The figure object containing the histogram.
         """
         fig, ax = plt.subplots()
         sns.histplot(ser, ax=ax)
@@ -171,7 +171,7 @@ def log_single_model_single_fold(
       metrics: MetricsDict: MetricsDict to use for evaluation (Default value = METRICS)
 
     Returns:
-      : dict: Dictionary, updated with the results from the current fold and current model.
+      (dict): Dictionary, updated with the results from the current fold and current model.
 
     """
 
@@ -179,11 +179,11 @@ def log_single_model_single_fold(
         """
 
         Args:
-          y_test: 
-          y_pred: 
+          y_test: array-like: True values.
+          y_pred: array-like: Predicted values.
 
         Returns:
-
+            (matplotlib.figure.Figure): Figure object containing the residuals vs fitted values plot.
         """
         fig = plt.figure()
         residuals = y_test - y_pred
