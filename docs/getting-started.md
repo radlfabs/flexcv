@@ -31,7 +31,7 @@ my_env_name/Scripts/activate
 pip install flexcv/requirements.txt
 ```
 
-##### Additional dependenciesv for `rpy2`
+##### Additional dependencies for `rpy2`
 
 Some of our model classes are actually wrapping around `rpy2` code and are using `R` under the hood. To use them, you should use a recent `R` version and run our `install_rpackages.py` script:
 

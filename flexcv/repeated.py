@@ -129,9 +129,6 @@ class RepeatedCV(CrossValidation):
     - in contrast to CrossValidation, the set_run method takes in a parent run and a list of children runs
     - perform method that performs repeated cross-validation
 
-    Args:
-
-    Returns:
 
     """
     def __init__(self, **kwargs):
@@ -280,34 +277,34 @@ class RepeatedCV(CrossValidation):
 
 if __name__ == "__main__":
     
-    from flexcv.synthesizer import generate_regression
-    from flexcv.models import LinearModel
-    from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
+  from flexcv.synthesizer import generate_regression
+  from flexcv.models import LinearModel
+  from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
 
-    # make sample data
-    X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise=9.1e-2)
+  # make sample data
+  X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise=9.1e-2)
 
-    # create a model mapping
-    model_map = ModelMappingDict(
-        {
-            "LinearModel": ModelConfigDict(
-                {
-                    "model": LinearModel,
-                }
-            ),
-        }
-    )
+  # create a model mapping
+  model_map = ModelMappingDict(
+      {
+          "LinearModel": ModelConfigDict(
+              {
+                  "model": LinearModel,
+              }
+          ),
+      }
+  )
 
-    credentials = {}
-    
-    rcv = (
-        RepeatedCV()
-        .set_data(X, y, group, dataset_name="ExampleData")
-        .set_models(model_map)
-        .set_n_repeats(3)
-        .set_neptune(credentials)
-        .perform()
-        .get_results()
-    )
+  credentials = {}
+  
+  rcv = (
+      RepeatedCV()
+      .set_data(X, y, group, dataset_name="ExampleData")
+      .set_models(model_map)
+      .set_n_repeats(3)
+      .set_neptune(credentials)
+      .perform()
+      .get_results()
+  )
 
-    rcv.summary.to_excel("repeated_cv.xlsx")  # save dataframe to excel file
+  rcv.summary.to_excel("repeated_cv.xlsx")  # save dataframe to excel file
