@@ -2,7 +2,7 @@
 
 In the future, this page will give you a detailled guide on how to use `flexcv` functions and objects.
 
-For the time being, please use our [getting started](getting-started.md) and [reference](reference.md). 
+For the time being, please use our [getting started](getting-started.md) and [reference](reference.md).
 
 ## Repeated Cross Validation
 
@@ -12,15 +12,13 @@ In the standard configuration, you would seed every run to make it absolutely re
 
 First, we create our random data set and a basic model mapping just as in a single run.
 
-Second, we instantiate a `RepeatedCV` object. This class not only has the `set`-methods just as CrossValidation but also implements `set_n_repeats()` and `set_neptune()`. We can chain these methods because they also return the class `self` and we use them to set the number of repetitions as well as passing the credentials for Neptune runs. `RepeatedCV` then takes care of instantiating the desired number of runs and logs every single cross validation to it's own neptune run. 
+Second, we instantiate a `RepeatedCV` object. This class not only has the `set`-methods just as CrossValidation but also implements `set_n_repeats()` and `set_neptune()`. We can chain these methods because they also return the class `self` and we use them to set the number of repetitions as well as passing the credentials for Neptune runs. `RepeatedCV` then takes care of instantiating the desired number of runs and logs every single cross validation to it's own neptune run.
 
 Most importantly `RepeatedCV` implements the iteration over single cross validation runs in it's `perform()` method. We can chain `perform()` in the same manner as we are now used to. The last element of our chain should also be `get_results`. This will allow us to inspect summary statistics as a measure of variance in the runs.
 
 Here is the full code to perform cross validation 3 times and get summary statistics for all folds and models.
 
-```
-python
-
+```python
 from flexcv.synthesizer import generate_regression
 from flexcv.models import LinearModel
 from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
