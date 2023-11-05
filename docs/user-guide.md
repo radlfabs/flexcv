@@ -29,16 +29,13 @@ X, y, group, random_slopes =generate_regression(10,100,n_slopes=1,noise=9.1e-2)
 
 # create a basic model mapping
 model_map = ModelMappingDict(
-
     {
-    "LinearModel": ModelConfigDict(
-    {
-    "model": LinearModel,
-    }
+    	"LinearModel": ModelConfigDict(
+    	{
+    		"model": LinearModel,
+    	}
     ),
-
     }
-
 )
 
 credentials = {}
