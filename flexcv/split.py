@@ -42,6 +42,29 @@ class CrossValMethod(Enum):
     CUSTOMSTRATGROUP = "CustomStratifiedGroupKFold"
 
 
+def string_to_crossvalmethod(method: str) -> CrossValMethod:
+    """Converts a string to a CrossValMethod enum member.
+
+    Args:
+      method: str: The string to convert.
+
+    Returns:
+      (CrossValMethod): The CrossValMethod enum value.
+
+    Raises:
+      ValueError: If the given string does not match any CrossValMethod.
+
+    """
+    keys =  [e.value for e in CrossValMethod]
+    values = [e for e in CrossValMethod]
+    method_dict = dict(zip(keys, values))
+    
+    if method in method_dict:
+        return method_dict[method]
+    else:
+        raise ValueError("Invalid Cross Validation method given.")
+
+
 class CustomStratifiedGroupKFold(BaseCrossValidator):
     """sklearn's StratifiedGroupKFold adapted for continuous target variables."""
 
@@ -201,3 +224,7 @@ def make_cross_val_split(
             return partial(cross_val_obj.split, groups=groups)
         case _:
             raise TypeError("Invalid Cross Validation method given.")
+
+
+if __name__ == "__main__":
+    print(string_to_crossvalmethod("KFold"))

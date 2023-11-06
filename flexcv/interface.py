@@ -14,7 +14,7 @@ from .core import cross_validate
 from .metrics import MetricsDict
 from .model_selection import ObjectiveScorer
 from .results_handling import CrossValidationResults
-from .split import CrossValMethod
+from .split import CrossValMethod, string_to_crossvalmethod
 from .utilities import add_module_handlers, run_padding
 from .model_mapping import ModelConfigDict, ModelMappingDict
 from .run import Run as DummyRun
@@ -137,7 +137,14 @@ class CrossValidation:
 
         Returns:
             (CrossValidation): self
-
+            
+        Example:
+            ```python
+            >>> X = pd.DataFrame({"x": [1, 2, 3, 4, 5], "z": [1, 2, 3, 4, 5]})
+            >>> y = pd.Series([1, 2, 3, 4, 5])
+            >>> cv = CrossValidation()
+            >>> cv.set_data(X, y)
+            ```
         """
         # check values
         if not isinstance(X, pd.DataFrame):
@@ -191,8 +198,8 @@ class CrossValidation:
 
     def set_splits(
         self,
-        split_out: CrossValMethod = CrossValMethod.KFOLD,
-        split_in: CrossValMethod = CrossValMethod.KFOLD,
+        split_out: str | CrossValMethod = CrossValMethod.KFOLD,
+        split_in: str | CrossValMethod = CrossValMethod.KFOLD,
         n_splits_out: int = 5,
         n_splits_in: int = 5,
         scale_out: bool = True,
@@ -200,11 +207,17 @@ class CrossValidation:
         break_cross_val: bool = False,
         metrics: MetricsDict = None,
     ):
-        """Set the cross validation strategy.
+        """Set the cross validation strategy. 
+        Set the split method simply by passing the `CrossValMethod` as a string or enum value. Passing as string might be more convenient for you but could lead to typos.
+        When passing as string, the string must be a valid value of the `CrossValMethod` enum.
+        See the reference for `CrossValMethod` for more details.
+        
+        Valid strings:
+            "KFold", "StratifiedKFold", "CustomStratifiedKFold", "GroupKFold", "StratifiedGroupKFold", "CustomStratifiedGroupKFold"
 
         Args:
-          split_out: CrossValMethod: Outer split method (Default value = CrossValMethod.KFOLD)
-          split_in: CrossValMethod: Inner split method for hyperparameter tuning (Default value = CrossValMethod.KFOLD)
+          split_out: str | CrossValMethod: Outer split method (Default value = CrossValMethod.KFOLD)
+          split_in: str | CrossValMethod: Inner split method for hyperparameter tuning (Default value = CrossValMethod.KFOLD)
           n_splits_out: int: Number of splits in outer loop (Default value = 5)
           n_splits_in: int: Number of splits in inner loop (Default value = 5)
           scale_out: bool: Whether or not the Features of the outer loop will be scaled to mean 0 and variance 1  (Default value = True)
@@ -215,7 +228,38 @@ class CrossValidation:
         Returns:
           (CrossValidation): self
 
+        Example:
+            Passing the method as instance of CrossValMethod:
+            ```python
+            >>> from flexcv import CrossValidation, CrossValMethod
+            >>> cv = CrossValidation()
+            >>> cv.set_splits(split_out=CrossValMethod.KFOLD, split_in=CrossValMethod.KFOLD)
+            ```
+            Passing the method as a string:
+            ```python
+            >>> from flexcv import CrossValidation
+            >>> cv = CrossValidation()
+            >>> cv.set_splits(split_out="KFOLD", split_in="KFold")
+            ```
+          
+        Split methods:
+            The split strategy is controlled by the `split_out` and `split_in` arguments. You can pass the actual `CrossValMethod` enum or a string.
+            
+            The `split_out` argument controls the fold assignment in the outer cross validation loop. 
+            In each outer loop the model is fit on the training fold and model performance is evaluated on unseen data of the test fold.
+            The `split_in` argument controls the inner loop split strategy. The inner loop cross validates the hyperparameters of the model.
+            A model is typically built by sampling from a distribution of hyperparameters. It is fit on the inner training fold and evaluated on the inner test fold.
+            Of course, the inner loop is nested in the outer loop, so the inner split is performed on the outer training fold.
+            
+            Read more about it in the respective documentation of the `CrossValMethod` enum.
+        
         """
+        if split_out and isinstance(split_out, str):
+            split_out = string_to_crossvalmethod(split_out)
+            
+        if split_in and isinstance(split_in, str):
+            split_in = string_to_crossvalmethod(split_in)
+        
         # get values of CrossValMethod enums
         ALLOWED_METHODS = [method.value for method in CrossValMethod]
 
@@ -488,7 +532,7 @@ if __name__ == "__main__":
     from .models import LinearModel
     from .synthesizer import generate_regression
 
-    X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise=9.1e-2)
+    X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise_level=9.1e-2)
     model_map = ModelMappingDict(
         {
             "LinearModel": ModelConfigDict(

@@ -13,7 +13,7 @@ from sklearn.utils.validation import check_random_state
 from statsmodels.tools.sm_exceptions import ConvergenceWarning
 from tqdm import tqdm
 
-from .logging import (
+from .cv_logging import (
     CustomNeptuneCallback,
     SingleModelFoldResult,
     log_diagnostics,

@@ -26,7 +26,7 @@ Navigate through the sections to explore the different parts of our project.
 
 ## ::: flexcv.models
 
-## ::: flexcv.logging
+## ::: flexcv.cv_logging
 
 ## ::: flexcv.plot
 
