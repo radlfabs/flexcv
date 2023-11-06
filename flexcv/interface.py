@@ -239,8 +239,10 @@ class CrossValidation:
             ```python
             >>> from flexcv import CrossValidation
             >>> cv = CrossValidation()
-            >>> cv.set_splits(split_out="KFOLD", split_in="KFold")
+            >>> cv.set_splits(split_out="KFold", split_in="KFold")
+            # Valid strings: "KFold", "StratifiedKFold", "CustomStratifiedKFold", "GroupKFold", "StratifiedGroupKFold", "CustomStratifiedGroupKFold"
             ```
+            
           
         Split methods:
             The split strategy is controlled by the `split_out` and `split_in` arguments. You can pass the actual `CrossValMethod` enum or a string.
