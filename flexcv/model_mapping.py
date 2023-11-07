@@ -92,6 +92,7 @@ class ModelConfigDict(Dict[str, Type]):
         """Sets default values for the model configuration dict. This allows us to use the dict without having to pass all the keys every time."""
         # check if dict key exists, if not, set default value
         self._check_key_set_default("requires_inner_cv", False)
+        self._check_key_set_default("requires_formula", False)
         self._check_key_set_default("allows_seed", True)
         self._check_key_set_default("allows_n_jobs", True)
         self._check_key_set_default("n_trials", 100)

@@ -24,6 +24,8 @@ from .model_selection import ObjectiveScorer, objective_cv
 from .split import CrossValMethod, make_cross_val_split
 from .utilities import get_fixed_effects_formula, get_re_formula
 from .model_mapping import ModelMappingDict
+from .merf import MERF
+from .models import LinearMixedEffectsModel
 
 warnings.filterwarnings("ignore", module=r"matplotlib\..*")
 warnings.filterwarnings("ignore", module=r"xgboost\..*")
@@ -244,6 +246,7 @@ def cross_validate(
                 
             # get bool in mapping[model_name]["requires_inner_cv"] and negate it
             skip_inner_cv = not mapping[model_name]["requires_inner_cv"]
+            requires_formula = mapping[model_name]["requires_formula"]
             
             if mapping[model_name]["allows_n_jobs"]:
                 n_jobs_model_dict = {"n_jobs": mapping[model_name]["n_jobs_model"]}  
@@ -266,6 +269,7 @@ def cross_validate(
                     **n_jobs_model_dict, random_state=random_seed
                 )
                 best_params = best_model.get_params()
+                study = None
 
             else:
                 n_trials
@@ -309,13 +313,6 @@ def cross_validate(
                 if not isinstance(n_trials, int):
                     raise ValueError("Invalid value for n_trials.")
 
-                to_model = (
-                    {
-                        "formula": formula,
-                    }
-                    if model_name == "LinearModel"
-                    else {}
-                )
                 # generate numpy random_state object for seeding the sampler
                 random_state = check_random_state(random_seed)
                 sampler_seed = random_state.randint(0, np.iinfo("int32").max)
@@ -351,19 +348,20 @@ def cross_validate(
                     for key, value in best_params.items()
                 }
 
+            # add random_state to best_params if it is not already in there
             if "random_state" not in best_params:
                 best_params = best_params | model_seed
 
-            to_model = (
-                {
-                    "formula": formula,
-                }
-                if model_name == "LinearModel"
-                else {}
-            )
+            # add formula to dict if it is required by the model type
+            # to_dict can be unpacked in the fit method
+            if requires_formula:
+                model_formula = {"formula": formula}
+            else:
+                model_formula = {}
+            
             # Fit the best model on the outer fold
             best_model = model_instance(**best_params)
-            fit_result = best_model.fit(X_train_scaled, y_train, **to_model)
+            fit_result = best_model.fit(X_train_scaled, y_train, **model_formula)
 
             y_pred = best_model.predict(X_test_scaled)
             y_pred_train = best_model.predict(X_train_scaled)
@@ -379,7 +377,7 @@ def cross_validate(
                 k,
                 run,
                 results_all_folds,
-                study=study if not model_name == "LinearModel" else None,
+                study=study,
                 metrics=metrics,
             )
 
@@ -408,6 +406,8 @@ def cross_validate(
                 features=X_train.columns,
             )
 
+            ###### MIXED EFFECTS EVALUATION #################
+            
             # code that is run for effects == "mixed"
             # if effects == "mixed":
             # look up mixed effects model in mapping
@@ -417,14 +417,17 @@ def cross_validate(
             # store the mixed effects model in the all_models_dict
             # store the mixed effects model in the model_results_dict
             # run the mixed effects model postprocessing
-
+            
             if (model_effects == "mixed") and mapping[model_name]["mixed_name"]:
+                
                 logger.info(f"Evaluating {mapping[model_name]['mixed_name']}...")
                 # tag the base prediction
                 y_pred_base = y_pred.copy()
-
-                if model_name == "LinearModel":
+                    
+                if mapping[model_name]["mixed_model"] == LinearMixedEffectsModel:
+                    # fit the mixed model. For LMEM there is no best model
                     mixed_model_instance = mapping[model_name]["mixed_model"]()
+                    # fit the model using the cluster variable and re_formula for slopes 
                     fit_result = mixed_model_instance.fit(
                         X=X_train_scaled,
                         y=y_train,
@@ -432,7 +435,8 @@ def cross_validate(
                         formula=formula,
                         re_formula=re_formula,
                     )
-                else:  # case MERF
+                elif mapping[model_name]["mixed_model"] == MERF:
+                    # instantiate the mixed model with the best fixed effects model
                     mixed_model_instance = mapping[model_name]["mixed_model"](
                         fixed_effects_model=mapping[model_name]["model"](**best_params),
                         max_iterations=max_iterations,
@@ -440,21 +444,24 @@ def cross_validate(
                         gll_early_stopping_window=em_window,
                         log_gll_per_iteration=False,
                     )
-
+                    # fit the mixed model using cluster variable and Z for slopes
                     fit_result = mixed_model_instance.fit(
                         X=X_train_scaled,
                         y=y_train,
                         clusters=cluster_train,
                         Z=Z_train,
                     )
+                else:
+                    raise ValueError(f"Invalid mixed model: mixed model must be MERF or LMM but was {mapping[model_name]['mixed_model']}")
 
+                # get test predictions
                 y_pred = mixed_model_instance.predict(
                     X=X_test_scaled,
                     clusters=cluster_test,
                     Z=Z_test,
                     predict_known_groups_lmm=predict_known_groups_lmm,
                 )
-
+                # get training predictions 
                 y_pred_train = mixed_model_instance.predict(
                     X=X_train_scaled,
                     clusters=cluster_train,
