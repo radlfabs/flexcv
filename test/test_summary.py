@@ -9,7 +9,9 @@ from flexcv.utilities import empty_func
 
 
 def regression_with_summary():
-    X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise_level=9.1e-2)
+    X, y, group, random_slopes = generate_regression(
+        10, 100, n_slopes=1, noise_level=9.1e-2
+    )
 
     model_map = ModelMappingDict(
         {

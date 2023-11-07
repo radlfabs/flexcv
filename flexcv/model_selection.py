@@ -288,7 +288,13 @@ def objective_cv(
             y_valid = y.iloc[valid_idx]
 
             score_valid, score_train, score_OF = objective(
-                X_train_in, y_train_in, X_valid, y_valid, pipe, params_, objective_scorer
+                X_train_in,
+                y_train_in,
+                X_valid,
+                y_valid,
+                pipe,
+                params_,
+                objective_scorer,
             )
 
             scores_valid.append(score_valid)

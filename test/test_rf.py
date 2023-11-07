@@ -10,7 +10,9 @@ import flexcv.model_postprocessing as mp
 
 
 def random_forest_regression():
-    X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise_level=9.1e-2)
+    X, y, group, random_slopes = generate_regression(
+        10, 100, n_slopes=1, noise_level=9.1e-2
+    )
 
     model_map = ModelMappingDict(
         {
@@ -22,7 +24,9 @@ def random_forest_regression():
                     "model": RandomForestRegressor,
                     "params": {
                         "max_depth": optuna.distributions.IntDistribution(5, 100),
-                        "n_estimators": optuna.distributions.CategoricalDistribution([10])
+                        "n_estimators": optuna.distributions.CategoricalDistribution(
+                            [10]
+                        ),
                     },
                     "post_processor": mp.rf_post,
                 }

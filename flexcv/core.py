@@ -243,16 +243,16 @@ def cross_validate(
                 param_grid = mapping[model_name][dataset_name]["params"]
             except KeyError:
                 param_grid = mapping[model_name]["params"]
-                
+
             # get bool in mapping[model_name]["requires_inner_cv"] and negate it
             skip_inner_cv = not mapping[model_name]["requires_inner_cv"]
             requires_formula = mapping[model_name]["requires_formula"]
-            
+
             if mapping[model_name]["allows_n_jobs"]:
-                n_jobs_model_dict = {"n_jobs": mapping[model_name]["n_jobs_model"]}  
+                n_jobs_model_dict = {"n_jobs": mapping[model_name]["n_jobs_model"]}
             else:
                 n_jobs_model_dict = {}
-            
+
             if mapping[model_name]["allows_seed"]:
                 model_seed = {"random_state": random_seed}
             else:
@@ -358,7 +358,7 @@ def cross_validate(
                 model_formula = {"formula": formula}
             else:
                 model_formula = {}
-            
+
             # Fit the best model on the outer fold
             best_model = model_instance(**best_params)
             fit_result = best_model.fit(X_train_scaled, y_train, **model_formula)
@@ -407,7 +407,7 @@ def cross_validate(
             )
 
             ###### MIXED EFFECTS EVALUATION #################
-            
+
             # code that is run for effects == "mixed"
             # if effects == "mixed":
             # look up mixed effects model in mapping
@@ -417,17 +417,16 @@ def cross_validate(
             # store the mixed effects model in the all_models_dict
             # store the mixed effects model in the model_results_dict
             # run the mixed effects model postprocessing
-            
+
             if (model_effects == "mixed") and mapping[model_name]["mixed_name"]:
-                
                 logger.info(f"Evaluating {mapping[model_name]['mixed_name']}...")
                 # tag the base prediction
                 y_pred_base = y_pred.copy()
-                    
+
                 if mapping[model_name]["mixed_model"] == LinearMixedEffectsModel:
                     # fit the mixed model. For LMEM there is no best model
                     mixed_model_instance = mapping[model_name]["mixed_model"]()
-                    # fit the model using the cluster variable and re_formula for slopes 
+                    # fit the model using the cluster variable and re_formula for slopes
                     fit_result = mixed_model_instance.fit(
                         X=X_train_scaled,
                         y=y_train,
@@ -452,7 +451,9 @@ def cross_validate(
                         Z=Z_train,
                     )
                 else:
-                    raise ValueError(f"Invalid mixed model: mixed model must be MERF or LMM but was {mapping[model_name]['mixed_model']}")
+                    raise ValueError(
+                        f"Invalid mixed model: mixed model must be MERF or LMM but was {mapping[model_name]['mixed_model']}"
+                    )
 
                 # get test predictions
                 y_pred = mixed_model_instance.predict(
@@ -461,7 +462,7 @@ def cross_validate(
                     Z=Z_test,
                     predict_known_groups_lmm=predict_known_groups_lmm,
                 )
-                # get training predictions 
+                # get training predictions
                 y_pred_train = mixed_model_instance.predict(
                     X=X_train_scaled,
                     clusters=cluster_train,

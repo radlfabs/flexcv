@@ -55,10 +55,10 @@ def string_to_crossvalmethod(method: str) -> CrossValMethod:
       ValueError: If the given string does not match any CrossValMethod.
 
     """
-    keys =  [e.value for e in CrossValMethod]
+    keys = [e.value for e in CrossValMethod]
     values = [e for e in CrossValMethod]
     method_dict = dict(zip(keys, values))
-    
+
     if method in method_dict:
         return method_dict[method]
     else:

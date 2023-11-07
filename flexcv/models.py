@@ -203,8 +203,8 @@ class LinearMixedEffectsModel(BaseLinearModel):
             return yp
         else:
             return self.md_.predict(exog=X)
-    
-    
+
+
 class EarthRegressor(BaseEstimator, RegressorMixin):
     """Wrapper Class for Earth Regressor in R.
     For more Details see https://cran.r-project.org/web/packages/earth/earth.pdf.
