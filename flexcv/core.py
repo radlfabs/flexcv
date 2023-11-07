@@ -31,9 +31,6 @@ warnings.simplefilter("ignore", ConvergenceWarning)
 logger = logging.getLogger(__name__)
 
 
-RANDOM_SEED = 42
-
-
 def cross_validate(
     *,
     X: pd.DataFrame,
@@ -244,10 +241,19 @@ def cross_validate(
                 param_grid = mapping[model_name][dataset_name]["params"]
             except KeyError:
                 param_grid = mapping[model_name]["params"]
-            # get bool in mapping[model_name]["inner_cv"] and negate it
-            skip_inner_cv = not mapping[model_name]["inner_cv"]
-            n_jobs_model_dict = mapping[model_name]["n_jobs"]
-            model_seed = {} if "SVR" in model_name else {"random_state": RANDOM_SEED}
+                
+            # get bool in mapping[model_name]["requires_inner_cv"] and negate it
+            skip_inner_cv = not mapping[model_name]["requires_inner_cv"]
+            
+            if mapping[model_name]["allows_n_jobs"]:
+                n_jobs_model_dict = {"n_jobs": mapping[model_name]["n_jobs_model"]}  
+            else:
+                n_jobs_model_dict = {}
+            
+            if mapping[model_name]["allows_seed"]:
+                model_seed = {"random_state": random_seed}
+            else:
+                model_seed = {}
 
             # build inner cv folds
             cross_val_split_in = make_cross_val_split(
@@ -257,7 +263,7 @@ def cross_validate(
             if skip_inner_cv:
                 # Instantiate model directly
                 best_model = model_instance(
-                    **n_jobs_model_dict, random_state=RANDOM_SEED
+                    **n_jobs_model_dict, random_state=random_seed
                 )
                 best_params = best_model.get_params()
 
@@ -311,7 +317,7 @@ def cross_validate(
                     else {}
                 )
                 # generate numpy random_state object for seeding the sampler
-                random_state = check_random_state(RANDOM_SEED)
+                random_state = check_random_state(random_seed)
                 sampler_seed = random_state.randint(0, np.iinfo("int32").max)
 
                 # Perform inner cross validation
@@ -345,8 +351,8 @@ def cross_validate(
                     for key, value in best_params.items()
                 }
 
-            if "random_state" in best_params:
-                best_params["random_state"] = RANDOM_SEED
+            if "random_state" not in best_params:
+                best_params = best_params | model_seed
 
             to_model = (
                 {

@@ -6,9 +6,9 @@ Usage:
     model_mapping = ModelMappingDict({
         "ModelName1": ModelConfigDict(
             {
-                "inner_cv": False,
+                "requires_inner_cv": False,
                 "n_trials": 100,
-                "n_jobs_model": {"n_jobs": 1},
+                "n_jobs_model": 1,
                 "n_jobs_cv": 1,
                 "model": model_1,
                 "params": {},
@@ -21,9 +21,9 @@ Usage:
         
         "ModelName2": ModelConfigDict(
             {
-                "inner_cv": True,
+                "requires_inner_cv": True,
                 "n_trials": 100,
-                "n_jobs_model": {"n_jobs": 1},
+                "n_jobs_model": 1,
                 "n_jobs_cv": 1,
                 "model": model_2,
                 "params": {},
@@ -49,22 +49,20 @@ class ModelConfigDict(Dict[str, Type]):
     If you don't pass them, it will set
     inner_cv = False
     n_trials = 100
-    n_jobs = {"n_jobs": 1}
+    n_jobs = 1
     n_jobs_cv = 1
 
     Usage:
         ```python
             {
-                "inner_cv": bool,
+                "requires_inner_cv": bool,
                         # this flag can be set to control if a model is used in the inner cross validation.
                         # if set to False, the model will be instantiated in the outer cross validation without hyper parameter optimization.
                 "n_trials": int,
                         # number of trials to be used in hyper parameter optimization.
-                "n_jobs_model": {"n_jobs": 1},
-                        # number of jobs to be used in the model. We use the sklearn convention here.
-                        # n_jobs_model is passed to the model constructor as **n_jobs_model
-                        # therefore, it MUST be a dictionary with the key "n_jobs" and the value being an integer
-                        # if you want to leave it empty, you can pass the empty dict {}.
+                "n_jobs_model": 1,
+                        # number of jobs to be used in the model. We use the sklearn convention here. We use the sklearn convention here.
+                        # If your model does not support n_jobs, you can pass False here.
                 "n_jobs_cv": 1,
                         # number of jobs to be used in the inner cross validation/hyper parameter tuning. We use the sklearn convention here.
                 "model": BaseEstimator,
@@ -93,9 +91,11 @@ class ModelConfigDict(Dict[str, Type]):
     def _set_defaults(self) -> None:
         """Sets default values for the model configuration dict. This allows us to use the dict without having to pass all the keys every time."""
         # check if dict key exists, if not, set default value
-        self._check_key_set_default("inner_cv", False)
+        self._check_key_set_default("requires_inner_cv", False)
+        self._check_key_set_default("allows_seed", True)
+        self._check_key_set_default("allows_n_jobs", True)
         self._check_key_set_default("n_trials", 100)
-        self._check_key_set_default("n_jobs", {"n_jobs": 1})
+        self._check_key_set_default("n_jobs_model", 1)
         self._check_key_set_default("n_jobs_cv", 1)
         self._check_key_set_default("params", {})
         self._check_key_set_default("post_processor", empty_func)
