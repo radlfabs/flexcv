@@ -30,14 +30,12 @@ MODEL_MAPPING = ModelMappingDict(
         ),
         "RandomForest": ModelConfigDict(
             {
-                # https://www.analyticsvidhya.com/blog/2020/03/beginners-guide-random-forest-hyperparameter-tuning/
                 "requires_inner_cv": True,
                 "n_trials": 400,
                 "n_jobs_model": 1,
                 "n_jobs_cv": -1,
                 "model": RandomForestRegressor,
                 "params": {
-                    #    https://www.analyticsvidhya.com/blog/2020/03/beginners-guide-random-forest-hyperparameter-tuning/
                     "max_depth": optuna.distributions.IntDistribution(5, 100),
                     "min_samples_split": optuna.distributions.IntDistribution(
                         2, 1000, log=True
@@ -65,8 +63,6 @@ MODEL_MAPPING = ModelMappingDict(
         ),
         "XGBoost": ModelConfigDict(
             {
-                # https://www.kaggle.com/code/andreshg/xgboost-optuna-hyperparameter-tunning
-                # https://www.kaggle.com/code/prashant111/a-guide-on-xgboost-hyperparameters-tuning
                 "requires_inner_cv": True,
                 "n_trials": 300,
                 "n_jobs_model": 1,
