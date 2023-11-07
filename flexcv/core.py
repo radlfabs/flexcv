@@ -55,11 +55,11 @@ def cross_validate(
     mapping: ModelMappingDict,
     metrics: MetricsDict,
     objective_scorer: ObjectiveScorer,
-    em_max_iterations: int,
-    em_stopping_threshold: float,
-    em_stopping_window: int,
-    predict_known_groups_lmm: bool,
-    diagnostics: bool,
+    em_max_iterations: int = None,
+    em_stopping_threshold: float = None,
+    em_stopping_window: int = None,
+    predict_known_groups_lmm: bool = True,
+    diagnostics: bool = False,
 ) -> Dict[str, Dict[str, list]]:
     """This function performs a cross-validation for a given regression formula, using one or a number of specified machine learning models and a configurable cross-validation method.
 
@@ -84,11 +84,11 @@ def cross_validate(
         mapping (ModelMappingDict): The mapping providing model instances, hyperparameter distributions, and postprocessing functions.
         metrics (MetricsDict): A dict of metrics to be used as the evaluation metric for the outer cross-validation.
         objective_scorer (ObjectiveScorer): A custom objective scorer object to provide the evaluation metric for the inner cross-validation.
-        em_max_iterations (int): For use with MERF. Maximum number of iterations for the EM algorithm.
-        em_stopping_threshold (float): For use with MERF. Threshold for the early stopping criterion of the EM algorithm.
-        em_stopping_window (int): For use with MERF. Window size for the early stopping criterion of the EM algorithm.
-        predict_known_groups_lmm (bool): For use with Mixed Linear Models. If True, the model will predict the known groups in the test set.
-        diagnostics (bool): If True, diagnostics plots are logged to Neptune.
+        em_max_iterations (int): For use with MERF. Maximum number of iterations for the EM algorithm. (Default: None)
+        em_stopping_threshold (float): For use with MERF. Threshold for the early stopping criterion of the EM algorithm. (Default: None)
+        em_stopping_window (int): For use with MERF. Window size for the early stopping criterion of the EM algorithm. (Default: None)
+        predict_known_groups_lmm (bool): For use with Mixed Linear Models. If True, the model will predict the known groups in the test set. (Default: True)
+        diagnostics (bool): If True, diagnostics plots are logged to Neptune. (Default: False)
 
 
     Returns:
@@ -110,6 +110,7 @@ def cross_validate(
     ```
 
     """
+    
     if objective_scorer is None:
         objective_scorer = ObjectiveScorer(mse_wrapper)
     else:
@@ -122,15 +123,6 @@ def cross_validate(
         logger.warning(
             "No Neptune run object passed. Logging to Neptune will be disabled."
         )
-
-    if isinstance(em_max_iterations, int):
-        max_iterations = em_max_iterations
-
-    if isinstance(em_stopping_window, int):
-        em_window = em_stopping_window
-
-    if isinstance(em_stopping_threshold, float):
-        em_stopping_threshold = em_stopping_threshold
 
     print()
     re_formula = get_re_formula(slopes)
@@ -437,9 +429,9 @@ def cross_validate(
                     # instantiate the mixed model with the best fixed effects model
                     mixed_model_instance = mapping[model_name]["mixed_model"](
                         fixed_effects_model=mapping[model_name]["model"](**best_params),
-                        max_iterations=max_iterations,
+                        max_iterations=em_max_iterations,
                         gll_early_stop_threshold=em_stopping_threshold,
-                        gll_early_stopping_window=em_window,
+                        gll_early_stopping_window=em_stopping_window,
                         log_gll_per_iteration=False,
                     )
                     # fit the mixed model using cluster variable and Z for slopes
