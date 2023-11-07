@@ -2,6 +2,9 @@ import numpy as np
 import pandas as pd
 
 
+RANDOM_SEED = 42
+
+
 def select_random_columns(df: pd.DataFrame, n: int) -> pd.DataFrame:
     """Select n random columns from a pandas DataFrame and return a new DataFrame containing only these columns.
 
@@ -43,13 +46,12 @@ def generate_regression(
     RANDOM_LEVEL = 1
 
     # initialize random number generator and generate predictors randomly
-    rng = np.random.default_rng(42)
+    rng = np.random.default_rng(RANDOM_SEED)
     X = rng.integers(-10, 10, (n_samples, m_features))
 
     # generate random coefficients with a linear relationship and add noise
     beta_fixed = rng.random(m_features) * FIXED_LEVEL
     epsilon = rng.standard_normal(n_samples) * noise_level
-    # y = 1 + X @ beta + epsilon
 
     # generate random group labels
     group = rng.integers(0, n_groups, n_samples)
