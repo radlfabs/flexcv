@@ -29,10 +29,10 @@ class ObjectiveScorer(
     The scorer function must match the following signature. Instantiating the class will check the signature.
 
     Args:
-        y_valid: ndarray: The validation target values.
-        y_pred: ndarray: The predicted target values.
-        y_train_in: ndarray: The training target values.
-        y_pred_train: ndarray: The predicted training target values.
+        y_valid (np.ndarray): The validation target values.
+        y_pred (np.ndarray): The predicted target values.
+        y_train_in (np.ndarray): The training target values.
+        y_pred_train (np.ndarray): The predicted training target values.
 
     Returns:
         (float): The objective function value.
@@ -82,10 +82,10 @@ def custom_scorer(y_valid, y_pred, y_train_in, y_pred_train) -> float:
     This function is used in the hyperparameter optimization process to evaluate the performance of different models with different hyperparameters.
 
     Args:
-      y_valid: ndarray: The validation target values
-      y_pred: ndarray: Predicted target values
-      y_train_in: Inner training target values
-      y_pred_train: Inner predicted target values
+      y_valid (np.ndarray): The validation target values
+      y_pred (np.ndarray): Predicted target values
+      y_train_in (np.ndarray): Inner training target values
+      y_pred_train (np.ndarray): Inner predicted target values
 
     Returns:
       (float): The objective function value.
@@ -133,11 +133,11 @@ def objective(
     Returns the negative validation and training MSEs as well as the negative objective function value, since optuna maximizes the objective function.
 
     Args:
-        X_train_in: DataFrame or ndarray: The training data.
-        y_train_in: DataFrame or ndarray: The training target values.
-        X_valid: DataFrame or ndarray: The validation data.
-        y_valid: DataFrame or ndarray: The validation target values.
-        pipe: Pipeline: The pipeline to be used for the training.
+        X_train_in (pd.DataFrame or np.ndarray): The training data.
+        y_train_in (pd.DataFrame or np.ndarray): The training target values.
+        X_valid (pd.DataFrame or np.ndarray): The validation data.
+        y_valid (pd.DataFrame or np.ndarray): The validation target values.
+        pipe (Pipeline): The pipeline to be used for the training.
 
     Returns:
         (tuple): A tuple containing the negative validation MSE, the negative training MSE and the negative objective function value.
@@ -176,16 +176,11 @@ def parallel_objective(
     Gets the training and validation indices and the data and calls the objective function.
 
     Args:
-        train_idx: ndarray
-            The training indices.
-        valid_idx: ndarray
-            The validation indices.
-        X: DataFrame or ndarray
-            The data.
-        y: DataFrame or ndarray
-            The target values.
-        pipe: Pipeline
-            The pipeline to be used for the training.
+        train_idx (ndarray): The training indices.
+        valid_idx (ndarray): The validation indices.
+        X (pd.DataFrame or np.ndarray): The data.
+        y (pd.DataFrame or np.ndarray): The target values.
+        pipe (Pipeline): The pipeline to be used for the training.
 
     Returns:
       (tuple): A tuple containing the validation MSE, the training MSE and the objective function value.
@@ -224,15 +219,15 @@ def objective_cv(
     If n_jobs is 1, the objective function is called sequentially.
 
     Args:
-      trial: Optuna trial object.
-      cross_val_split: function: Function that returns the indices for the cross validation split.
-      pipe: Pipeline: The pipeline to be used for the training.
-      params: dict: Dictionary containing the parameters to be set in the pipeline.
-      X: DataFrame or ndarray: Features.
-      y: DataFrame or ndarray: Target.
-      run: Run: neptune run object
-      n_jobs: int: Sklearn n_jobs parameter to control if CV is run in parallel or sequentially
-      objective_scorer: ObjectiveScorer: Callable class that wraps a scorer function to be used as an objective function.
+      trial (neptune.trial): Optuna trial object.
+      cross_val_split (function): Function that returns the indices for the cross validation split.
+      pipe (Pipeline): The pipeline to be used for the training.
+      params (dict): Dictionary containing the parameters to be set in the pipeline.
+      X (pd.DataFrame or np.ndarray): Features.
+      y (pd.DataFrame or np.ndarray): Target.
+      run (neptune.run): neptune run object
+      n_jobs (int): Sklearn n_jobs parameter to control if CV is run in parallel or sequentially
+      objective_scorer (ObjectiveScorer): Callable class that wraps a scorer function to be used as an objective function.
 
 
     Returns:

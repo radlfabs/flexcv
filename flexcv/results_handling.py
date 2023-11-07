@@ -9,23 +9,6 @@ import numpy as np
 import pandas as pd
 
 
-def pformat_dict(d, indent=""):
-    """Pretty-format a dictionary, only printing values that are themselves dictionaries.
-
-    Args:
-      d: dictionary to print
-      indent: str: Level of indentation for use with recursion (Default value = "")
-
-    Returns:
-
-    """
-    formatted = ""
-    for key, value in d.items():
-        formatted.join(f"{indent}{key}")
-        if isinstance(value, dict):
-            pformat_dict(value, indent + "  ")
-
-
 def add_summary_stats(df: pd.DataFrame) -> pd.DataFrame:
     """Add summary statistics to a pandas DataFrame.
     Calculates the mean, median and standard deviation on copies slices of the original data and adds them as rows to the DataFrame.
@@ -77,12 +60,13 @@ class CrossValidationResults(dict):
     }
     ```
     This class is a wrapper around this dictionary which provides a summary of the results.
-    `_make_summary` computes the mean, median and standard deviation of the metrics for each model.
-    `_make_summary` is called the first time the summary property is accessed and the result is cached.
-    `_get_model` returns the model instance corresponding to the given model name.
+    
+    - `_make_summary` computes the mean, median and standard deviation of the metrics for each model.
+    - `_make_summary` is called the first time the summary property is accessed and the result is cached.
+    - `_get_model` returns the model instance corresponding to the given model name.
 
     Properties:
-        summary: pd.DataFrame: Summary of the results.
+        summary (pd.DataFrame): Summary of the results.
 
     """
 
@@ -162,9 +146,9 @@ class CrossValidationResults(dict):
         E.g. for MSE, direction should be "min" and for R2, direction should be "max".
 
         Args:
-          model_name: str: Name of the model (Default value = None)
-          metric_name: str: Name for the metric (Default value = "mse")
-          direction: str: Minimize or maximize. (Default value = "min")
+          model_name (str): Name of the model (Default value = None)
+          metric_name (str): Name for the metric (Default value = "mse")
+          direction (str): Minimize or maximize. (Default value = "min")
 
         Returns:
             (object): The model with the best metric value for the given metric.
@@ -200,8 +184,8 @@ class CrossValidationResults(dict):
         """Returns the predictions for the given model and fold.
 
         Args:
-          model_name: str: The name of the model.
-          fold_id: int: The id of the fold.
+          model_name (str): The name of the model.
+          fold_id (int): The id of the fold.
 
         Returns:
           (array-like): The predictions for the given model and fold.
@@ -213,8 +197,8 @@ class CrossValidationResults(dict):
         """Returns the true values for the given model and fold.
 
         Args:
-          model_name: str: The name of the model.
-          fold_id:  int: The id of the fold.
+          model_name (str): The name of the model.
+          fold_id (int): The id of the fold.
 
         Returns:
             (array-like): The true values for the given model and fold.
@@ -225,8 +209,8 @@ class CrossValidationResults(dict):
         """Returns the predictions for the given model and fold.
 
         Args:
-          model_name:  str: The name of the model.
-          fold_id:  int: The id of the fold.
+          model_name (str): The name of the model.
+          fold_id (int): The id of the fold.
 
         Returns:
             (array-like): The training predictions for the given model and fold.
@@ -237,8 +221,8 @@ class CrossValidationResults(dict):
         """Returns the true values for the given model and fold.
 
         Args:
-          model_name: str: The name of the model.
-          fold_id: int: The id of the fold.
+          model_name (str): The name of the model.
+          fold_id (int): The id of the fold.
 
         Returns:
             (array-like): The training true values for the given model and fold.
@@ -250,8 +234,8 @@ class CrossValidationResults(dict):
         If the key is not found, returns None and will not raise an error.
 
         Args:
-          model_name: str: The name of the model.
-          fold_id: int: The id of the fold.
+          model_name (str): The name of the model.
+          fold_id (int): The id of the fold.
 
         Returns:
             (dict): The parameters for the given model and fold.

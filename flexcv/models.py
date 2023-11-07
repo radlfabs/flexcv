@@ -69,8 +69,8 @@ class LinearModel(BaseLinearModel):
         """Fit the LM to the given training data.
 
         Args:
-          X(array-like of shape (n_samples, n_features)): The training input samples.
-          y(array-like of shape (n_samples,)): The target values.
+          X (array-like of shape (n_samples, n_features)): The training input samples.
+          y (array-like of shape (n_samples,)): The target values.
           **kwargs(dict): Additional parameters to pass to the underlying model's `fit` method.
 
         Returns:
@@ -99,7 +99,7 @@ class LinearModel(BaseLinearModel):
         """Make predictions using the fitted model.
 
         Args:
-          X: array-like: Features
+          X (array-like): Features
           **kwargs: Used to prevent raising an error when passing the `clusters` argument.
 
         Returns:
@@ -121,10 +121,10 @@ class LinearMixedEffectsModel(BaseLinearModel):
         """Fit the LMER model to the given training data.
 
         Args:
-          X(array-like of shape (n_samples, n_features)): The training input samples.
-          y(array-like of shape (n_samples,)): The target values.
-          clusters(array-like of shape (n_samples,)):
-          **kwargs(dict): Additional parameters to pass to the underlying model's `fit` method.
+          X (array-like of shape (n_samples, n_features)): The training input samples.
+          y (array-like of shape (n_samples,)): The target values.
+          clusters (array-like of shape (n_samples,)):
+          **kwargs (dict): Additional parameters to pass to the underlying model's `fit` method.
           re_formula:
 
         Returns:
@@ -169,7 +169,7 @@ class LinearMixedEffectsModel(BaseLinearModel):
         Make predictions using the fitted model.
 
         Args:
-          X: array-like: Features
+          X (array-like): Features
           **kwargs: Any other keyword arguments to pass to the underlying model's `predict` method. This is necessary to prevent raising an error when passing the `clusters` argument.
 
         Returns:
@@ -209,36 +209,17 @@ class EarthRegressor(BaseEstimator, RegressorMixin):
     """Wrapper Class for Earth Regressor in R.
     For more Details see https://cran.r-project.org/web/packages/earth/earth.pdf.
 
-    Parameters:
-        degree: int, default=1
-            Degree of the splines. 1 for linear, 2 for quadratic, etc.
-        nprune: int, default=None
-            Number of pruning steps. If None, the number of pruning steps is determined by the algorithm.
-        nk: int, default=None
-            Number of knots. If None, the number of knots is determined by the algorithm.
-            The default is semi-automatically calculated from the number of predictors but may need adjusting.
-        thresh: float, default=0.001
-            Forward stepping threshold.
-        minspan: int, default=0
-            Minimum number of observations between knots.
-        endspan: int, default=0
-            Minimum number of observations before the first and after the final knot.
-        newvar_penalty: float, default=0.0
-        fast_k: int, default=20
-            Maximum number of parent terms considered at each step of the forward pass.
-        fast_beta: float, default=1.0
-            Fast MARS ageing coefficient, as described in the Fast MARS paper section 3.1.
-            Default is 1. A value of 0 sometimes gives better results.
-        pmethod: str, default="backward"
-            Pruning method. One of: backward none exhaustive forward seqrep cv.
-            Default is "backward". Specify pmethod="cv" to use cross-validation to select the number of terms.
-            This selects the number of terms that gives the maximum mean out-of-fold RSq on the fold models.
-            Requires the nfold argument. Use "none" to retain all the terms created by the forward pass.
-            If y has multiple columns, then only "backward" or "none" is allowed.
-            Pruning can take a while if "exhaustive" is chosen and the model is big (more than about 30 terms).
-            The current version of the leaps package used during pruning does not allow user interrupts
-            (i.e., you have to kill your R session to interrupt; in Windows use the Task Manager or from the command line use taskkill).
-
+    Args:
+        degree (int): Degree of the splines. 1 for linear, 2 for quadratic, etc. (Default value = 1)
+        nprune (int | None): Number of pruning steps. If None, the number of pruning steps is determined by the algorithm. (Default value = None)
+        nk (int | None): Number of knots. If None, the number of knots is determined by the algorithm. The default is semi-automatically calculated from the number of predictors but may need adjusting. (Default value = None)
+        thresh (float): Forward stepping threshold. (Default value = 0.001)
+        minspan (int): Minimum number of observations between knots. (Default value = 0)
+        endspan (int): Minimum number of observations before the first and after the final knot. (Default value = 0)
+        newvar_penalty (float): (Default value = 0.0)
+        fast_k (int): Maximum number of parent terms considered at each step of the forward pass. (Default value = 20)
+        fast_beta (float): Fast MARS ageing coefficient, as described in the Fast MARS paper section 3.1. Default is 1. A value of 0 sometimes gives better results. (Default value = 1.0)
+        pmethod (str): Pruning method. One of: backward none exhaustive forward seqrep cv. Default is "backward". Specify pmethod="cv" to use cross-validation to select the number of terms. This selects the number of terms that gives the maximum mean out-of-fold RSq on the fold models. Requires the nfold argument. Use "none" to retain all the terms created by the forward pass. If y has multiple columns, then only "backward" or "none" is allowed. Pruning can take a while if "exhaustive" is chosen and the model is big (more than about 30 terms). The current version of the leaps package used during pruning does not allow user interrupts (i.e., you have to kill your R session to interrupt; in Windows use the Task Manager or from the command line use taskkill). (Default value = "backward")
 
     """
 
@@ -272,8 +253,8 @@ class EarthRegressor(BaseEstimator, RegressorMixin):
         """Fit a EARTH model to the given training data.
 
         Args:
-          X: array-like: Features.
-          y: array-like: Target values.
+          X (array-like): Features.
+          y (array-like): Target values.
 
         Returns:
            (object): Returns self.
@@ -352,7 +333,7 @@ class EarthRegressor(BaseEstimator, RegressorMixin):
         """Make predicitons using the fitted model.
 
         Args:
-          X: array-like: Features
+          X (array-like): Features
 
         Returns:
             (array-like): An array of fitted values.

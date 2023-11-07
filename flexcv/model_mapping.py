@@ -45,12 +45,19 @@ from .utilities import empty_func
 
 class ModelConfigDict(Dict[str, Type]):
     """A dictionary that maps model configuration names to their corresponding types.
-    To make working with this custom Dict-like class easy, we re-implemented the __init__ method to set some default key-value pairs for us.
-    If you don't pass them, it will set
-    inner_cv = False
-    n_trials = 100
-    n_jobs = 1
-    n_jobs_cv = 1
+    
+    Default Values:
+        To make working with this custom Dict-like class easy, we re-implemented the __init__ method to set some default key-value pairs for us.
+        If you don't pass them, it will set
+        
+        - requires_inner_cv = False
+        - requires_formula = False
+        - allows_seed = True
+        - allows_n_jobs = True
+        - n_trials = 100
+        - n_jobs = 1
+        - n_jobs_cv = 1
+        - post_processor = empty_func
 
     Usage:
         ```python
@@ -108,7 +115,7 @@ class ModelConfigDict(Dict[str, Type]):
         """Method to check if a key exists in the dict.
 
         Args:
-          key: str | int : The key to check for.
+          key (str | int) : The key to check for.
 
         Returns:
           (bool): True if the key exists, False otherwise.
@@ -123,8 +130,8 @@ class ModelConfigDict(Dict[str, Type]):
         """Checks if a key exists in the dict and sets a default value if it doesn't.
 
         Args:
-          key: str | int: The key to check for.
-          default: str | int:  The default value to set if the key doesn't exist.
+          key (str | int): The key to check for.
+          default (str | int):  The default value to set if the key doesn't exist.
 
         Returns:
           (None)
@@ -156,7 +163,7 @@ def map_backwards(mapping) -> dict:
     From the mixed effects model to the fixed effects model.
 
     Args:
-      mapping: dict: The model mapping to map backwards.
+      mapping (dict): The model mapping to map backwards.
 
     Returns:
       (dict): The reversed mapped model mapping.

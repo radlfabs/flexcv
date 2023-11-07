@@ -12,10 +12,10 @@ def mse_wrapper(y_valid, y_pred, y_train_in, y_pred_train):
     This can be useful to avoid overfitting. The sklearn MSE function had to be wrapped accordingly
 
     Args:
-      y_valid: array-like: Target in the validation set.
-      y_pred: array-like: Predictions for the validation set.
-      y_train_in: array-like: Target in the training set.
-      y_pred_train: array-like: Predictions for the training set.
+      y_valid (array-like): Target in the validation set.
+      y_pred (array-like): Predictions for the validation set.
+      y_train_in (array-like): Target in the training set.
+      y_pred_train (array-like): Predictions for the training set.
 
     Returns:
         (float): Mean squared error.
@@ -27,17 +27,23 @@ def mse_wrapper(y_valid, y_pred, y_train_in, y_pred_train):
 class MetricsDict(dict):
     """A dictionary that maps metric names to functions.
     It can be passed to the cross_validate function to specify which metrics to calculate in the outer loop.
-    By default, the following metrics are initialized:
-    R²: The coefficient of determination
-    MSE: Mean squared error
-    MAE: Mean absolute error
-
-    We decided againt using the RMSE as a default metric, because we would run into trouble wherever we would average over it.
-    RMSE should always be averaged as `sqrt(mean(MSE_values))` and not as `mean(sqrt(MSE_values))`.
-    Also, the standard deviation would be calculated incorrectly if RMSE is included at this point.
+    
+    Default Metrics:
+        By default, the following metrics are initialized:
+        
+        - R²: The coefficient of determination
+        
+        - MSE: Mean squared error
+        
+        - MAE: Mean absolute error
 
     Parameters:
-        :dict: A dictionary that maps metric names to functions.
+        (dict): A dictionary that maps metric names to functions.
+        
+    Note: 
+        We decided againt using the RMSE as a default metric, because we would run into trouble wherever we would average over it.
+        RMSE should always be averaged as `sqrt(mean(MSE_values))` and not as `mean(sqrt(MSE_values))`.
+        Also, the standard deviation would be calculated incorrectly if RMSE is included at this point.
     """
 
     def __init__(self):

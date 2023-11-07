@@ -205,11 +205,11 @@ def permutation_importance(
     """
     Calculates and plots the permutation importance of a model.
     Args:
-        model: object: The model to calculate the permutation importance for.
-        model_name: str: The name of the model.
-        X: array-like: The features.
-        y: array-like: The target.
-        features: array-like | list: The feature names.
+        model (object): The model to calculate the permutation importance for.
+        model_name (str): The name of the model.
+        X (array-like): The features.
+        y (array-like): The target.
+        features (array-like | list): The feature names.
 
     Returns:
         (tuple[plt.Figure, pd.DataFrame]): A tuple containing the figure and the permutation importance dataframe.

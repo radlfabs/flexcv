@@ -44,43 +44,37 @@ class CustomNeptuneCallback(npt_utils.NeptuneCallback):
         self._log_plots(study, trial)
 
 
-def log_diagnostics(
-    X_train,
-    X_test,
-    y_train,
-    y_test,
-    run,
-    effects,
-    cluster_train: pd.Series = None,
-    cluster_test: pd.Series = None,
-    namestring="out",
-):
-    """This function makes histograms of the features and target for diagnostic purposes.
-    All outputs are logged to neptune and the function returns None.
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+def log_diagnostics(X_train: pd.DataFrame, X_test: pd.DataFrame, y_train: pd.Series, y_test: pd.Series, run, effects: str, cluster_train: pd.Series = None, cluster_test: pd.Series = None, namestring: str = "out") -> None:
+    """Logs histograms of the features and target for diagnostic purposes to neptune.
 
     Args:
-      X_train: pd.DataFrame: Training features.
-      X_test: pd.DataFrame: Testing features.
-      y_train: pd.Series: Training target.
-      y_test: pd.Series: Testing target.
-      run: Neptune run object.
-      effects: str: Type of effects to be used. Either "fixed" or "mixed".
-      cluster_train: pd.Series: Training clustering or grouping variable (Default value = None)
-      cluster_test: pd.Series: Testing clustering or grouping variable (Default value = None)
-      namestring: str: A string to pass to logging. Use to separate folds: use "in" or "out" (Default value = "out")
+        X_train (pd.DataFrame): Training features.
+        X_test (pd.DataFrame): Testing features.
+        y_train (pd.Series): Training target.
+        y_test (pd.Series): Testing target.
+        run: Neptune run object.
+        effects (str): Type of effects to be used. Either "fixed" or "mixed".
+        cluster_train (pd.Series, optional): Training clustering or grouping variable. Defaults to None.
+        cluster_test (pd.Series, optional): Testing clustering or grouping variable. Defaults to None.
+        namestring (str, optional): A string to pass to logging. Use to separate folds: use "in" or "out". Defaults to "out".
 
     Returns:
-        (None)
+        None
     """
+    # function definitions
 
-    def get_df_hist_fig(df):
+    def get_df_hist_fig(df: pd.DataFrame) -> plt.Figure:
         """Generates a histogram for each column in the dataframe.
 
         Args:
-          df: pd.DataFrame: The data to plot histograms for.
+            df (pd.DataFrame): The data to plot histograms for.
 
         Returns:
-          (matplotlib.figure.Figure): The figure object containing the histograms as subplots.
+            plt.Figure: The figure object containing the histograms as subplots.
         """
         fig, axes = plt.subplots(len(df.columns), 1, figsize=(5, 15))
         ax = axes.flatten()
@@ -92,14 +86,14 @@ def log_diagnostics(
             ax[i].ticklabel_format(style="plain", axis="both")
         return fig
 
-    def get_series_hist_fig(ser):
+    def get_series_hist_fig(ser: pd.Series) -> plt.Figure:
         """Get a histogram for a series.
 
         Args:
-          ser: pd.Series: The data to plot a histogram for.
+            ser (pd.Series): The data to plot a histogram for.
 
         Returns:
-            (matplotlib.figure.Figure): The figure object containing the histogram.
+            plt.Figure: The figure object containing the histogram.
         """
         fig, ax = plt.subplots()
         sns.histplot(ser, ax=ax)
@@ -166,9 +160,9 @@ def log_single_model_single_fold(
       best_params: Best parameters for the model.
       k: int: Fold number.
       run: Neptune run object.
-      results_all_folds: dict: Dictionary containing results from all folds.
-      study: Study | None: Optuna study object. If None, no inner CV was performed. (Default value = None)
-      metrics: MetricsDict: MetricsDict to use for evaluation (Default value = METRICS)
+      results_all_folds (dict): Dictionary containing results from all folds.
+      study (Study | None): Optuna study object. If None, no inner CV was performed. (Default value = None)
+      metrics (MetricsDict): MetricsDict to use for evaluation (Default value = METRICS)
 
     Returns:
       (dict): Dictionary, updated with the results from the current fold and current model.
@@ -275,17 +269,17 @@ class SingleModelFoldResult:
     This class is used in cross_validate to pass arguments to the model postprocessor and to easily log results.
 
     Parameters:
-        k: int: Fold number.
-        model_name: Name of the model.
-        best_model: Best model object.
-        best_params: Best parameters for the model.
-        y_pred: Predicted values for the test set.
-        y_test: Target values for the test set.
-        X_test: Test features.
-        y_train: Target values for the training set.
-        y_pred_train: Predicted values for the training set.
-        X_train: Training features.
-        fit_result: Any: Result of the fit method of the model.
+        k (int): Fold number.
+        model_name (str): Name of the model.
+        best_model (object): Best model object.
+        best_params (dict): Best parameters for the model.
+        y_pred (pd.Series): Predicted values for the test set.
+        y_test (pd.Series): Target values for the test set.
+        X_test (pd.DataFrame): Test features.
+        y_train (pd.DataFrame): Target values for the training set.
+        y_pred_train (pd.Series): Predicted values for the training set.
+        X_train (pd.DataFrame): Training features.
+        fit_result (object): Result of the fit method of the model.
 
     """
 

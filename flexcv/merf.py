@@ -22,16 +22,6 @@ logger = logging.getLogger(__name__)
 
 
 def compute_y_star(data_class, b_hat_df, cluster_id):
-    """
-
-    Args:
-      data_class:
-      b_hat_df:
-      cluster_id:
-
-    Returns:
-
-    """
     return data_class.y_by_cluster[cluster_id] - data_class.Z_by_cluster[
         cluster_id
     ].dot(b_hat_df.loc[cluster_id])
@@ -40,20 +30,6 @@ def compute_y_star(data_class, b_hat_df, cluster_id):
 def compute_m_step(
     EmData, cluster_id, sigma2_hat_sum, D_hat_sum, sigma2_hat, D_hat, b_hat_df
 ):
-    """
-
-    Args:
-      EmData:
-      cluster_id:
-      sigma2_hat_sum:
-      D_hat_sum:
-      sigma2_hat:
-      D_hat:
-      b_hat_df:
-
-    Returns:
-
-    """
     indices_i = EmData.indices_by_cluster[cluster_id]
     y_i = EmData.y_by_cluster[cluster_id]
     Z_i = EmData.Z_by_cluster[cluster_id]
@@ -109,8 +85,6 @@ def compute_m_step(
 
 @dataclass
 class EMDataClass:
-    """ """
-
     pass
 
 
@@ -135,12 +109,19 @@ class MERF(BaseEstimator):
     * bi is the random effect coefficients. They are different per cluster i but are assumed to be drawn from the same distribution ~N(0, Sigma_b) where Sigma_b is learned from the data.
 
     Args:
-      fixed_effects_model: sklearn.base.RegressorMixin: instantiated model class
-      gll_early_stop_threshold: float: early stopping threshold on GLL improvement
-      max_iterations: int: maximum number of EM iterations to train
+      fixed_effects_model (sklearn.base.RegressorMixin): instantiated model class
+      gll_early_stop_threshold (float): early stopping threshold on GLL improvement
+      max_iterations (int): maximum number of EM iterations to train
 
     Returns:
 
+    Note:
+        This file is a modified version of the MERF implementation by the authors of the paper:
+        https://www.tandfonline.com/doi/abs/10.1080/00949655.2012.741599
+        Github: https://github.com/manifoldai/merf
+        Blog post: https://towardsdatascience.com/mixed-effects-random-forests-6ecbb85cb177
+        Copyright (c) 2019 Manifold
+        Licensed under the MIT License
     """
 
     def __init__(
@@ -175,13 +156,13 @@ class MERF(BaseEstimator):
         For unknown clusters the pure fixed effect (RF) estimate is used.
 
         Args:
-          X: np.ndarray: fixed effect covariates
-          Z: np.ndarray: random effect covariates
-          clusters: pd.Series: cluster assignments for samples
+          X (np.ndarray): fixed effect covariates
+          Z (np.ndarray): random effect covariates
+          clusters (pd.Series): cluster assignments for samples
           **kwargs: Any other keyword argument. This is important to not raise during flexcv's cross validation.
 
         Returns:
-          np.ndarray: the predictions y_hat
+          (np.ndarray): the predictions y_hat
 
         """
         if not isinstance(clusters, pd.Series):
@@ -232,20 +213,20 @@ class MERF(BaseEstimator):
         """Fit MERF using Expectation-Maximization algorithm.
 
         Args:
-          y(np.ndarray): response/target variable
-          X: np.ndarray: fixed effect covariates
-          Z: np.ndarray: random effect covariates
-          clusters: pd.Series: cluster assignments for samples
-          y: np.ndarray: target values
-          X_val: np.ndarray: validation fixed effects covariates (Default value = None)
-          Z_val: np.ndarray: validation re covariates (Default value = None)
-          clusters_val: pd.Series: validation cluster assignments for samples (Default value = None)
-          y_val: np.ndarray: validation target values (Default value = None)
-          *args: any other positional argument
-          **kwargs: any other keyword argument
+            y (np.ndarray): response/target variable
+            X (np.ndarray): fixed effect covariates
+            Z (np.ndarray): random effect covariates
+            clusters (pd.Series): cluster assignments for samples
+            y (np.ndarray): target values
+            X_val (np.ndarray | None): validation fixed effects covariates (Default value = None)
+            Z_val (np.ndarray | None): validation re covariates (Default value = None)
+            clusters_val (pd.Series | None): validation cluster assignments for samples (Default value = None)
+            y_val (np.ndarray | None): validation target values (Default value = None)
+            *args: any other positional argument
+            **kwargs: any other keyword argument
 
         Returns:
-          MERF: fitted model
+          (MERF): fitted model
 
         """
 
@@ -444,15 +425,6 @@ class MERF(BaseEstimator):
 
     def score(self, X, Z, clusters, y):
         """Score is not implented.
-
-        Args:
-          X:
-          Z:
-          clusters:
-          y:
-
-        Returns:
-
         """
         raise NotImplementedError()
 

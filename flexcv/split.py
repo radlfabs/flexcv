@@ -46,13 +46,13 @@ def string_to_crossvalmethod(method: str) -> CrossValMethod:
     """Converts a string to a CrossValMethod enum member.
 
     Args:
-      method: str: The string to convert.
+      method (str): The string to convert.
 
     Returns:
       (CrossValMethod): The CrossValMethod enum value.
 
     Raises:
-      ValueError: If the given string does not match any CrossValMethod.
+      (ValueError): If the given string does not match any CrossValMethod.
 
     """
     keys = [e.value for e in CrossValMethod]
@@ -80,9 +80,9 @@ class CustomStratifiedGroupKFold(BaseCrossValidator):
         This is a variation of StratifiedGroupKFold that uses a custom discretization of the target variable.
 
         Args:
-          X: array-like: Features
-          y: array-like: target
-          groups: array-like: Grouping/clustering variable (Default value = None)
+          X (array-like): Features
+          y (array-like): target
+          groups (array-like): Grouping/clustering variable (Default value = None)
 
         Returns:
             (Iterator[tuple[ndarray, ndarray]]): Iterator over the indices of the training and test set.
@@ -126,9 +126,9 @@ class CustomStratifiedKFold(BaseCrossValidator):
         This is a variation of StratifiedGroupKFold that uses a custom discretization of the target variable.
 
         Args:
-          X:: Features
-          y:: target
-          groups:: Grouping variable (Default value = None)
+          X (array-like): Features
+          y (array-like): target
+          groups (array-like): Grouping variable (Default value = None)
 
         Returns:
             (Iterator[tuple[ndarray, ndarray]]): Iterator over the indices of the training and test set.
@@ -153,9 +153,9 @@ class CustomStratifiedKFold(BaseCrossValidator):
         """
 
         Args:
-          X:
-          y:  (Default value = None)
-          groups:  (Default value = None)
+          X (array-like): Features
+          y (array-like): target values. (Default value = None)
+          groups (array-like): grouping values. (Default value = None)
 
         Returns:
          (int) : The number of splitting iterations in the cross-validator.
@@ -173,16 +173,16 @@ def make_cross_val_split(
     """This function creates and returns a callable cross validation splitter based on the specified method.
 
     Args:
-      groups: pd.Series | None: A pd.Series containing the grouping information for the samples.
-      method: CrossValMethod: A CrossValMethod enum value specifying the cross validation method to use.
-      n_splits: int: Number of splits (Default value = 5)
-      random_state: int: A random seed to control random processes (Default value = 42)
+      groups (pd.Series | None): A pd.Series containing the grouping information for the samples.
+      method (CrossValMethod): A CrossValMethod enum value specifying the cross validation method to use.
+      n_splits (int): Number of splits (Default value = 5)
+      random_state (int): A random seed to control random processes (Default value = 42)
 
     Returns:
       (Callable): A callable cross validation splitter based on the specified method.
 
     Raises:
-      TypeError: If the given method is not one of KFOLD
+      (TypeError): If the given method is not one of KFOLD
 
     """
 

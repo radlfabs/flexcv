@@ -128,12 +128,12 @@ class CrossValidation:
         """Set the data for cross validation.
 
         Args:
-          X: pd.DataFrame: The features. Must not contain the target or groups.
-          y: pd.DataFrame | pd.Series: The target variable.
-          groups: pd.DataFrame | pd.Series:  The grouping/clustering variable. (Default value = None) (Default value = None)
-          slopes: pd.DataFrame | pd.Series: The random slopes variable(s) (Default value = None)
-          target_name: str: Customize the target's name. This string will be used in logging. (Default value = "")
-          dataset_name: str: Customize your datasdet's name. This string will be used in logging. (Default value = "")
+            X (pd.DataFrame): The features. Must not contain the target or groups.
+            y (pd.DataFrame | pd.Series): The target variable.
+            groups (pd.DataFrame | pd.Series): The grouping/clustering variable. (Default value = None)
+            slopes (pd.DataFrame | pd.Series): The random slopes variable(s) (Default value = None)
+            target_name (str): Customize the target's name. This string will be used in logging. (Default value = "")
+            dataset_name (str): Customize your datasdet's name. This string will be used in logging. (Default value = "")
 
         Returns:
             (CrossValidation): self
@@ -212,18 +212,23 @@ class CrossValidation:
         When passing as string, the string must be a valid value of the `CrossValMethod` enum.
         See the reference for `CrossValMethod` for more details.
 
-        Valid strings:
-            "KFold", "StratifiedKFold", "CustomStratifiedKFold", "GroupKFold", "StratifiedGroupKFold", "CustomStratifiedGroupKFold"
+        Valid strings for `split_out` and `split_in`:
+            - "KFold"
+            - "StratifiedKFold"
+            - "CustomStratifiedKFold"
+            - "GroupKFold"
+            - "StratifiedGroupKFold"
+            - "CustomStratifiedGroupKFold"
 
         Args:
-          split_out: str | CrossValMethod: Outer split method (Default value = CrossValMethod.KFOLD)
-          split_in: str | CrossValMethod: Inner split method for hyperparameter tuning (Default value = CrossValMethod.KFOLD)
-          n_splits_out: int: Number of splits in outer loop (Default value = 5)
-          n_splits_in: int: Number of splits in inner loop (Default value = 5)
-          scale_out: bool: Whether or not the Features of the outer loop will be scaled to mean 0 and variance 1  (Default value = True)
-          scale_in: bool: Whether or not the Features of the inner loop will be scaled to mean 0 and variance 1 (Default value = True)
-          break_cross_val: bool: If True, the outer loop we break after first iteration. Use for debugging (Default value = False)
-          metrics: MetricsDict: A dict containint evaluation metrics for the outer loop results. See MetricsDict for Details. (Default value = None)
+            split_out (str | CrossValMethod): Outer split method. (Default value = CrossValMethod.KFOLD)
+            split_in (str | CrossValMethod): Inner split method for hyperparameter tuning. (Default value = CrossValMethod.KFOLD)
+            n_splits_out (int): Number of splits in outer loop. (Default value = 5)
+            n_splits_in (int): Number of splits in inner loop. (Default value = 5)
+            scale_out (bool): Whether or not the Features of the outer loop will be scaled to mean 0 and variance 1. (Default value = True)
+            scale_in (bool): Whether or not the Features of the inner loop will be scaled to mean 0 and variance 1. (Default value = True)
+            break_cross_val (bool): If True, the outer loop we break after first iteration. Use for debugging. (Default value = False)
+            metrics (MetricsDict): A dict containing evaluation metrics for the outer loop results. See MetricsDict for details. (Default value = None)
 
         Returns:
           (CrossValidation): self
@@ -306,7 +311,7 @@ class CrossValidation:
         """Set your models and related parameters.
 
         Args:
-          mapping: ModelMappingDict: Dict of model names and model configurations. See ModelMappingDict for more information.
+          mapping (ModelMappingDict[str, ModelConfigDict]): Dict of model names and model configurations. See ModelMappingDict for more information.
 
         Returns:
           (CrossValidation): self
@@ -328,8 +333,8 @@ class CrossValidation:
         """Configure parameters regarding inner cross validation and Optuna optimization.
 
         Args:
-          n_trials: int: Number of trials to sample from the parameter distributions (Default value = 100)
-          objective_scorer: ObjectiveScorer: Callable to provide the optimization objective value. Is called during Optuna SearchCV (Default value = None)
+          n_trials (int): Number of trials to sample from the parameter distributions (Default value = 100)
+          objective_scorer (ObjectiveScorer): Callable to provide the optimization objective value. Is called during Optuna SearchCV (Default value = None)
 
         Returns:
           (CrossValidation): self
@@ -357,11 +362,11 @@ class CrossValidation:
         """Configure mixed effects parameters.
 
         Args:
-          model_mixed_effects: bool: If mixed effects will be modelled. Set the model_mapping attribute accordingly with set_models (Default value = False)
-          em_max_iterations: int: For use with EM. Max number of iterations (Default value = 100)
-          em_stopping_threshold: float: For use with EM. Threshold of GLL residuals for early stopping (Default value = None)
-          em_stopping_window: int: For use with EM. Number of consecutive iterations to be below threshold for early stopping (Default value = None)
-          predict_known_groups_lmm: bool: For use with LMER, whether or not known groups should be predicted (Default value = True)
+          model_mixed_effects (bool): If mixed effects will be modelled. Set the model_mapping attribute accordingly with set_models (Default value = False)
+          em_max_iterations (int): For use with EM. Max number of iterations (Default value = 100)
+          em_stopping_threshold (float): For use with EM. Threshold of GLL residuals for early stopping (Default value = None)
+          em_stopping_window (int): For use with EM. Number of consecutive iterations to be below threshold for early stopping (Default value = None)
+          predict_known_groups_lmm (bool): For use with LMER, whether or not known groups should be predicted (Default value = True)
 
         Returns:
           (CrossValidation): self
@@ -396,9 +401,9 @@ class CrossValidation:
         """
 
         Args:
-          run: NeptuneRun: The run object to use for logging (Default value = None)
-          diagnostics: bool: If True, extended diagnostic plots are logged (Default value = False)
-          random_seed: int: Seed for random processes (Default value = 42)
+          run (NeptuneRun): The run object to use for logging (Default value = None)
+          diagnostics (bool): If True, extended diagnostic plots are logged (Default value = False)
+          random_seed (int): Seed for random processes (Default value = 42)
 
         Returns:
             (CrossValidation): self
@@ -424,7 +429,7 @@ class CrossValidation:
         """Logs the config to Neptune. If None, a Dummy is instantiated.
 
         Args:
-          run: NeptuneRun: The run to log to (Default value = None)
+          run (NeptuneRun): The run to log to (Default value = None)
 
         Returns:
           (CrossValidation): self
@@ -501,9 +506,6 @@ class CrossValidation:
         Checks if a neptune run object has been set. If the user did not provide a neptune run object, a dummy run is instantiated.
         All logs and plots will be logged to the dummy run and will be lost.
         However, the cross validation results is created and can be returned via the `CrossValidation.results` property.
-
-        Args:
-            None
 
         Returns:
             (CrossValidation): self

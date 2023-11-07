@@ -9,8 +9,8 @@ def select_random_columns(df: pd.DataFrame, n: int) -> pd.DataFrame:
     """Select n random columns from a pandas DataFrame and return a new DataFrame containing only these columns.
 
     Args:
-      df: pd.DataFrame: Input data to select n columns from.
-      n: int: Number of columns to select.
+      df (pd.DataFrame): Input data to select n columns from.
+      n (int): Number of columns to select.
 
     Returns:
       (pd.DataFrame): A DataFrame containing n randomly selected columns
@@ -31,11 +31,11 @@ def generate_regression(
     """Generate a dataset for linear regression using the numpy default rng.
 
     Args:
-      m_features: int: Number of features, i.e. columns, to be generated.
-      n_samples: int: Number of rows to be generated.
-      n_groups: int: Number of groups/clusters. (Default value = 5)
-      n_slopes: int: Number of columns in the feature matrix to be used as random slopes as well. (Default value = 1)
-      noise_level: float: The data will be generated with added standard normal noise which is multiplied with noise_level. (Default value = 0.1)
+      m_features (int): Number of features, i.e. columns, to be generated.
+      n_samples (int): Number of rows to be generated.
+      n_groups (int): Number of groups/clusters. (Default value = 5)
+      n_slopes (int): Number of columns in the feature matrix to be used as random slopes as well. (Default value = 1)
+      noise_level (float): The data will be generated with added standard normal noise which is multiplied with noise_level. (Default value = 0.1)
 
     Returns:
       (tuple): A tuple containing the following elements:

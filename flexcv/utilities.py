@@ -100,3 +100,22 @@ def run_padding(func):
         return results
 
     return wrapper_function
+
+
+def pformat_dict(d, indent=""):
+    """Pretty-format a dictionary, only printing values that are themselves dictionaries.
+
+    Args:
+      d (dict): dictionary to print
+      indent (str): Level of indentation for use with recursion (Default value = "")
+
+    Returns:
+
+    """
+    formatted = ""
+    for key, value in d.items():
+        formatted.join(f"{indent}{key}")
+        if isinstance(value, dict):
+            next_layer = pformat_dict(value, indent + "  ")
+            formatted.join(next_layer)
+    return formatted
