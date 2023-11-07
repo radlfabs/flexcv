@@ -17,6 +17,7 @@ def simple_regression():
             "LinearModel": ModelConfigDict(
                 {
                     "model": LinearModel,
+                    "requires_formula": True,
                 }
             ),
         }

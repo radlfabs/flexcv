@@ -19,6 +19,7 @@ def random_forest_regression():
             "RandomForest": ModelConfigDict(
                 {
                     "requires_inner_cv": True,
+                    "requires_formula": False,
                     "n_jobs_model": 1,
                     "n_jobs_cv": -1,
                     "model": RandomForestRegressor,

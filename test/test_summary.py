@@ -18,6 +18,7 @@ def regression_with_summary():
             "LinearModel": ModelConfigDict(
                 {
                     "requires_inner_cv": False,
+                    "requires_formula": True,
                     "n_jobs_model": 1,
                     "model": LinearModel,
                     "params": {},

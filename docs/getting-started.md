@@ -62,7 +62,10 @@ X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise_leve
 # create a model mapping
 model_map = ModelMappingDict({
     "LinearModel": ModelConfigDict({
+	# pass the model class but NOT the instance ;)
         "model": LinearModel,
+	# specify if your model needs a R-style formula for the fit
+	"requires_formula": True,
     }),
 })
 
