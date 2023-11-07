@@ -87,6 +87,9 @@ class ModelConfigDict(Dict[str, Type]):
                         # name of the mixed effects model. It is used to identify the model in the results dictionary.
             }
         ```
+        See also:
+            For information on possible optuna distributions, see:
+            https://optuna.readthedocs.io/en/stable/reference/distributions.html
     """
 
     def __init__(self, mapping=None):
