@@ -16,9 +16,9 @@ MODEL_MAPPING = ModelMappingDict(
     {
         "LinearModel": ModelConfigDict(
             {
-                "inner_cv": False,
+                "requires_inner_cv": False,
                 "n_trials": 100,
-                "n_jobs_model": {"n_jobs": 1},
+                "n_jobs_model": 1,
                 "n_jobs_cv": 1,
                 "model": LinearModel,
                 "params": {},
@@ -31,9 +31,9 @@ MODEL_MAPPING = ModelMappingDict(
         "RandomForest": ModelConfigDict(
             {
                 # https://www.analyticsvidhya.com/blog/2020/03/beginners-guide-random-forest-hyperparameter-tuning/
-                "inner_cv": True,
+                "requires_inner_cv": True,
                 "n_trials": 400,
-                "n_jobs_model": {"n_jobs": -1},
+                "n_jobs_model": 1,
                 "n_jobs_cv": -1,
                 "model": RandomForestRegressor,
                 "params": {
@@ -67,9 +67,9 @@ MODEL_MAPPING = ModelMappingDict(
             {
                 # https://www.kaggle.com/code/andreshg/xgboost-optuna-hyperparameter-tunning
                 # https://www.kaggle.com/code/prashant111/a-guide-on-xgboost-hyperparameters-tuning
-                "inner_cv": True,
+                "requires_inner_cv": True,
                 "n_trials": 300,
-                "n_jobs_model": {"n_jobs": -1},
+                "n_jobs_model": 1,
                 "n_jobs_cv": -1,
                 "model": XGBRegressor,
                 "params": {
@@ -109,10 +109,9 @@ MODEL_MAPPING = ModelMappingDict(
         ),
         "MARS": ModelConfigDict(
             {
-                "inner_cv": True,
+                "requires_inner_cv": True,
                 "n_trials": 200,
-                "n_jobs_model": {},
-                "n_jobs_cv": 1,
+                "allows_n_jobs": False
                 "model": EarthRegressor,
                 "params": {  # 'degree', 'endspan', 'fast_beta', 'fast_k', 'minspan', 'newvar_penalty', 'nk', 'nprune', 'pmethod', 'random_state', 'thresh'
                     "degree": optuna.distributions.IntDistribution(1, 5),
@@ -132,9 +131,9 @@ MODEL_MAPPING = ModelMappingDict(
         ),
         "SVR": ModelConfigDict(
             {
-                "inner_cv": True,
+                "requires_inner_cv": True,
                 "n_trials": 450,
-                "n_jobs_model": {},
+                "allows_n_jobs": False,
                 "n_jobs_cv": -1,
                 "model": SVR,
                 "params": {

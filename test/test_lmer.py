@@ -15,9 +15,9 @@ def simple_regression():
         {
             "LinearModel": ModelConfigDict(
                 {
-                    "inner_cv": False,
+                    "requires_inner_cv": False,
                     "n_trials": 100,
-                    "n_jobs_model": {"n_jobs": 1},
+                    "n_jobs_model": 1,
                     "n_jobs_cv": 1,
                     "model": LinearModel,
                     "params": {},
