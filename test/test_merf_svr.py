@@ -1,5 +1,6 @@
 import numpy as np
 import optuna
+from sklearn.svm import SVR
 
 from flexcv.synthesizer import generate_regression
 from flexcv.interface import CrossValidation
@@ -7,7 +8,6 @@ from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
 from flexcv.run import Run
 import flexcv.model_postprocessing as mp
 from flexcv.merf import MERF
-from flexcv.models import SVR
 
 def merf_svr_regression():
     X, y, group, random_slopes = generate_regression(
@@ -20,7 +20,7 @@ def merf_svr_regression():
             {
                 "requires_inner_cv": True,
                 "allows_n_jobs": False,
-                "n_jobs_cv": 1,
+                "allows_seed": False,
                 "model": SVR,
                 "params": {
                     "C": optuna.distributions.FloatDistribution(0.001, 50, log=True),
@@ -45,8 +45,8 @@ def merf_svr_regression():
         .perform()
         .get_results()
     )
-    n_values = len(results["MERF"]["metrics"])
-    r2_values = [results["MERF"]["metrics"][k]["r2"] for k in range(n_values)]
+    n_values = len(results["SVREM"]["metrics"])
+    r2_values = [results["SVREM"]["metrics"][k]["r2"] for k in range(n_values)]
     return np.mean(r2_values)
 
 
