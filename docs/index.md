@@ -6,7 +6,8 @@
   </tr>
 </table>
 
-Find the repository [here](https://github.com/radlfabs/flexcv) or the documentation [here](https://radlfabs.github.io/flexcv/). Quickly get started with `flexcv` by reading our notes on [installation](start/getting-started.md) or take a quick [tutorial](start/tutorial.md) to get familiar with the package. If you want to dive deeper into the package, read our [guides](user-guide.md) or take a look at the [reference](reference.md).
+
+Find the repository [here](https://github.com/radlfabs/flexcv).
 
 `flexcv` is a Python package that implements flexible cross validation and machine learning for tabular data. It provides a range of features for comparing machine learning models on different datasets with different sets of predictors, customizing just about everything around cross validations. It supports both fixed and random effects, as well as random slopes.
 
