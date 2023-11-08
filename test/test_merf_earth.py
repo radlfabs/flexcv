@@ -8,6 +8,7 @@ from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
 from flexcv.run import Run
 import flexcv.model_postprocessing as mp
 from flexcv.merf import MERF
+from flexcv.models import 
 
 
 def merf_mixed_regression():
@@ -17,25 +18,26 @@ def merf_mixed_regression():
 
     model_map = ModelMappingDict(
         {
-            "RandomForest": ModelConfigDict(
+            "Earth": ModelConfigDict(
                 {
                     "requires_inner_cv": True,
-                    "requires_formula": False,
-                    "allows_seed": True,
-                    "allows_n_jobs": True,
-                    "n_jobs_model": -1,
-                    "n_jobs_cv": -1,
-                    "model": RandomForestRegressor,
-                    "params": {
-                        "max_depth": optuna.distributions.IntDistribution(5, 100),
-                        "n_estimators": optuna.distributions.CategoricalDistribution(
-                            [10]
-                        ),
+                    "n_trials": 200,
+                    "allows_n_jobs": False
+                    "model": EarthRegressor,
+                    "params": {  # 'degree', 'endspan', 'fast_beta', 'fast_k', 'minspan', 'newvar_penalty', 'nk', 'nprune', 'pmethod', 'random_state', 'thresh'
+                        "degree": optuna.distributions.IntDistribution(1, 5),
+                        "nprune": optuna.distributions.IntDistribution(1, 300),
+                        # "fast_k": optuna.distributions.CategoricalDistribution([0, 1, 5, 10, 20]),  #
+                        "fast_k": optuna.distributions.IntDistribution(0, 20),  #
+                        # "nk": does not help
+                        "newvar_penalty": optuna.distributions.FloatDistribution(0.01, 0.2),
+                        # "pmethod": # use default: backward
+                        # "fast_beta": # default(=1) yielded best results
                     },
+                    "post_processor": mp.mars_post,
                     "mixed_model": MERF,
-                    "post_processor": mp.rf_post,
                     "mixed_post_processor": mp.expectation_maximation_post,
-                    "mixed_name": "MERF",
+                    "mixed_name": "EarthEM",
                 }
             ),
         }

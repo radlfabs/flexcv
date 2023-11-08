@@ -71,9 +71,9 @@ MODEL_MAPPING=ModelMappingDict(
                 "model": LinearModel,
                 "params": {},
                 "post_processor": mp.lm_post,
-                "level_4_model": LinearMixedEffectsModel,
-                "level_4_post_processor": mp.lmer_post,
-                "level_4_name": "MixedLM",
+                "mixed_model": LinearMixedEffectsModel,
+                "mixed_post_processor": mp.lmer_post,
+                "mixed_name": "MixedLM",
             }
         ),
         "RandomForest": ModelConfigDict(
@@ -104,9 +104,9 @@ MODEL_MAPPING=ModelMappingDict(
                     "n_estimators": optuna.distributions.IntDistribution(2,7000),
                 },
                 "post_processor": mp.rf_post,
-                "level_4_model": MERF,
-                "level_4_post_processor": mp.expectation_maximation_post,
-                "level_4_name": "MERF",
+                "mixed_model": MERF,
+                "mixed_post_processor": mp.expectation_maximation_post,
+                "mixed_name": "MERF",
             }
         ),
         "XGBoost": ModelConfigDict(
@@ -146,9 +146,9 @@ MODEL_MAPPING=ModelMappingDict(
                     "reg_lambda": optuna.distributions.FloatDistribution(0.001,800),
                 },
                 "post_processor": mp.xgboost_post,
-                "level_4_model": MERF,
-                "level_4_post_processor": mp.expectation_maximation_post,
-                "level_4_name": "XGBEM",
+                "mixed_model": MERF,
+                "mixed_post_processor": mp.expectation_maximation_post,
+                "mixed_name": "XGBEM",
             }
         ),
         "MARS": ModelConfigDict(
@@ -163,9 +163,9 @@ MODEL_MAPPING=ModelMappingDict(
                     "newvar_penalty": optuna.distributions.FloatDistribution(0.01,0.2),
                 },
                 "post_processor": mp.mars_post,
-                "level_4_model": MERF,
-                "level_4_post_processor": mp.expectation_maximation_post,
-                "level_4_name": "EarthEM",
+                "mixed_model": MERF,
+                "mixed_post_processor": mp.expectation_maximation_post,
+                "mixed_name": "EarthEM",
             }
         ),
         "SVR": ModelConfigDict(
@@ -188,9 +188,9 @@ MODEL_MAPPING=ModelMappingDict(
                     # "shrinking": default "True" yielded best restults
                 },
                 "post_processor": mp.svr_post,
-                "level_4_model": MERF,
-                "level_4_post_processor": mp.expectation_maximation_post,
-                "level_4_name": "SVREM",
+                "mixed_model": MERF,
+                "mixed_post_processor": mp.expectation_maximation_post,
+                "mixed_name": "SVREM",
             }
         ),
     }
