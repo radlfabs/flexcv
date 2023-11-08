@@ -1,16 +1,14 @@
 """
 This module implements customization of the objective function for the hyperparameter optimization.
-In order to use a custom objective function, we implemented the inner cv loop as follows:
-Pseudo Code:
-    ```python
-    objective_cv(
-        if n_jobs == -1:
-            parallel_objective(
-                some_kind_of_scorer
-            )
-        else:
-            objective(some_king_of_scorer)
-    ```
+In order to use a custom objective function, we implemented the inner cv loop as follows (pseudo code):
+
+```python
+objective_cv(
+    if n_jobs == -1:
+        parallel_objective(some_kind_of_scorer)
+    else:
+        objective(some_king_of_scorer)
+```
 
 """
 
@@ -93,12 +91,10 @@ def custom_scorer(y_valid, y_pred, y_train_in, y_pred_train) -> float:
     For hyperparameter tuning (inner cv loop) we use the following hierarchy:
         ```python
         objective_cv(
-        if n_jobs == -1:
-            parallel_objective(
-                some_kind_of_scorer
-            )
-        else:
-            objective(some_king_of_scorer)
+            if n_jobs == -1:
+                parallel_objective(some_kind_of_scorer)
+            else:
+                objective(some_king_of_scorer)
         ```
 
     """
@@ -131,6 +127,7 @@ def objective(
     Predicts the validation data and calculates the MSE for both the validation and training data.
     Then applies the objective scorer to the validation MSE and the training MSE which returns the objective function value.
     Returns the negative validation and training MSEs as well as the negative objective function value, since optuna maximizes the objective function.
+    This function is called from the objective_cv function if n_jobs_cv is set to 1.
 
     Args:
         X_train_in (pd.DataFrame or np.ndarray): The training data.
@@ -145,12 +142,10 @@ def objective(
     Inner CV pseudo code:
         ```python
         objective_cv(
-        if n_jobs == -1:
-            parallel_objective(
-                some_kind_of_scorer
-            )
-        else:
-            objective(some_king_of_scorer)
+            if n_jobs == -1:
+                parallel_objective(some_kind_of_scorer)
+            else:
+                objective(some_king_of_scorer)
         ```
 
     """
@@ -173,7 +168,8 @@ def parallel_objective(
     train_idx, valid_idx, X, y, pipe, params_, objective_scorer: ObjectiveScorer
 ):
     """Objective function for the hyperparameter optimization to be used with multiprocessing.Pool.starmap.
-    Gets the training and validation indices and the data and calls the objective function.
+    Gets the training and validation indices and the data and calls the objective function. 
+    Is called from the objective_cv function if n_jobs_cv is set to -1.
 
     Args:
         train_idx (ndarray): The training indices.
@@ -188,12 +184,10 @@ def parallel_objective(
     Inner CV pseudo code:
         ```python
         objective_cv(
-        if n_jobs == -1:
-            parallel_objective(
-                some_kind_of_scorer
-            )
-        else:
-            objective(some_king_of_scorer)
+            if n_jobs == -1:
+                parallel_objective(some_kind_of_scorer)
+            else:
+                objective(some_king_of_scorer)
         ```
 
     """
@@ -236,12 +230,10 @@ def objective_cv(
     Inner CV pseudo code:
         ```python
         objective_cv(
-        if n_jobs == -1:
-        parallel_objective(
-            some_kind_of_scorer
-            )
-        else:
-        objective(some_king_of_scorer)
+            if n_jobs == -1:
+                parallel_objective(some_kind_of_scorer)
+            else:
+                objective(some_king_of_scorer)
         ```
 
     """
