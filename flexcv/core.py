@@ -433,6 +433,7 @@ def cross_validate(
                         gll_early_stop_threshold=em_stopping_threshold,
                         gll_early_stopping_window=em_stopping_window,
                         log_gll_per_iteration=False,
+                        **model_seed,
                     )
                     # fit the mixed model using cluster variable and Z for slopes
                     fit_result = mixed_model_instance.fit(
