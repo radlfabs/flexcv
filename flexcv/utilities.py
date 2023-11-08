@@ -14,9 +14,9 @@ def empty_func(*args, **kwargs) -> None:
       **kwargs: Any keayword argument is accepted.
 
     Returns:
-      (None)
+      args, kwargs: The passed arguments and keyword arguments.
     """
-    pass
+    return args, kwargs
 
 
 def add_module_handlers(logger: logging.Logger) -> None:
