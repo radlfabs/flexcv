@@ -43,6 +43,13 @@ These are the core packages used under the hood in `flexcv`:
 3. `neptune` - Awesome logging dashboard with lots of integrations. It is a charm in combination with `Optuna`. We used it to track all of our experiments. `Neptune` is quite deeply integrated into `flexcv`. Learn more about this great library [here](https://neptune.ai/).
 4. `merf` - Mixed Effects for Random Forests. Applies correction terms on the predictions of clustered data. Works not only with random forest but with every `sklearn` BaseEstimator.
 
+## Why would you use `flexcv`?
+
+Working with cross validation in Python usually starts with creating a sklearn pipeline. Pipelines are super useful to combine preprocessing steps with model fitting and prevent data leakage. 
+However, there are limitations, e. g. if you want to push the training part of your clustering variable to the inner cross validation split. For some of the features, you would have to write a lot of boilerplate code to get it working, and you end up with a lot of code duplication.
+As soon as you want to use a linear mixed effects model, you have to use the `statsmodels` package, which is not compatible with the `sklearn` pipeline.
+`flexcv` solves these problems and provides a lot of useful features for cross validation and machine learning on tabular data, so you can focus on your data and your models.
+
 ## Installation
 
 First, clone this repository.
