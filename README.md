@@ -72,13 +72,14 @@ my_env_name/Scripts/activate
 pip install flexcv/requirements.txt
 ```
 
-#### Additional dependencies `rpy2`
+#### Additional dependencies of `EarthRegressor`
 
-Some of our model classes are actually wrapping around `rpy2` code and are using `R` under the hood. To use them, you should use a recent `R` version and run our `install_rpackages.py` script:
+The model class for the `EarthRegressor` is actually wrapping around `rpy2` code and is using embedded `R` under the hood. If you do not plan to use this type of estimator, you will not need to perform the next steps. 
+To use our `EarthRegressor`, you should have a recent `R` version installed and run our `install_rpackages.py` script:
 
 ```bash
 cd flexcv
-python install_rpackages.py
+python -m install_rpackages
 ```
 
 Now you have installed everything you need to perform flexible cross validation and machine learning on your tabular data.
