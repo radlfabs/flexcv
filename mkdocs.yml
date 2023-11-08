@@ -47,7 +47,7 @@ plugins:
       python:
         paths: [.]
         options:
-          show_root_toc_entry: true
+          # show_root_toc_entry: true
           show_root_heading: true
           show_root_members_full_path: true
           show_root_full_path: true
@@ -63,6 +63,9 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
+  - attr_list
+  - md_in_html
+
 
 nav:
   - Home: index.md
@@ -85,8 +88,10 @@ nav:
     - Model Selection: reference/model-selection.md
     - Metrics: reference/metrics.md
     - Core Function: reference/core.md
-    - Models and Postprocessing: reference/models.md
-    - Logging and Plotting: reference/log-plot.md
+    - Models: reference/models.md
+    - Model Postprocessing: reference/postprocessing.md
+    - Logging: reference/log.md
+    - Plotting: reference/plotting.md
     - Utilities: reference/utilities.md
     - Data Synthesis: reference/synthesis.md
   - About: about.md

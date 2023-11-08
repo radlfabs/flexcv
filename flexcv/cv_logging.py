@@ -34,8 +34,8 @@ class CustomNeptuneCallback(npt_utils.NeptuneCallback):
     def __call__(self, study, trial):
         """Logs only the best trial and the plots.
         Args:
-          study: optuna.study: Optuna study object.
-          trial: optuna.trial: Optuna trial object.
+          study (optuna.study): Optuna study object.
+          trial (optuna.trial): Optuna trial object.
 
         Returns:
           (None)
