@@ -21,9 +21,9 @@ class LinearRegDiagnostic:
     Implementation by https://www.statsmodels.org/stable/examples/notebooks/generated/linear_regression_diagnostics_plots.html#Simple-multiple-linear-regression
 
     Diagnostic plots to identify potential problems in a linear regression fit.
-    
+
     Mainly,
-    
+
         - non-linearity of data
         - Correlation of error terms
         - non-constant variance

@@ -48,7 +48,18 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-def log_diagnostics(X_train: pd.DataFrame, X_test: pd.DataFrame, y_train: pd.Series, y_test: pd.Series, run, effects: str, cluster_train: pd.Series = None, cluster_test: pd.Series = None, namestring: str = "out") -> None:
+
+def log_diagnostics(
+    X_train: pd.DataFrame,
+    X_test: pd.DataFrame,
+    y_train: pd.Series,
+    y_test: pd.Series,
+    run,
+    effects: str,
+    cluster_train: pd.Series = None,
+    cluster_test: pd.Series = None,
+    namestring: str = "out",
+) -> None:
     """Logs histograms of the features and target for diagnostic purposes to neptune.
 
     Args:

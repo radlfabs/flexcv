@@ -110,7 +110,7 @@ def cross_validate(
     ```
 
     """
-    
+
     if objective_scorer is None:
         objective_scorer = ObjectiveScorer(mse_wrapper)
     else:

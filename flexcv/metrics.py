@@ -27,14 +27,14 @@ def mse_wrapper(y_valid, y_pred, y_train_in, y_pred_train):
 class MetricsDict(dict):
     """A dictionary that maps metric names to functions.
     It can be passed to the cross_validate function to specify which metrics to calculate in the outer loop.
-    
+
     Default Metrics:
         By default, the following metrics are initialized:
-        
+
         - R²: The coefficient of determination
-        
+
         - MSE: Mean squared error
-        
+
         - MAE: Mean absolute error
 
         We decided againt using the RMSE as a default metric, because we would run into trouble wherever we would average over it.
@@ -50,7 +50,7 @@ class MetricsDict(dict):
 
         def naive_metric(valid, pred):
             return 42
-        
+
         # instantiate a MetricsDict with the default metrics R², MSE and MAE
         metrics = MetricsDict()
         # add a custom metric

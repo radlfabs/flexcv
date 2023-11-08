@@ -60,7 +60,7 @@ class CrossValidationResults(dict):
     }
     ```
     This class is a wrapper around this dictionary which provides a summary of the results.
-    
+
     - `_make_summary` computes the mean, median and standard deviation of the metrics for each model.
     - `_make_summary` is called the first time the summary property is accessed and the result is cached.
     - `_get_model` returns the model instance corresponding to the given model name.

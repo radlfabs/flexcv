@@ -424,8 +424,7 @@ class MERF(BaseEstimator):
         return self
 
     def score(self, X, Z, clusters, y):
-        """Score is not implented.
-        """
+        """Score is not implented."""
         raise NotImplementedError()
 
     def get_bhat_history_df(self):

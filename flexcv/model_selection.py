@@ -168,7 +168,7 @@ def parallel_objective(
     train_idx, valid_idx, X, y, pipe, params_, objective_scorer: ObjectiveScorer
 ):
     """Objective function for the hyperparameter optimization to be used with multiprocessing.Pool.starmap.
-    Gets the training and validation indices and the data and calls the objective function. 
+    Gets the training and validation indices and the data and calls the objective function.
     Is called from the objective_cv function if n_jobs_cv is set to -1.
 
     Args:

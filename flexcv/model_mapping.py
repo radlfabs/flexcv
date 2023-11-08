@@ -45,11 +45,11 @@ from .utilities import empty_func
 
 class ModelConfigDict(Dict[str, Type]):
     """A dictionary that maps model configuration names to their corresponding types.
-    
+
     Default Values:
         To make working with this custom Dict-like class easy, we re-implemented the __init__ method to set some default key-value pairs for us.
         If you don't pass them, it will set
-        
+
         - requires_inner_cv = False
         - requires_formula = False
         - allows_seed = True
