@@ -1,3 +1,9 @@
+"""This module contains functions that are specifically written to fulfill the postprocessing requirements of the models.
+They are customized depending on what the model returns and what the user wants to log to Neptune.
+The functions are called by the `cross_validate` function in the `flexcv.core` module after the model has been fitted.
+"""
+
+
 import logging
 from pprint import pformat
 
