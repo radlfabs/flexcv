@@ -37,13 +37,25 @@ class MetricsDict(dict):
         
         - MAE: Mean absolute error
 
-    Parameters:
-        (dict): A dictionary that maps metric names to functions.
-        
-    Note: 
         We decided againt using the RMSE as a default metric, because we would run into trouble wherever we would average over it.
         RMSE should always be averaged as `sqrt(mean(MSE_values))` and not as `mean(sqrt(MSE_values))`.
         Also, the standard deviation would be calculated incorrectly if RMSE is included at this point.
+
+    Parameters:
+        (dict): A dictionary that maps metric names to functions.
+
+    Example:
+        ```python
+        from flexcv.metrics import MetricsDict
+
+        def naive_metric(valid, pred):
+            return 42
+        
+        # instantiate a MetricsDict with the default metrics R², MSE and MAE
+        metrics = MetricsDict()
+        # add a custom metric
+        metrics["naive_metric"] = naive_metric
+        ```
     """
 
     def __init__(self):
