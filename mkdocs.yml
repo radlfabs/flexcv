@@ -1,15 +1,20 @@
 site_name: flexcv
-nav:
-  - Home: index.md
-  - Getting Started: getting-started.md
-  - Tutorial: tutorial.md
-  - User Guide: user-guide.md
-  - Reference: reference.md
-  - About: about.md
+site_url: https://radlfabs.github.io/flexcv/
+site_author: Fabian Rosenthal
+site_description: >-
+  Customize your cross validation runs with ease.
+copyright: Copyright &copy; 2023 Fabian Rosenthal
 
 theme:
   name: material
+  logo: images/icon_c.png
   features:
+    - navigation.tabs
+    - navigation.top
+    - navigation.sections
+    - navigation.expand
+    - navigation.tracking
+    - toc.follow
     - content.code.copy
   palette:
     # Palette toggle for automatic mode
@@ -33,9 +38,9 @@ theme:
         name: Switch to system preference
 
 plugins:
-- search 
 # do not search in source code
 - search:
+    separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
     exclude: [flexcv]
 - mkdocstrings:
     handlers:
@@ -58,3 +63,30 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
+
+nav:
+  - Home: index.md
+  - Getting Started: 
+    - Installation: start/getting-started.md
+    - Tutorial: start/tutorial.md
+  - User Guide:
+    - user-guide.md
+    - Fit a Random Forest: guides/rf-regressor.md
+    - Model Random Effects: guides/random-effects.md
+    - Repeated Cross Validation: guides/repeated-guide.md
+    - Fit Mutiple Models: guides/multiple-models.md
+  - Reference: 
+    - reference/reference.md
+    - Interface: reference/interface.md
+    - Handling Results: reference/results-handling.md
+    - Model Mapping: reference/model-mapping.md
+    - Split Methods: reference/split.md
+    - Repeated Runs: reference/repeated-ref.md
+    - Model Selection: reference/model-selection.md
+    - Metrics: reference/metrics.md
+    - Core Function: reference/core.md
+    - Models and Postprocessing: reference/models.md
+    - Logging and Plotting: reference/log-plot.md
+    - Utilities: reference/utilities.md
+    - Data Synthesis: reference/synthesis.md
+  - About: about.md

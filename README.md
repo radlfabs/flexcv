@@ -1,12 +1,22 @@
-# flexcv - Flexible Cross Validation and Machine Learning for Regression on Tabular Data
+<table>
+  <tr>
+    <td><img src="docs/images/logo_colored.png" width="200"></td>
+    <td><h1>Flexible Cross Validation and Machine Learning for Regression on Tabular Data
+</h1></td>
+  </tr>
+</table>
 
 Authors: Fabian Rosenthal, Patrick Blättermann and Siegbert Versümer
 
+## Welcome to `flexcv`
 This repository contains the code for the python package `flexcv` which implements flexible cross validation and machine learning for tabular data. It's code is used for the machine learning evaluations in Versümer et al. (2023).
+The core functionality has been developed in the course of a research project at Düsseldorf University of Applied Science, Germany.
 
 `flexcv` is a method comparison package for Python that wraps around popular libraries to easily taylor complex cross validation code to your needs.
 
 It provides a range of features for comparing machine learning models on different datasets with different sets of predictors customizing just about everything around cross validations. It supports both fixed and random effects, as well as random slopes.
+
+You can find our documentation [here](https://radlfabs.github.io/flexcv/).
 
 ## Features
 
@@ -39,7 +49,7 @@ First, clone this repository.
 
 To use `flexcv` you will need Python 3.10 or 3.11. Some dependencies are not yet compatible with Python version 3.12. As soon as they update their compatibility we can support Python 3.12 as well.
 
-##### Using conda
+#### Using conda
 
 You can easily install this version of Python using conda (Anaconda or Miniconda). We recommend using a fresh environment for cleanly holding all relevant packages corresponding to this repo. With conda installed you can create a new Python 3.10 environment, activate it and install our requirements by running the following lines from the command line:
 
@@ -51,7 +61,7 @@ cd path/to/this/repo
 pip install -r flexcv/requirements.txt
 ```
 
-##### Using env
+#### Using `venv`
 
 To separate Python environments on your system, you can also use the `venv` package from the standard library.
 
@@ -62,7 +72,7 @@ my_env_name/Scripts/activate
 pip install flexcv/requirements.txt
 ```
 
-##### Additional dependencies `rpy2`
+#### Additional dependencies `rpy2`
 
 Some of our model classes are actually wrapping around `rpy2` code and are using `R` under the hood. To use them, you should use a recent `R` version and run our `install_rpackages.py` script:
 
@@ -75,7 +85,6 @@ Now you have installed everything you need to perform flexible cross validation 
 
 ## Getting Started
 
-Note: The interface is currently under review and may be changed soon. Therefore, the getting started may be a off at the moment.
 
 Let's set up a minimal working example using a LinearRegression estimator and some randomly generated regression data.
 
@@ -88,8 +97,12 @@ from flexcv.synthesizer import generate_regression
 from flexcv.models import LinearModel
   
 # make sample data
-X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise_level=9.1e-2)
-  
+X, y, group, _ = generate_regression(10, 100, n_slopes=1, noise_level=9.1e-2)
+```
+
+Now we configure a simple linear model to fit on our data. We use the `ModelMappingDict` to map a model name to a `ModelConfigDict` which holds the model class and some additional information. We can then pass this mapping to the `CrossValidation` class to perform the cross validation.
+
+```python
 # create a model mapping
 model_map = ModelMappingDict({
     "LinearModel": ModelConfigDict({
@@ -100,7 +113,11 @@ model_map = ModelMappingDict({
 	"requires_formula": True,
     }),
 })
+```
 
+The `CrossValidation` class is the core of this package. It holds all the information about the data, the models, the cross validation splits and the results. It is also responsible for performing the cross validation and logging the results. Setting up the `CrossValidation` object is easy. We can use method chaining to set up our configuration and perform the cross validation. You might be familiar with this pattern from `pandas` and other packages. The set-methods all return the `CrossValidation` object itself, so we can chain them together. The `perform` method then performs the cross validation and returns the `CrossValidation` object again. The `get_results` method returns a `CrossValidationResults` object which holds all the results of the cross validation. It has a `summary` property which returns a `pandas.DataFrame` with all the results. We can then use the `to_excel` method of the `DataFrame` to save the results to an excel file.
+
+```python
 # instantiate our cross validation class
 cv = CrossValidation()
 
@@ -108,7 +125,9 @@ cv = CrossValidation()
 results = (
     cv
     .set_data(X, y, group, dataset_name="ExampleData")
-    .set_splits(method_outer_split=flexcv.CrossValMethod.GROUP, method_inner_split=flexcv.CrossValMethod.KFOLD)
+    .set_splits(
+        method_outer_split=flexcv.CrossValMethod.GROUP, 
+        method_inner_split=flexcv.CrossValMethod.KFOLD)
     .set_models(model_map)
     .perform()
     .get_results()
@@ -124,7 +143,7 @@ Additional info on how to get started working with this package will be added he
 
 ## Documentation
 
-Have a look at our [documentation](https://radlfabs.github.io/flexcv/). Besides a guide to get started, we will add tutorials, a more detailled user guide and an API reference in the future.
+Have a look at our [documentation](https://radlfabs.github.io/flexcv/). We currently add lots of additional guides and tutorials to help you get started with `flexcv`.
 
 ## Conclusion
 
