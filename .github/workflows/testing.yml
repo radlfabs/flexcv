@@ -32,4 +32,5 @@ jobs:
         python -m install_rpackages
     - name: Run tests
       run: |
+        pip install -e .
         pytest
