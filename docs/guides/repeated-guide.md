@@ -19,7 +19,7 @@ from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
 from flexcv.repeated import RepeatedCV
 
 # make sample data
-X, y, group, random_slopes =generate_regression(10,100,n_slopes=1,noise_level=9.1e-2)
+X, y, group, random_slopes =generate_regression(10,100,n_slopes=1,noise_level=9.1e-2, random_seed=42
 
 # create a basic model mapping
 model_map =ModelMappingDict(

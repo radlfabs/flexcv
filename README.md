@@ -105,7 +105,7 @@ from flexcv.synthesizer import generate_regression
 from flexcv.models import LinearModel
   
 # make sample data
-X, y, group, _ = generate_regression(10, 100, n_slopes=1, noise_level=9.1e-2)
+X, y, group, _ = generate_regression(10, 100, n_slopes=1, noise_level=9.1e-2, random_seed=42)
 ```
 
 Now we configure a simple linear model to fit on our data. We use the `ModelMappingDict` to map a model name to a `ModelConfigDict` which holds the model class and some additional information. We can then pass this mapping to the `CrossValidation` class to perform the cross validation.

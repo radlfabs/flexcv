@@ -13,7 +13,7 @@ from flexcv.synthesizer import generate_regression
 from flexcv.models import LinearModel
   
 # make sample data
-X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise_level=9.1e-2)
+X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise_level=9.1e-2, random_seed=42)
   
 # create a model mapping
 model_map = ModelMappingDict({

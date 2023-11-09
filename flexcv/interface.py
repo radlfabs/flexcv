@@ -537,7 +537,7 @@ if __name__ == "__main__":
     from .synthesizer import generate_regression
 
     X, y, group, random_slopes = generate_regression(
-        10, 100, n_slopes=1, noise_level=9.1e-2
+        10, 100, n_slopes=1, noise_level=9.1e-2, random_seed=42
     )
     model_map = ModelMappingDict(
         {
