@@ -273,11 +273,11 @@ class CrossValidation:
             raise TypeError(f"split_in must be a valid CrossValMethod name, was {split_in}. Choose from: " + ", ".join(ALLOWED_METHODS) + ".")
         
         # check values
-        if not (split_out.value in ALLOWED_METHODS):
-            raise TypeError("split_out must be a CrossValMethod ")
+        if not (split_out in ALLOWED_METHODS):
+            raise TypeError("split_out must be a valid CrossValMethod ")
 
-        if not (split_in.value in ALLOWED_METHODS):
-            raise TypeError("split_in must be a CrossValMethod")
+        if not (split_in in ALLOWED_METHODS):
+            raise TypeError("split_in must be a valid CrossValMethod")
 
         if not isinstance(n_splits_out, int):
             raise TypeError("n_splits_out must be an integer")
