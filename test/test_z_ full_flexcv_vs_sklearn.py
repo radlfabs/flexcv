@@ -71,7 +71,7 @@ def test_kfold_flexcv_roughly_equals_sklearn():
     )
     flexcv_val = flexcv_lm_kfold(X, y)
     sklearn_val = - sklearn_lm_kfold(X, y)
-    assert np.isclose(np.array([flexcv_val]), np.array([sklearn_val])) < np.finfo(float).eps
+    assert np.isclose(np.array([flexcv_val]), np.array([sklearn_val]))
 
 
 ##### Test group kfold #####
@@ -139,7 +139,7 @@ def test_groupkfold_flexcv_roughly_equals_sklearn():
     )
     flexcv_val = flexcv_lm_groupkfold(X, y, group)
     sklearn_val = - sklearn_lm_groupkfold(X, y, group)
-    assert np.isclose(np.array([flexcv_val]), np.array([sklearn_val])) < np.finfo(float).eps
+    assert np.isclose(np.array([flexcv_val]), np.array([sklearn_val]))
 
 
 ##### Test sklearn.LinearRegression vs flexcv.models.LinearModel #####
@@ -203,4 +203,4 @@ def test_linearmodels_flexcv_roughly_equals_sklearn():
     )
     flexcv_val = flexcv_lm_kfold(X, y)
     sklearn_val = - sklearn_lm_kfold(X, y)
-    assert np.isclose(np.array([flexcv_val]), np.array([sklearn_val])) < np.finfo(float).eps
+    assert np.isclose(np.array([flexcv_val]), np.array([sklearn_val]))

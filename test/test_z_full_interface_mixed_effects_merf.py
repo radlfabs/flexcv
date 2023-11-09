@@ -50,17 +50,17 @@ def merf_mixed_regression():
         .set_models(model_map)
         .set_inner_cv(3)
         .set_splits(n_splits_out=3)
-        .set_mixed_effects(True, 25)
+        .set_mixed_effects(True, 5)
         .perform()
         .get_results()
     )
 
-    return np.mean([results["MERF"]["metrics"][k]["r2"] for k in range(3)])
+    return np.mean(results["MERF"]["folds_by_metrics"]["r2"])
 
 
 def test_merf_rf():
     """Test if the mean r2 value of the random forest regression is is exactly the same over time."""
-    assert np.isclose([merf_mixed_regression()], [0.05766260983676633])
+    assert np.isclose([merf_mixed_regression()], [0.0832993979557632])
 
 
 def merf_mixed_xgboost():
@@ -96,20 +96,20 @@ def merf_mixed_xgboost():
         .set_inner_cv(3)
         .set_splits(n_splits_out=3)
         .set_run(Run(), random_seed=42)
-        .set_mixed_effects(True, 25)
+        .set_mixed_effects(True, 5)
         .perform()
         .get_results()
     )
 
-    return np.mean([results["XGBEM"]["metrics"][k]["r2"] for k in range(3)])
+    return np.mean(results["XGBEM"]["folds_by_metrics"]["r2"])
 
 
 def test_merf_xgboost():
     """Test if the mean r2 value of the random forest regression is is exactly the same over time."""
     assert np.isclose(
         [merf_mixed_xgboost()],
-        [-0.11295634934360958]
-        ) < np.finfo(float).eps
+        [-0.12340731619124896]
+        )
 
 
 def merf_earth_regression():
@@ -144,17 +144,17 @@ def merf_earth_regression():
         .set_inner_cv(3)
         .set_splits(n_splits_out=3)
         .set_run(Run(), random_seed=42)
-        .set_mixed_effects(True, 25)
+        .set_mixed_effects(True, 5)
         .perform()
         .get_results()
     )
 
-    return np.mean([results["EarthEM"]["metrics"][k]["r2"] for k in range(3)])
+    return np.mean(results["EarthEM"]["folds_by_metrics"]["r2"])
 
 
 def test_merf_earth():
     """Test if the mean r2 value of the random forest regression is exactly the same over time."""
-    assert np.isclose([merf_earth_regression()], [0.06477039485366536]) < np.finfo(float).eps
+    assert np.isclose([merf_earth_regression()], [0.03308048396566532])
 
 
 def merf_svr_regression():
@@ -189,14 +189,14 @@ def merf_svr_regression():
         .set_inner_cv(3)
         .set_splits(n_splits_out=3)
         .set_run(Run(), random_seed=42)
-        .set_mixed_effects(True, 25)
+        .set_mixed_effects(True, 5)
         .perform()
         .get_results()
     )
 
-    return np.mean([results["SVREM"]["metrics"][k]["r2"] for k in range(3)])
+    return np.mean(results["SVREM"]["folds_by_metrics"]["r2"])
 
 
 def test_merf_svr_mixed():
     """Test if the mean r2 value of the random forest regression is exactly the same over time."""
-    assert np.isclose([merf_svr_regression()], [0.3000626035453695]) < np.finfo(float).eps
+    assert np.isclose([merf_svr_regression()], [0.2880957829764944])

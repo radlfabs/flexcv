@@ -45,5 +45,5 @@ def test_summary():
     mean_r2_lm = check_value.loc[("mean", "r2")].to_numpy()
     eps = np.finfo(float).eps
     ref_value = 0.4265339487499462
-    assert np.isclose(mean_r2_lm[0] / ref_value)
-    assert np.isclose(mean_r2_lm[0] / ref_value)
+    assert np.isclose(mean_r2_lm[0], ref_value)
+    assert np.isclose(mean_r2_lm[0], ref_value)

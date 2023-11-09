@@ -42,4 +42,4 @@ def lmer_regression():
 
 
 def test_linear_mixed_effects():
-    assert np.isclose([lmer_regression()], [0.3331408486407139]) < np.finfo(float).eps
+    assert np.isclose([lmer_regression()], [0.3331408486407139])
