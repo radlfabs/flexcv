@@ -242,12 +242,6 @@ class CrossValidationResults(dict):
         """
         return self[model_name].get("parameters", [None])[fold_id]
 
-    def __add__(self, other):
-        """Adds two CrossValidationResults summaries.
-        The result is a MergedResult object.
-        """
-        raise NotImplementedError
-
 
 class MergedSummary(CrossValidationResults):
     """ """
