@@ -43,9 +43,10 @@ def try_mean(x):
         (float): Mean of the input array.
 
     """
+    from numpy.core._exceptions import UFuncTypeError
     try:
         return np.mean(x)
-    except ValueError:
+    except (ValueError, UFuncTypeError):
         # entered if x contains str "NaN"
         # check if all elements in x are equal to "NaN"
         if np.all([element == "NaN" for element in x]):
