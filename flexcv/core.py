@@ -33,6 +33,38 @@ warnings.simplefilter("ignore", ConvergenceWarning)
 logger = logging.getLogger(__name__)
 
 
+def preprocess_slopes(Z_train_slope, Z_test_slope, must_scale) -> tuple[np.ndarray, np.ndarray]:
+    if must_scale:
+        scaler = StandardScaler()
+        Z_train_slope_scaled = pd.DataFrame(
+            scaler.fit_transform(Z_train_slope),
+            columns=Z_train_slope.columns,
+            index=Z_train_slope.index,
+        )
+        Z_test_slope_scaled = pd.DataFrame(
+            scaler.transform(Z_test_slope),
+            columns=Z_test_slope.columns,
+            index=Z_test_slope.index,
+        )
+    else:
+        Z_train_slope_scaled = Z_train_slope
+        Z_test_slope_scaled = Z_test_slope
+
+    Z_train_slope_scaled["Intercept"] = 1
+    cols = Z_train_slope_scaled.columns.tolist()
+    cols = cols[-1:] + cols[:-1]
+    Z_train_slope_scaled = Z_train_slope_scaled[cols]
+
+    Z_test_slope_scaled["Intercept"] = 1
+    cols = Z_test_slope_scaled.columns.tolist()
+    cols = cols[-1:] + cols[:-1]
+    Z_test_slope_scaled = Z_test_slope_scaled[cols]
+
+    Z_train = Z_train_slope_scaled.to_numpy()
+    Z_test = Z_test_slope_scaled.to_numpy()
+    return Z_train, Z_test
+
+
 def cross_validate(
     *,
     X: pd.DataFrame,
@@ -150,6 +182,9 @@ def cross_validate(
     ):
         print()  # for beautiful tqdm progressbar
         
+        groups_exist = groups is not None
+        slopes_exist = slopes is not None 
+        
         # check if break is requested and if this is the 2nd outer fold
         if break_cross_val and k == 1:
             break
@@ -161,8 +196,8 @@ def cross_validate(
         X_test = X.iloc[test_index]
         y_test = y.iloc[test_index]  # type: ignore
 
-        cluster_train = groups.iloc[train_index] if groups is not None else None  # type: ignore
-        cluster_test = groups.iloc[test_index] if groups is not None else None  # type: ignore
+        cluster_train = groups.iloc[train_index] if groups_exist else None  # type: ignore
+        cluster_test = groups.iloc[test_index] if groups_exist else None  # type: ignore
 
         if scale_out:
             # apply standard scaler but preserve the type pd.DataFrame
@@ -179,38 +214,12 @@ def cross_validate(
             X_train_scaled = X_train
             X_test_scaled = X_test
 
-        if slopes is not None:
-            Z_train_slope = slopes.iloc[train_index]
-            Z_test_slope = slopes.iloc[test_index]
-
-            if scale_out:
-                scaler = StandardScaler()
-                Z_train_slope_scaled = pd.DataFrame(
-                    scaler.fit_transform(Z_train_slope),
-                    columns=Z_train_slope.columns,
-                    index=Z_train_slope.index,
-                )
-                Z_test_slope_scaled = pd.DataFrame(
-                    scaler.transform(Z_test_slope),
-                    columns=Z_test_slope.columns,
-                    index=Z_test_slope.index,
-                )
-            else:
-                Z_train_slope_scaled = Z_train_slope
-                Z_test_slope_scaled = Z_test_slope
-
-            Z_train_slope_scaled["Intercept"] = 1
-            cols = Z_train_slope_scaled.columns.tolist()
-            cols = cols[-1:] + cols[:-1]
-            Z_train_slope_scaled = Z_train_slope_scaled[cols]
-
-            Z_test_slope_scaled["Intercept"] = 1
-            cols = Z_test_slope_scaled.columns.tolist()
-            cols = cols[-1:] + cols[:-1]
-            Z_test_slope_scaled = Z_test_slope_scaled[cols]
-
-            Z_train = Z_train_slope_scaled.to_numpy()
-            Z_test = Z_test_slope_scaled.to_numpy()
+        if slopes_exist:
+            Z_train, Z_test = preprocess_slopes(
+                Z_train_slope=slopes.iloc[train_index], 
+                Z_test_slope=slopes.iloc[test_index], 
+                must_scale=scale_out
+            )
 
         else:
             Z_train = np.ones((len(X_train), 1))  # type: ignore
