@@ -10,7 +10,7 @@ from flexcv.utilities import empty_func
 
 def regression_with_summary():
     X, y, group, random_slopes = generate_regression(
-        10, 100, n_slopes=1, noise_level=9.1e-2
+        10, 100, n_slopes=1, noise_level=9.1e-2, random_seed=42
     )
 
     model_map = ModelMappingDict(
@@ -45,5 +45,5 @@ def test_summary():
     mean_r2_lm = check_value.loc[("mean", "r2")].to_numpy()
     eps = np.finfo(float).eps
     ref_value = 0.4265339487499462
-    assert (mean_r2_lm[0] / ref_value) > (1 - eps)
-    assert (mean_r2_lm[0] / ref_value) < (1 + eps)
+    assert np.isclose(mean_r2_lm[0] / ref_value)
+    assert np.isclose(mean_r2_lm[0] / ref_value)

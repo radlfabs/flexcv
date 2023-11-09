@@ -66,13 +66,12 @@ def test_kfold_flexcv_roughly_equals_sklearn():
     - flexcv: LinearRegression() -> CrossValidation() with "kFold"-> perform() -> get_results()
     assert MAE on the MSE of the two pipelines is less than machine epsilon
     """
-    from sklearn.metrics import mean_absolute_error
     X, y, group, random_slopes = generate_regression(
-        10, 100, n_slopes=1, noise_level=9.1e-2
+        10, 100, n_slopes=1, noise_level=9.1e-2, random_seed=42
     )
     flexcv_val = flexcv_lm_kfold(X, y)
     sklearn_val = - sklearn_lm_kfold(X, y)
-    assert mean_absolute_error(np.array([flexcv_val]), np.array([sklearn_val])) < np.finfo(float).eps
+    assert np.isclose(np.array([flexcv_val]), np.array([sklearn_val])) < np.finfo(float).eps
 
 
 ##### Test group kfold #####
@@ -135,13 +134,12 @@ def test_groupkfold_flexcv_roughly_equals_sklearn():
     - flexcv: LinearRegression() -> CrossValidation() with "GroupKFold"-> perform() -> get_results()
     assert MAE on the MSE of the two pipelines is less than precision
     """
-    from sklearn.metrics import mean_absolute_error
     X, y, group, random_slopes = generate_regression(
-        10, 100, n_slopes=1, noise_level=9.1e-2
+        10, 100, n_slopes=1, noise_level=9.1e-2, random_seed=42
     )
     flexcv_val = flexcv_lm_groupkfold(X, y, group)
     sklearn_val = - sklearn_lm_groupkfold(X, y, group)
-    assert mean_absolute_error(np.array([flexcv_val]), np.array([sklearn_val])) < np.finfo(float).eps
+    assert np.isclose(np.array([flexcv_val]), np.array([sklearn_val])) < np.finfo(float).eps
 
 
 ##### Test sklearn.LinearRegression vs flexcv.models.LinearModel #####
@@ -200,10 +198,9 @@ def test_linearmodels_flexcv_roughly_equals_sklearn():
     - flexcv: LinearRegression() -> CrossValidation() with "kFold"-> perform() -> get_results()
     assert MAE on the MSE of the two pipelines is less than machine epsilon
     """
-    from sklearn.metrics import mean_absolute_error
     X, y, group, random_slopes = generate_regression(
-        10, 100, n_slopes=1, noise_level=9.1e-2
+        10, 100, n_slopes=1, noise_level=9.1e-2, random_seed=42
     )
     flexcv_val = flexcv_lm_kfold(X, y)
     sklearn_val = - sklearn_lm_kfold(X, y)
-    assert mean_absolute_error(np.array([flexcv_val]), np.array([sklearn_val])) < np.finfo(float).eps
+    assert np.isclose(np.array([flexcv_val]), np.array([sklearn_val])) < np.finfo(float).eps

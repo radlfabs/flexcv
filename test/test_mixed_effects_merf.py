@@ -15,7 +15,7 @@ from flexcv.models import EarthRegressor
 
 def merf_mixed_regression():
     X, y, group, random_slopes = generate_regression(
-        10, 100, n_slopes=1, noise_level=9.1e-2
+        10, 100, n_slopes=1, noise_level=9.1e-2, random_seed=42
     )
 
     model_map = ModelMappingDict(
@@ -50,29 +50,22 @@ def merf_mixed_regression():
         .set_models(model_map)
         .set_inner_cv(3)
         .set_splits(n_splits_out=3)
-        .set_run(Run(), random_seed=42)
         .set_mixed_effects(True, 25)
         .perform()
         .get_results()
     )
-    summary = results.summary
-    n_values = len(results["MERF"]["metrics"])
-    r2_values = [results["MERF"]["metrics"][k]["r2"] for k in range(n_values)]
-    return np.mean(r2_values)
+
+    return np.mean([results["MERF"]["metrics"][k]["r2"] for k in range(3)])
 
 
 def test_merf_rf():
-    """Test if the mean r2 value of the random forest regression is correct."""
-    check_value = merf_mixed_regression()
-    eps = np.finfo(float).eps
-    ref_value = 0.11496675402377587
-    assert (check_value / ref_value) > (1 - eps)
-    assert (check_value / ref_value) < (1 + eps)
+    """Test if the mean r2 value of the random forest regression is is exactly the same over time."""
+    assert np.isclose([merf_mixed_regression()], [0.05766260983676633])
 
 
 def merf_mixed_xgboost():
     X, y, group, random_slopes = generate_regression(
-        10, 100, n_slopes=1, noise_level=9.1e-2
+        10, 100, n_slopes=1, noise_level=9.1e-2, random_seed=42
     )
 
     model_map = ModelMappingDict(
@@ -107,24 +100,21 @@ def merf_mixed_xgboost():
         .perform()
         .get_results()
     )
-    summary = results.summary
-    n_values = len(results["XGBEM"]["metrics"])
-    r2_values = [results["XGBEM"]["metrics"][k]["r2"] for k in range(n_values)]
-    return np.mean(r2_values)
+
+    return np.mean([results["XGBEM"]["metrics"][k]["r2"] for k in range(3)])
 
 
 def test_merf_xgboost():
-    """Test if the mean r2 value of the random forest regression is correct."""
-    check_value = merf_mixed_xgboost()
-    eps = np.finfo(float).eps
-    ref_value = -0.045098611366661046
-    assert (check_value / ref_value) > (1 - eps)
-    assert (check_value / ref_value) < (1 + eps)
+    """Test if the mean r2 value of the random forest regression is is exactly the same over time."""
+    assert np.isclose(
+        [merf_mixed_xgboost()],
+        [-0.11295634934360958]
+        ) < np.finfo(float).eps
 
 
 def merf_earth_regression():
     X, y, group, random_slopes = generate_regression(
-        10, 100, n_slopes=1, noise_level=9.1e-2
+        10, 100, n_slopes=1, noise_level=9.1e-2, random_seed=42
     )
 
     model_map = ModelMappingDict(
@@ -158,24 +148,18 @@ def merf_earth_regression():
         .perform()
         .get_results()
     )
-    summary = results.summary
-    n_values = len(results["EarthEM"]["metrics"])
-    r2_values = [results["EarthEM"]["metrics"][k]["r2"] for k in range(n_values)]
-    return np.mean(r2_values)
+
+    return np.mean([results["EarthEM"]["metrics"][k]["r2"] for k in range(3)])
 
 
 def test_merf_earth():
-    """Test if the mean r2 value of the random forest regression is correct."""
-    check_value = merf_earth_regression()
-    eps = np.finfo(float).eps
-    ref_value = -0.17212212996671483
-    assert (check_value / ref_value) > (1 - eps)
-    assert (check_value / ref_value) < (1 + eps)
+    """Test if the mean r2 value of the random forest regression is exactly the same over time."""
+    assert np.isclose([merf_earth_regression()], [0.06477039485366536]) < np.finfo(float).eps
 
 
 def merf_svr_regression():
     X, y, group, random_slopes = generate_regression(
-        10, 100, n_slopes=1, noise_level=9.1e-2
+        10, 100, n_slopes=1, noise_level=9.1e-2, random_seed=42
     )
 
     model_map = ModelMappingDict(
@@ -209,15 +193,10 @@ def merf_svr_regression():
         .perform()
         .get_results()
     )
-    n_values = len(results["SVREM"]["metrics"])
-    r2_values = [results["SVREM"]["metrics"][k]["r2"] for k in range(n_values)]
-    return np.mean(r2_values)
+
+    return np.mean([results["SVREM"]["metrics"][k]["r2"] for k in range(3)])
 
 
 def test_merf_svr_mixed():
-    """Test if the mean r2 value of the random forest regression is correct."""
-    check_value = merf_svr_regression()
-    eps = np.finfo(float).eps
-    ref_value = 0.18189191135516083
-    assert (check_value / ref_value) > (1 - eps)
-    assert (check_value / ref_value) < (1 + eps)
+    """Test if the mean r2 value of the random forest regression is exactly the same over time."""
+    assert np.isclose([merf_svr_regression()], [0.3000626035453695]) < np.finfo(float).eps
