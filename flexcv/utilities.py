@@ -68,7 +68,8 @@ def add_module_handlers(logger: logging.Logger) -> None:
 
 
 def get_fixed_effects_formula(target_name, X_data) -> str:
-    """Returns the fixed effects formula for the dataset
+    """Returns the fixed effects formula for the dataset.
+    
     Scheme: "target ~ column1 + column2 + ...
 
     Args:
@@ -78,6 +79,8 @@ def get_fixed_effects_formula(target_name, X_data) -> str:
     Returns:
       (str): The fixed effects formula.
     """
+    if X_data.shape[1] == 1:
+        return f"{target_name} ~ {X_data.columns[0]}"
     start = f"{target_name} ~ {X_data.columns[0]} + "
     end = " + ".join(X_data.columns[1:])
     return start + end
