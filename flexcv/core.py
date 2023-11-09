@@ -257,7 +257,7 @@ def cross_validate(
             if skip_inner_cv:
                 # Instantiate model directly
                 best_model = model_instance(
-                    **n_jobs_model_dict, random_state=random_seed
+                    **n_jobs_model_dict, **model_seed
                 )
                 best_params = best_model.get_params()
                 study = None
