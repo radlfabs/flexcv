@@ -149,7 +149,11 @@ def cross_validate(
         )
     ):
         print()  # for beautiful tqdm progressbar
-
+        
+        # check if break is requested and if this is the 2nd outer fold
+        if break_cross_val and k == 1:
+            break
+        
         # Assign the outer folds data
         X_train = X.iloc[train_index]
         y_train = y.iloc[train_index]  # type: ignore
@@ -388,14 +392,19 @@ def cross_validate(
                 fit_result=fit_result,
             )
 
-            # call model postprocessing on the single results dataclass
-            postpro_func = mapping[model_name]["post_processor"]
-            all_models_dict = postpro_func(
-                results_all_folds,
-                single_model_fold_result,
-                run,
-                features=X_train.columns,
-            )
+            try:
+                # call model postprocessing on the single results dataclass
+                postpro_func = mapping[model_name]["post_processor"]
+                all_models_dict = postpro_func(
+                    results_all_folds,
+                    single_model_fold_result,
+                    run,
+                    features=X_train.columns,
+                )
+            except KeyError:
+                logger.info(
+                    f"No postprocessing function found for {model_name}. Continuing..."
+                )
 
             ###### MIXED EFFECTS EVALUATION #################
 
@@ -491,18 +500,19 @@ def cross_validate(
                     fit_result=fit_result,
                 )
 
-                postpro_func = mapping[model_name]["mixed_post_processor"]
-
-                all_models_dict = postpro_func(
-                    results_all_folds=all_models_dict,
-                    fold_result=single_model_fold_result,
-                    run=run,
-                    y_pred_base=y_pred_base,
-                    mixed_name=mapping[model_name]["mixed_name"],
-                )
-
-        if break_cross_val and k == 0:
-            break
+                try:
+                    postpro_func = mapping[model_name]["mixed_post_processor"]
+                    all_models_dict = postpro_func(
+                        results_all_folds=all_models_dict,
+                        fold_result=single_model_fold_result,
+                        run=run,
+                        y_pred_base=y_pred_base,
+                        mixed_name=mapping[model_name]["mixed_name"],
+                    )
+                except KeyError:
+                    logger.info(
+                        f"No postprocessing function found for {mapping[model_name]['mixed_name']}. Continuing..."
+                    )
 
         print()
         print()
