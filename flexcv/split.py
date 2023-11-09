@@ -9,7 +9,9 @@ from functools import partial
 from typing import Callable, Iterator
 
 import pandas as pd
+import numpy as np
 from numpy import ndarray
+from numpy.core._exceptions import UFuncTypeError
 from sklearn.model_selection import (
     BaseCrossValidator,
     GroupKFold,
@@ -149,7 +151,13 @@ class CustomStratifiedKFold(BaseCrossValidator):
         else:
             y_cat = kbins.fit_transform(y.reshape(-1, 1)).flatten().astype(int)  # type: ignore
         # concatenate y_cat and groups such that the stratification is done on both
-        y_concat = y_cat.astype(str) + "_" + groups.astype(str)
+        # elementwise concatenation of three arrays
+        try:
+            y_cat = y_cat.astype(str) + "_" + groups.astype(str)
+        except UFuncTypeError:
+            # Why easy when you can do it the hard way?
+            y_concat = np.core.defchararray.add(np.core.defchararray.add(y_cat.astype(str), "_"), groups.astype(str))
+
         return self.skf.split(X, y_concat)
 
     def get_n_splits(self, X, y=None, groups=None):
@@ -230,4 +238,4 @@ def make_cross_val_split(
 
 
 if __name__ == "__main__":
-    print(string_to_crossvalmethod("KFold"))
+    pass
