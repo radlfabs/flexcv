@@ -7,22 +7,22 @@ class Run(NeptuneRun):
     It will not do anything."""
 
     def __init__(self, *args, **kwargs):
-        self.run_id = "dummy"
+        pass
 
     def fetch(self):
-        return self.run_id
+        return None
 
     def stop(self):
         pass
 
     def __getitem__(self, key):
-        return self
+        return None
 
     def __setitem__(self, key, value):
         pass
 
     def __getattr__(self, key):
-        return self
+        return None
 
     def __setattr__(self, key, value):
         pass
@@ -31,10 +31,10 @@ class Run(NeptuneRun):
         pass
 
     def __str__(self):
-        return self.run_id
+        return "dummy"
 
     def __repr__(self):
-        return self.run_id
+        return "dummy"
 
     def append(self, *args, **kwargs):
         pass
