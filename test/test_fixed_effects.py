@@ -2,11 +2,50 @@ import numpy as np
 import optuna
 from sklearn.ensemble import RandomForestRegressor
 
+import flexcv.model_postprocessing as mp
 from flexcv.synthesizer import generate_regression
 from flexcv.interface import CrossValidation
-from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
+from flexcv.interface import ModelConfigDict
+from flexcv.interface import ModelMappingDict
 from flexcv.run import Run
-import flexcv.model_postprocessing as mp
+from flexcv.models import LinearModel
+
+
+def simple_regression():
+    X, y, group, random_slopes = generate_regression(
+        10, 100, n_slopes=1, noise_level=9.1e-2
+    )
+    model_map = ModelMappingDict(
+        {
+            "LinearModel": ModelConfigDict(
+                {
+                    "model": LinearModel,
+                    "requires_formula": True,
+                }
+            ),
+        }
+    )
+
+    cv = CrossValidation()
+    results = (
+        cv.set_data(X, y, group, random_slopes)
+        .set_models(model_map)
+        .set_run(Run())
+        .perform()
+        .get_results()
+    )
+
+    n_values = len(results["LinearModel"]["metrics"])
+    r2_values = [results["LinearModel"]["metrics"][k]["r2"] for k in range(n_values)]
+    return np.mean(r2_values)
+
+
+def test_linear_model():
+    check_value = simple_regression()
+    eps = np.finfo(float).eps
+    ref_value = 0.4265339487499462
+    assert (check_value / ref_value) > (1 - eps)
+    assert (check_value / ref_value) < (1 + eps)
 
 
 def random_forest_regression():
@@ -55,4 +94,6 @@ def test_randomforest_regression_fixed():
     """Test if the mean r2 value of the random forest regression is correct."""
     check_value = random_forest_regression()
     eps = np.finfo(float).eps
-    assert (check_value / 0.07334709720199191) > (1 - eps)
+    ref_value = 0.07334709720199191
+    assert (check_value / ref_value) > (1 - eps)
+    assert (check_value / ref_value) < (1 + eps)

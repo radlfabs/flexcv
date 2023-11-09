@@ -42,4 +42,4 @@ def test_repeated_equal_seeds():
 def test_repeated_different_seeds():
     """Test that the standard deviation of the R2 over runs with different seeds is not zero."""
     rtn_value = run_repeated([42, 43])
-    assert rtn_value.loc["r2_std", "LinearModel"] > 0.0
+    assert rtn_value.loc["r2_std", "LinearModel"] != 0.0

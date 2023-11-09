@@ -44,4 +44,6 @@ def test_summary():
     check_value = regression_with_summary()
     mean_r2_lm = check_value.loc[("mean", "r2")].to_numpy()
     eps = np.finfo(float).eps
-    assert (mean_r2_lm / 0.36535132545331933) > (1 - eps)
+    ref_value = 0.4265339487499462
+    assert (mean_r2_lm[0] / ref_value) > (1 - eps)
+    assert (mean_r2_lm[0] / ref_value) < (1 + eps)

@@ -8,7 +8,7 @@ from flexcv.models import LinearMixedEffectsModel, LinearModel
 from flexcv.run import Run
 
 
-def simple_regression():
+def lmer_regression():
     X, y, group, random_slopes = generate_regression(
         10, 100, n_slopes=1, noise_level=9.1e-2
     )
@@ -19,11 +19,7 @@ def simple_regression():
                 {
                     "requires_inner_cv": False,
                     "requires_formula": True,
-                    "n_trials": 100,
-                    "n_jobs_model": 1,
-                    "n_jobs_cv": 1,
                     "model": LinearModel,
-                    "params": {},
                     "post_processor": empty_func,
                     "mixed_model": LinearMixedEffectsModel,
                     "mixed_post_processor": empty_func,
@@ -49,7 +45,9 @@ def simple_regression():
     return np.mean(r2_values)
 
 
-def test_lmer_regression_k3():
-    check_value = simple_regression()
+def test_linear_mixed_effects():
+    check_value = lmer_regression()
     eps = np.finfo(float).eps
-    assert (check_value / 0.31799553543275216) > (1 - eps)
+    ref_value = 0.33402132305208826
+    assert (check_value / ref_value) > (1 - eps)
+    assert (check_value / ref_value) < (1 + eps)

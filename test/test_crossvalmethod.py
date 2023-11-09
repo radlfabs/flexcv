@@ -1,3 +1,4 @@
+import pytest
 from flexcv.split import CrossValMethod, string_to_crossvalmethod
 
 
@@ -10,3 +11,8 @@ def test_string_conversion():
         string_to_crossvalmethod("CustomStratifiedGroupKFold")
         == CrossValMethod.CUSTOMSTRATGROUP
     )
+
+
+def test_invalid_string():
+    with pytest.raises(ValueError):
+        string_to_crossvalmethod("InvalidString")
