@@ -34,6 +34,16 @@ logger = logging.getLogger(__name__)
 
 
 def preprocess_slopes(Z_train_slope, Z_test_slope, must_scale) -> tuple[np.ndarray, np.ndarray]:
+    """This function preprocesses the random slopes variable(s) for use in the mixed effects model.
+    
+    Args:
+        Z_train_slope (pd.DataFrame): Random slopes variable(s) for the training set.
+        Z_test_slope (pd.DataFrame): Random slopes variable(s) for the test set.
+        must_scale (bool): If True, the random slopes are scaled to zero mean and unit variance.
+        
+    Returns:
+        (tuple[np.ndarray, np.ndarray]): The preprocessed random slopes as a tuple of numpy arrays: (Z_train, Z_test)
+    """
     if must_scale:
         scaler = StandardScaler()
         Z_train_slope_scaled = pd.DataFrame(
@@ -65,6 +75,28 @@ def preprocess_slopes(Z_train_slope, Z_test_slope, must_scale) -> tuple[np.ndarr
     return Z_train, Z_test
 
 
+def preprocess_features(X_train, X_test) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Scales the features to zero mean and unit variance.
+    
+    Args:
+        X_train (pd.DataFrame): Features for the training set.
+        X_test (pd.DataFrame): Features for the test set.
+        
+    Returns:
+        (tuple[pd.DataFrame, pd.DataFrame]): The preprocessed features as a tuple of pandas DataFrames: (X_train_scaled, X_test_scaled)
+    """
+    scaler = StandardScaler()
+    X_train_scaled = pd.DataFrame(
+        scaler.fit_transform(X_train),
+        columns=X_train.columns,
+        index=X_train.index,
+    )
+    X_test_scaled = pd.DataFrame(
+        scaler.transform(X_test), columns=X_test.columns, index=X_test.index
+    )
+    return X_train_scaled, X_test_scaled
+    
+    
 def cross_validate(
     *,
     X: pd.DataFrame,
@@ -200,16 +232,8 @@ def cross_validate(
         cluster_test = groups.iloc[test_index] if groups_exist else None  # type: ignore
 
         if scale_out:
-            # apply standard scaler but preserve the type pd.DataFrame
-            scaler = StandardScaler()
-            X_train_scaled = pd.DataFrame(
-                scaler.fit_transform(X_train),
-                columns=X_train.columns,
-                index=X_train.index,
-            )
-            X_test_scaled = pd.DataFrame(
-                scaler.transform(X_test), columns=X_test.columns, index=X_test.index
-            )
+            X_train_scaled, X_test_scaled = preprocess_features(X_train, X_test)
+
         else:
             X_train_scaled = X_train
             X_test_scaled = X_test
@@ -225,16 +249,14 @@ def cross_validate(
             Z_train = np.ones((len(X_train), 1))  # type: ignore
             Z_test = np.ones((len(X_test), 1))  # type: ignore
 
-        ##### DIAGNOSTICS #####
+        # run diagnostics if requested
         if diagnostics:
-            if model_effects == "mixed":
-                to_diagnose = {
-                    "effects": 4,
-                    "cluster_train": cluster_train,
-                    "cluster_test": cluster_test,
-                }
-            else:
-                to_diagnose = {"effects": 0}
+            to_diagnose = {
+                "effects": model_effects,
+                "cluster_train": cluster_train,
+                "cluster_test": cluster_test,
+            } if model_effects == "mixed" else {"effects": model_effects}
+
             log_diagnostics(
                 X_train_scaled, X_test_scaled, y_train, y_test, run, **to_diagnose
             )
