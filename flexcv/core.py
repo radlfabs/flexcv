@@ -22,7 +22,12 @@ from .cv_logging import (
 from .metrics import MetricsDict, mse_wrapper
 from .model_selection import ObjectiveScorer, objective_cv
 from .split import CrossValMethod, make_cross_val_split
-from .utilities import get_fixed_effects_formula, get_re_formula
+from .utilities import (
+    get_fixed_effects_formula, 
+    get_re_formula,
+    add_model_to_keys,
+    rm_model_from_keys,
+)
 from .model_mapping import ModelMappingDict
 from .merf import MERF
 from .models import LinearMixedEffectsModel
@@ -264,20 +269,16 @@ def cross_validate(
         # Loop over all models
         for model_name in mapping.keys():
             logger.info(f"Evaluating {model_name}...")
-            model_instance = mapping[model_name]["model"]
-            try:
-                param_grid = mapping[model_name][dataset_name]["params"]
-            except KeyError:
-                param_grid = mapping[model_name]["params"]
-
-            # get bool in mapping[model_name]["requires_inner_cv"] and negate it
-            skip_inner_cv = not mapping[model_name]["requires_inner_cv"]
+        
+            skip_inner_cv = not mapping[model_name]["requires_inner_cv"]  # get bool in mapping[model_name]["requires_inner_cv"] and negate it
             requires_formula = mapping[model_name]["requires_formula"]
-
+            model_class = mapping[model_name]["model"]
+            param_grid = mapping[model_name]["params"]
+            
             if mapping[model_name]["allows_n_jobs"]:
-                n_jobs_model_dict = {"n_jobs": mapping[model_name]["n_jobs_model"]}
+                n_jobs_model = {"n_jobs": mapping[model_name]["n_jobs_model"]}
             else:
-                n_jobs_model_dict = {}
+                n_jobs_model = {}
 
             if mapping[model_name]["allows_seed"]:
                 model_seed = {"random_state": random_seed}
@@ -290,41 +291,34 @@ def cross_validate(
             )
 
             if skip_inner_cv:
-                # Instantiate model directly
-                best_model = model_instance(
-                    **n_jobs_model_dict, **model_seed
+                # Instantiate model directly without inner cross-validation
+                # has to be best_model because it is the only one instantiated
+                best_model = model_class(
+                    **n_jobs_model, **model_seed
                 )
                 best_params = best_model.get_params()
+                # set study to None since no study is instantiated otherwise
                 study = None
 
             else:
+                # this block performs the inner cross-validation with Optuna
+                
                 n_trials
                 n_jobs_cv_int = mapping[model_name]["n_jobs_cv"]
-                if not scale_in:
-                    pipe_in = Pipeline(
-                        [
-                            (
-                                "model",
-                                model_instance(**n_jobs_model_dict, **model_seed),
-                            ),
-                        ]
-                    )
-                else:
-                    pipe_in = Pipeline(
-                        [
-                            ("scaler", StandardScaler()),
-                            (
-                                "model",
-                                model_instance(**n_jobs_model_dict, **model_seed),
-                            ),
-                        ]
-                    )
+
+                pipe_in = Pipeline(
+                    [
+                        ("scaler", StandardScaler()) if scale_in else (),
+                        (
+                            "model",
+                            model_class(**n_jobs_model, **model_seed),
+                        ),
+                    ]
+                )
 
                 # add "model__" to all keys of the param_grid
-                param_grid = {
-                    f"model__{key}": value for key, value in param_grid.items()
-                }
-
+                param_grid = add_model_to_keys(param_grid)
+                
                 neptune_callback = CustomNeptuneCallback(
                     run[f"{model_name}/Optuna/{k}"],
                     # reduce load on neptune, i.e., reduce number of items and plots
@@ -334,7 +328,7 @@ def cross_validate(
                     study_update_freq=10,  # log every 10th trial,
                 )
 
-                if n_trials == "mapped":
+                if n_trials == "mapped":  # TODO can this be automatically detected by the CrossValidation Class?
                     n_trials = mapping[model_name]["n_trials"]
                 if not isinstance(n_trials, int):
                     raise ValueError("Invalid value for n_trials.")
@@ -343,10 +337,13 @@ def cross_validate(
                 random_state = check_random_state(random_seed)
                 sampler_seed = random_state.randint(0, np.iinfo("int32").max)
 
-                # Perform inner cross validation
+                # get sampler to be used for the inner cross-validation
                 sampler = optuna.samplers.TPESampler(seed=sampler_seed)
+                
+                # instantiate the study object
                 study = optuna.create_study(sampler=sampler, direction="maximize")
 
+                # set the parameters for the study
                 study_params = {
                     "cross_val_split": cross_val_split_in,
                     "pipe": pipe_in,
@@ -355,6 +352,7 @@ def cross_validate(
                     "y": y_train,
                 }
 
+                # run the inner cross-validation
                 study.optimize(
                     lambda trial: objective_cv(
                         trial,
@@ -367,12 +365,8 @@ def cross_validate(
                     n_trials=n_trials,
                     callbacks=[neptune_callback],
                 )
-
-                best_params = study.best_params
-                best_params = {
-                    key.replace("model__", ""): value
-                    for key, value in best_params.items()
-                }
+                # get best params from study and rm "model__" from keys
+                best_params = rm_model_from_keys(study.best_params)
 
             # add random_state to best_params if it is not already in there
             if "random_state" not in best_params:
@@ -386,7 +380,7 @@ def cross_validate(
                 model_formula = {}
 
             # Fit the best model on the outer fold
-            best_model = model_instance(**best_params)
+            best_model = model_class(**best_params)
             fit_result = best_model.fit(X_train_scaled, y_train, **model_formula)
 
             y_pred = best_model.predict(X_test_scaled)
@@ -508,7 +502,7 @@ def cross_validate(
                     y_train,
                     y_pred_train,
                     mapping[model_name]["mixed_name"],
-                    best_model,
+                    mixed_model_instance,
                     best_params,
                     k,
                     run,
@@ -520,7 +514,7 @@ def cross_validate(
                 single_model_fold_result = SingleModelFoldResult(
                     k=k,
                     model_name=mapping[model_name]["mixed_name"],
-                    best_model=best_model,
+                    best_model=mixed_model_instance,
                     best_params=best_params,
                     y_pred=y_pred,
                     y_test=y_test,

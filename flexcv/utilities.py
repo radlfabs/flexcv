@@ -20,6 +20,30 @@ def empty_func(*args, **kwargs) -> None:
     return args, kwargs
 
 
+def add_model_to_keys(param_grid):
+    """This function adds the string "model__" to avery key of the param_grid dict.
+    
+    Args:
+      param_grid (dict): A dictionary of parameters for a model.
+      
+    Returns:
+      (dict): A dictionary of parameters for a model with the string "model__" added to each key.
+    """
+    return {f"model__{key}": value for key, value in param_grid.items()}
+
+
+def rm_model_from_keys(param_grid):
+    """This function removes the string "model__" from avery key of the param_grid dict.
+    
+    Args:
+      param_grid (dict): A dictionary of parameters for a model.
+      
+    Returns:
+      (dict): A dictionary of parameters for a model with the string "model__" removed from each key.
+    """
+    return {key.replace("model__", ""): value for key, value in param_grid.items()}
+
+
 def add_module_handlers(logger: logging.Logger) -> None:
     """Adds handlers to the logger for the module.
 
