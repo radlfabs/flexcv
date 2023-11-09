@@ -13,7 +13,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    
+
     - name: Set up Python 3.11
       uses: actions/setup-python@v2
       with:
@@ -29,7 +29,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        python -m install_rpackages.py
+        python -m install_rpackages
     - name: Run tests
       run: |
         pytest
