@@ -75,7 +75,8 @@ class CrossValidation:
     """
 
     def __init__(self) -> None:
-        self._was_logged = False
+        self._was_logged_ = False
+        self._was_performed_ = False
         self.config = {
             # Data related
             "X": None,
@@ -261,15 +262,16 @@ class CrossValidation:
             Read more about it in the respective documentation of the `CrossValMethod` enum.
 
         """
-        if split_out and isinstance(split_out, str):
-            split_out = string_to_crossvalmethod(split_out)
-
-        if split_in and isinstance(split_in, str):
-            split_in = string_to_crossvalmethod(split_in)
-
+        
         # get values of CrossValMethod enums
         ALLOWED_METHODS = [method.value for method in CrossValMethod]
-
+        
+        if isinstance(split_out, str) and (split_out not in ALLOWED_METHODS):
+            raise TypeError(f"split_out must be a valid CrossValMethod name, was {split_out}. Choose from: " + ", ".join(ALLOWED_METHODS) + ".")
+        
+        if isinstance(split_in, str) and (split_in not in ALLOWED_METHODS):
+            raise TypeError(f"split_in must be a valid CrossValMethod name, was {split_in}. Choose from: " + ", ".join(ALLOWED_METHODS) + ".")
+        
         # check values
         if not (split_out.value in ALLOWED_METHODS):
             raise TypeError("split_out must be a CrossValMethod ")
@@ -425,7 +427,21 @@ class CrossValidation:
         self.config["random_seed"] = random_seed
         return self
 
-    def _log(self, run: NeptuneRun = None):
+    def _prepare_before_perform(self):
+        """Make preparation steps before performing the cross validation.
+        Checks if a neptune run object has been set. If the user did not provide a neptune run object, a dummy run is instantiated.
+        This method is called by the `perform()` method.
+        """
+        if isinstance(self.config["split_out"], str):
+            self.config["split_out"] = string_to_crossvalmethod(self.config["split_out"])
+
+        if isinstance(self.config["split_in"], str):
+            self.config["split_in"] = string_to_crossvalmethod(self.config["split_in"])
+            
+        if not hasattr(self.config, "run"):
+            self.config["run"] = DummyRun()
+
+    def _log(self):
         """Logs the config to Neptune. If None, a Dummy is instantiated.
 
         Args:
@@ -435,13 +451,7 @@ class CrossValidation:
           (CrossValidation): self
 
         """
-        if not run:
-            if hasattr(self.config, "run"):
-                run = self.config["run"]
-            else:
-                run = DummyRun()
-        else:
-            self.config["run"] = run
+        run = self.config["run"]
 
         run["data/dataset_name"].log(self.config["dataset_name"])
         run["data/target_name"].log(self.config["target_name"])
@@ -451,22 +461,12 @@ class CrossValidation:
         run["data/y"].upload(File.as_html(pd.DataFrame(self.config["y"])))
         if self.config["groups"] is not None:
             run["data/groups"].upload(File.as_html(pd.DataFrame(self.config["groups"])))
-            run["data/groups_name"].log(self.config["group"].name)
+            run["data/groups_name"].log(self.config["groups"].name)
         if self.config["slopes"] is not None:
             run["data/slopes"].upload(File.as_html(pd.DataFrame(self.config["slopes"])))
             run["data/slopes_name"].log(
                 pd.DataFrame(self.config["slopes"]).columns.tolist()
             )
-
-        if isinstance(self.config["split_out"], CrossValMethod):
-            self.config["split_out"] = self.config["split_out"].value
-        elif isinstance(self.config["split_out"], CrossValMethod):
-            self.config["split_out"] = self.config["split_out"]
-
-        if isinstance(self.config["split_in"], CrossValMethod):
-            self.config["split_in"] = self.config["split_in"].value
-        elif isinstance(self.config["split_in"], str):
-            self.config["split_in"] = self.config["split_in"]
 
         run["cross_val/cross_val_method_out"].log(self.config["split_out"].value)
         run["cross_val/cross_val_method_in"].log(self.config["split_in"].value)
@@ -494,10 +494,14 @@ class CrossValidation:
         run["run/diagnostics"].log(self.config["diagnostics"])
         run["run/random_seed"].log(self.config["random_seed"])
 
-        if self.results_:
+        if hasattr(self, "results_"):
             summary_df = self.results_.summary
             run["results/summary"].upload(File.as_html(summary_df))
-        self._was_logged = True
+        else:
+            logger.warning(
+                "You have not called perform() yet. No results to log. Call perform() to log the results."
+            )
+        self._was_logged_ = True
         return self
 
     @run_padding
@@ -510,25 +514,32 @@ class CrossValidation:
         Returns:
             (CrossValidation): self
         """
-        if not hasattr(self.config, "run"):
-            self.config["run"] = DummyRun()
-        run = self.config["run"]
-
+        self._prepare_before_perform()
         results = cross_validate(**self.config)
+        self._was_performed_ = True
         self.results_ = CrossValidationResults(results)
-        if self._was_logged:
-            self._log()
-            run["results/summary"].upload(File.as_html(self.results_.summary))
+        self._log()
         return self
 
     def get_results(self) -> CrossValidationResults:
         """Returns a `CrossValidationResults` object. This results object is a wrapper class around the results dict from the `cross_validate` function."""
-        return self.results_
+        if hasattr(self, "results_"):
+            return self.results_
+        else:
+            raise RuntimeError(
+                "You must call perform() before you can get the results."
+            )
+
 
     @property
     def results(self) -> CrossValidationResults:
         """Returns a `CrossValidationResults` object. This results object is a wrapper class around the results dict from the `cross_validate` function."""
-        return self.results_
+        if not self._was_performed_:
+            return self.results_
+        else:
+            raise RuntimeError(
+                "You must call perform() before you can get the results."
+            )
 
 
 if __name__ == "__main__":
