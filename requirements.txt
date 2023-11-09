@@ -1,5 +1,6 @@
 matplotlib==3.8.0
 neptune==1.8.2
+neptune-optuna
 numpy==1.23.4
 openpyxl==3.1.2
 optuna==3.4.0
