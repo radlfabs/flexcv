@@ -2,9 +2,6 @@ import numpy as np
 import pandas as pd
 
 
-RANDOM_SEED = 42
-
-
 def select_random_columns(df: pd.DataFrame, n: int) -> pd.DataFrame:
     """Select n random columns from a pandas DataFrame and return a new DataFrame containing only these columns.
 
@@ -27,6 +24,7 @@ def generate_regression(
     n_groups: int = 5,
     n_slopes: int = 1,
     noise_level: float = 0.1,
+    random_seed: int = 42,
 ) -> tuple[pd.DataFrame, pd.Series, pd.Series, pd.DataFrame]:
     """Generate a dataset for linear regression using the numpy default rng.
 
@@ -46,7 +44,7 @@ def generate_regression(
     RANDOM_LEVEL = 1
 
     # initialize random number generator and generate predictors randomly
-    rng = np.random.default_rng(RANDOM_SEED)
+    rng = np.random.default_rng(random_seed)
     X = rng.integers(-10, 10, (n_samples, m_features))
 
     # generate random coefficients with a linear relationship and add noise
