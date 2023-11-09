@@ -10,19 +10,19 @@ class Run(NeptuneRun):
         pass
 
     def fetch(self):
-        return None
+        return self
 
     def stop(self):
         pass
 
     def __getitem__(self, key):
-        return None
+        return self
 
     def __setitem__(self, key, value):
         pass
 
     def __getattr__(self, key):
-        return None
+        return self
 
     def __setattr__(self, key, value):
         pass
