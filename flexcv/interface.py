@@ -264,19 +264,20 @@ class CrossValidation:
         """
         
         # get values of CrossValMethod enums
-        ALLOWED_METHODS = [method.value for method in CrossValMethod]
+        ALLOWED_STRINGS = [method.value for method in CrossValMethod]
+        ALLOWED_METHODS = [method for method in CrossValMethod]
         
-        if isinstance(split_out, str) and (split_out not in ALLOWED_METHODS):
-            raise TypeError(f"split_out must be a valid CrossValMethod name, was {split_out}. Choose from: " + ", ".join(ALLOWED_METHODS) + ".")
+        if isinstance(split_out, str) and (split_out not in ALLOWED_STRINGS):
+            raise TypeError(f"split_out must be a valid CrossValMethod name, was {split_out}. Choose from: " + ", ".join(ALLOWED_STRINGS) + ".")
         
-        if isinstance(split_in, str) and (split_in not in ALLOWED_METHODS):
-            raise TypeError(f"split_in must be a valid CrossValMethod name, was {split_in}. Choose from: " + ", ".join(ALLOWED_METHODS) + ".")
+        if isinstance(split_in, str) and (split_in not in ALLOWED_STRINGS):
+            raise TypeError(f"split_in must be a valid CrossValMethod name, was {split_in}. Choose from: " + ", ".join(ALLOWED_STRINGS) + ".")
         
         # check values
-        if not (split_out in ALLOWED_METHODS):
+        if isinstance(split_out, CrossValMethod) and (split_out not in ALLOWED_METHODS):
             raise TypeError("split_out must be a valid CrossValMethod ")
 
-        if not (split_in in ALLOWED_METHODS):
+        if isinstance(split_in, CrossValMethod) and (split_in not in ALLOWED_METHODS):
             raise TypeError("split_in must be a valid CrossValMethod")
 
         if not isinstance(n_splits_out, int):
@@ -534,7 +535,7 @@ class CrossValidation:
     @property
     def results(self) -> CrossValidationResults:
         """Returns a `CrossValidationResults` object. This results object is a wrapper class around the results dict from the `cross_validate` function."""
-        if not self._was_performed_:
+        if hasattr(self, "results_"):
             return self.results_
         else:
             raise RuntimeError(
