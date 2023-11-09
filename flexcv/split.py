@@ -112,8 +112,11 @@ class CustomStratifiedGroupKFold(BaseCrossValidator):
 
 
 class CustomStratifiedKFold(BaseCrossValidator):
-    """sklearn's StratifiedKFold adapted for continuous target variables."""
-
+    """Cross Validation Method.
+    This is a variation of StratifiedKFold that uses a custom discretization of the target variable.
+    Stratification is done on the concatination of discretized target variable and group instead of the original target variable.
+    This ensures, that distributions of the target variable per group are similar in each fold.
+    """
     def __init__(self, n_splits, shuffle=True, random_state=42, groups=None):
         self.n_splits = n_splits
         self.shuffle = shuffle
