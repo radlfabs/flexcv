@@ -4,8 +4,8 @@ from unittest.mock import patch
 from unittest.mock import MagicMock
 
 from sklearn.ensemble import RandomForestRegressor
-import pandas as pd
-
+from sklearn.model_selection import KFold
+import numpy as np
     
 from flexcv.interface import CrossValidationResults, CrossValidation
 from flexcv.split import CrossValMethod
@@ -157,6 +157,42 @@ def test_cross_validation_set_splits_invalid_metrics():
     cv = CrossValidation()
     with pytest.raises(TypeError):
         cv.set_splits(metrics="invalid type")
+
+def test_set_splits_with_cross_val_method():
+    cv = CrossValidation()
+    cv.set_splits(split_out=CrossValMethod.KFOLD, split_in=CrossValMethod.KFOLD)
+    assert cv.config["split_out"] == CrossValMethod.KFOLD
+    assert cv.config["split_in"] == CrossValMethod.KFOLD
+
+def test_set_splits_with_string():
+    cv = CrossValidation()
+    cv.set_splits(split_out="KFold", split_in="KFold")
+    assert cv.config["split_out"] == CrossValMethod.KFOLD
+    assert cv.config["split_in"] == CrossValMethod.KFOLD
+
+def test_set_splits_with_sklearn_cross_validator():
+    cv = CrossValidation()
+    kfold = KFold(n_splits=5)
+    cv.set_splits(split_out=kfold, split_in=kfold)
+    assert cv.config["split_out"] == kfold
+    assert cv.config["split_in"] == kfold
+
+def test_set_splits_with_iterator():
+    cv = CrossValidation()
+    iterator = iter([np.array([1, 2, 3]), np.array([4, 5, 6])])
+    cv.set_splits(split_out=iterator, split_in=iterator)
+    assert cv.config["split_out"] == iterator
+    assert cv.config["split_in"] == iterator
+
+def test_set_splits_with_invalid_string():
+    cv = CrossValidation()
+    with pytest.raises(TypeError):
+        cv.set_splits(split_out="InvalidMethod", split_in="InvalidMethod")
+
+def test_set_splits_with_invalid_type():
+    cv = CrossValidation()
+    with pytest.raises(TypeError):
+        cv.set_splits(split_out=123, split_in=123)
         
 def test_cross_validation_set_models_valid():
     # Test set_models method with valid mapping
@@ -373,3 +409,43 @@ def test_cross_validation_results_not_performed():
     cv = CrossValidation()
     with pytest.raises(RuntimeError):
         cv.results
+
+def test_prepare_before_perform():
+    # Test _prepare_before_perform method
+    cv = CrossValidation()
+    cv.config["split_out"] = "kfold"
+    cv.config["split_in"] = "group"
+    cv.config["mapping"] = ModelMappingDict({
+        "RandomForestRegressor": ModelConfigDict({
+            "model": RandomForestRegressor,
+            "parameters": {"n_estimators": 100}
+        })
+    })
+    cv.config["n_trials"] = 100
+    cv._prepare_before_perform()
+    assert cv.config["split_out"] == CrossValMethod.KFOLD
+    assert cv.config["split_in"] == CrossValMethod.GROUP
+    assert isinstance(cv.config["run"], DummyRun)
+    assert cv.config["mapping"]["RandomForestRegressor"]["n_trials"] == 100
+
+def test_prepare_before_perform_with_run():
+    # Test _prepare_before_perform method with a run already set
+    cv = CrossValidation()
+    cv.config["run"] = NeptuneRun()
+    cv._prepare_before_perform()
+    assert isinstance(cv.config["run"], NeptuneRun)
+
+def test_prepare_before_perform_with_n_trials():
+    # Test _prepare_before_perform method with n_trials already set in mapping
+    cv = CrossValidation()
+    cv.config["mapping"] = ModelMappingDict({
+        "RandomForestRegressor": ModelConfigDict({
+            "model": RandomForestRegressor,
+            "parameters": {"n_estimators": 100},
+            "n_trials": 50
+        })
+    })
+    cv.config["n_trials"] = 100
+    cv._prepare_before_perform()
+    assert cv.config["mapping"]["RandomForestRegressor"]["n_trials"] == 50
+    

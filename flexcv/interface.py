@@ -5,10 +5,13 @@ This module contains the CrossValidation class. This class is the central interf
 import logging
 from dataclasses import dataclass
 from pprint import pformat
+from typing import Iterator
 
 import pandas as pd
+import numpy as np
 from neptune.metadata_containers.run import Run as NeptuneRun
 from neptune.types import File
+from sklearn.model_selection import BaseCrossValidator
 
 from .core import cross_validate
 from .metrics import MetricsDict
@@ -199,8 +202,8 @@ class CrossValidation:
 
     def set_splits(
         self,
-        split_out: str | CrossValMethod = CrossValMethod.KFOLD,
-        split_in: str | CrossValMethod = CrossValMethod.KFOLD,
+        split_out: str | CrossValMethod | BaseCrossValidator | Iterator = CrossValMethod.KFOLD,
+        split_in: str | CrossValMethod | BaseCrossValidator | Iterator  = CrossValMethod.KFOLD,
         n_splits_out: int = 5,
         n_splits_in: int = 5,
         scale_out: bool = True,
@@ -441,6 +444,15 @@ class CrossValidation:
             
         if not hasattr(self.config, "run"):
             self.config["run"] = DummyRun()
+            
+        # check for every key in config, if "n_trials" is set
+        # if not, set to the value of self.config["n_trials"]
+        for model_key, inner_dict in self.config["mapping"].items():
+            if "n_trials" not in inner_dict:
+                self.config["mapping"][model_key]["n_trials"] = self.config["n_trials"]
+                
+            elif not isinstance(inner_dict["n_trials"], int):
+                raise TypeError("n_trials must be an integer")
 
     def _log(self):
         """Logs the config to Neptune. If None, a Dummy is instantiated.
@@ -468,9 +480,14 @@ class CrossValidation:
             run["data/slopes_name"].log(
                 pd.DataFrame(self.config["slopes"]).columns.tolist()
             )
-
-        run["cross_val/cross_val_method_out"].log(self.config["split_out"].value)
-        run["cross_val/cross_val_method_in"].log(self.config["split_in"].value)
+        try:
+            run["cross_val/cross_val_method_out"].log(self.config["split_out"].value)
+        except AttributeError:
+            run["cross_val/cross_val_method_out"].log(self.config["split_out"])
+        try:
+            run["cross_val/cross_val_method_in"].log(self.config["split_in"].value)
+        except AttributeError:
+            run["cross_val/cross_val_method_in"].log(self.config["split_in"])
         run["cross_val/n_splits_out"].log(self.config["n_splits_out"])
         run["cross_val/n_splits_in"].log(self.config["n_splits_in"])
         run["cross_val/scale_in"].log(self.config["scale_in"])

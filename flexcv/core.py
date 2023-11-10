@@ -1,6 +1,6 @@
 import logging
 import warnings
-from typing import Dict
+from typing import Dict, Iterator
 
 import numpy as np
 import optuna
@@ -11,6 +11,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.utils.validation import check_random_state
 from statsmodels.tools.sm_exceptions import ConvergenceWarning
+from sklearn.model_selection._split import BaseCrossValidator
 from tqdm import tqdm
 
 from .cv_logging import (
@@ -111,8 +112,8 @@ def cross_validate(
     run: NeptuneRun,
     groups: pd.Series,
     slopes: pd.DataFrame | pd.Series,
-    split_out: CrossValMethod,
-    split_in: CrossValMethod,
+    split_out: CrossValMethod | BaseCrossValidator | Iterator,
+    split_in: CrossValMethod | BaseCrossValidator | Iterator,
     break_cross_val: bool,
     scale_in: bool,
     scale_out: bool,
@@ -140,7 +141,7 @@ def cross_validate(
         run (NeptuneRun): A Run object to log to.
         groups (pd.Series): The grouping or clustering variable.
         slopes (pd.DataFrame | pd.Series): Random slopes variable(s)
-        split_out (CrossValMethod): Outer split strategy.
+        split_out (CrossValMethod | BaseCross): Outer split strategy.
         split_in (CrossValMethod): Inner split strategy.
         break_cross_val (bool): If True, only the first outer fold is evaluated.
         scale_in (bool): If True, the features are scaled in the inner cross-validation to zero mean and unit variance. This works independently of the outer scaling.
@@ -303,7 +304,7 @@ def cross_validate(
             else:
                 # this block performs the inner cross-validation with Optuna
                 
-                n_trials
+                n_trials = mapping[model_name]["n_trials"]
                 n_jobs_cv_int = mapping[model_name]["n_jobs_cv"]
 
                 pipe_in = Pipeline(
@@ -327,11 +328,6 @@ def cross_validate(
                     log_plot_edf=False,
                     study_update_freq=10,  # log every 10th trial,
                 )
-
-                if n_trials == "mapped":  # TODO can this be automatically detected by the CrossValidation Class?
-                    n_trials = mapping[model_name]["n_trials"]
-                if not isinstance(n_trials, int):
-                    raise ValueError("Invalid value for n_trials.")
 
                 # generate numpy random_state object for seeding the sampler
                 random_state = check_random_state(random_seed)
