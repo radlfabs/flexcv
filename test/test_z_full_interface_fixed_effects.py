@@ -1,7 +1,7 @@
 import numpy as np
 import optuna
 from sklearn.ensemble import RandomForestRegressor
-
+from sklearn.model_selection import KFold
 import flexcv.model_postprocessing as mp
 from flexcv.synthesizer import generate_regression
 from flexcv.interface import CrossValidation
@@ -38,8 +38,37 @@ def simple_regression():
     return np.mean(results["LinearModel"]["folds_by_metrics"]["r2"])
 
 
-def test_linear_model():
-    assert np.isclose([simple_regression()], [0.4265339487499462])
+def set_splits_input_kfold_with_linear_model():
+    X, y, _, _ = generate_regression(
+        10, 100, n_slopes=1, noise_level=9.1e-2, random_seed=42
+    )
+    kfold = KFold(n_splits=5, random_state=42, shuffle=True)
+    model_map = ModelMappingDict(
+        {
+            "LinearModel": ModelConfigDict(
+                {
+                    "model": LinearModel,
+                    "requires_formula": True,
+                }
+            ),
+        }
+    )
+
+    cv = CrossValidation()
+    results = (
+        cv.set_data(X, y)
+        .set_models(model_map)
+        .set_splits(kfold)
+        .set_run(Run())
+        .perform()
+        .get_results()
+    )
+
+    return np.mean(results["LinearModel"]["folds_by_metrics"]["r2"])
+
+
+def test_set_splits_input_kfold_with_linear_model():
+    assert np.isclose([set_splits_input_kfold_with_linear_model()], [0.4265339487499462])
 
 
 def random_forest_regression():
