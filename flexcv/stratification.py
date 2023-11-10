@@ -4,9 +4,11 @@ import pandas as pd
 import numpy as np
 
 from numpy.core._exceptions import UFuncTypeError
-from sklearn.model_selection import (
+from sklearn.model_selection._split import (
     BaseCrossValidator,
     GroupsConsumerMixin,
+)
+from sklearn.model_selection import (
     StratifiedGroupKFold,
     StratifiedKFold,
 )
@@ -57,7 +59,7 @@ class ContinuousStratifiedKFold(BaseCrossValidator):
             
         return self.skf.split(X, y_cat)
 
-    def get_n_splits(self, X, y=None, groups=None):
+    def get_n_splits(self, X=None, y=None, groups=None):
         """
 
         Args:
@@ -113,7 +115,7 @@ class ContinuousStratifiedGroupKFold(GroupsConsumerMixin, BaseCrossValidator):
             y_cat = kbins.fit_transform(y.reshape(-1, 1)).flatten().astype(int)  # type: ignore
         return self.sgkf.split(X, y_cat, groups)
 
-    def get_n_splits(self, X, y=None, groups=None):
+    def get_n_splits(self, X=None, y=None, groups=None):
         """
         Returns the number of splitting iterations in the cross-validator.
 
@@ -174,7 +176,7 @@ class ConcatenatedStratifiedKFold(GroupsConsumerMixin, BaseCrossValidator):
 
         return self.skf.split(X, y_concat)
 
-    def get_n_splits(self, X, y=None, groups=None):
+    def get_n_splits(self, X=None, y=None, groups=None):
         """
 
         Args:
