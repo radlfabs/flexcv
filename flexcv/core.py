@@ -1,6 +1,6 @@
 import logging
 import warnings
-from typing import Dict
+from typing import Dict, Iterator
 
 import numpy as np
 import optuna
@@ -11,6 +11,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.utils.validation import check_random_state
 from statsmodels.tools.sm_exceptions import ConvergenceWarning
+from sklearn.model_selection._split import BaseCrossValidator
 from tqdm import tqdm
 
 from .cv_logging import (
@@ -111,8 +112,8 @@ def cross_validate(
     run: NeptuneRun,
     groups: pd.Series,
     slopes: pd.DataFrame | pd.Series,
-    split_out: CrossValMethod,
-    split_in: CrossValMethod,
+    split_out: CrossValMethod | BaseCrossValidator | Iterator,
+    split_in: CrossValMethod | BaseCrossValidator | Iterator,
     break_cross_val: bool,
     scale_in: bool,
     scale_out: bool,
@@ -140,7 +141,7 @@ def cross_validate(
         run (NeptuneRun): A Run object to log to.
         groups (pd.Series): The grouping or clustering variable.
         slopes (pd.DataFrame | pd.Series): Random slopes variable(s)
-        split_out (CrossValMethod): Outer split strategy.
+        split_out (CrossValMethod | BaseCross): Outer split strategy.
         split_in (CrossValMethod): Inner split strategy.
         break_cross_val (bool): If True, only the first outer fold is evaluated.
         scale_in (bool): If True, the features are scaled in the inner cross-validation to zero mean and unit variance. This works independently of the outer scaling.
