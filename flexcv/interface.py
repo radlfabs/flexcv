@@ -441,6 +441,15 @@ class CrossValidation:
             
         if not hasattr(self.config, "run"):
             self.config["run"] = DummyRun()
+            
+        # check for every key in config, if "n_trials" is set
+        # if not, set to the value of self.config["n_trials"]
+        for model_key, inner_dict in self.config["mapping"].items():
+            if "n_trials" not in inner_dict:
+                self.config["mapping"][model_key]["n_trials"] = self.config["n_trials"]
+                
+            elif not isinstance(inner_dict["n_trials"], int):
+                raise TypeError("n_trials must be an integer")
 
     def _log(self):
         """Logs the config to Neptune. If None, a Dummy is instantiated.

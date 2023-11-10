@@ -303,7 +303,7 @@ def cross_validate(
             else:
                 # this block performs the inner cross-validation with Optuna
                 
-                n_trials
+                n_trials = mapping[model_name]["n_trials"]
                 n_jobs_cv_int = mapping[model_name]["n_jobs_cv"]
 
                 pipe_in = Pipeline(
@@ -327,11 +327,6 @@ def cross_validate(
                     log_plot_edf=False,
                     study_update_freq=10,  # log every 10th trial,
                 )
-
-                if n_trials == "mapped":  # TODO can this be automatically detected by the CrossValidation Class?
-                    n_trials = mapping[model_name]["n_trials"]
-                if not isinstance(n_trials, int):
-                    raise ValueError("Invalid value for n_trials.")
 
                 # generate numpy random_state object for seeding the sampler
                 random_state = check_random_state(random_seed)
