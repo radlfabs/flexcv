@@ -1,7 +1,7 @@
 """
 This module contains the CrossValidation class. This class is the central interface to interact with `flexcv`.
 """
-
+import inspect
 import logging
 from dataclasses import dataclass
 from pprint import pformat
@@ -357,22 +357,26 @@ class CrossValidation:
         self.config["objective_scorer"] = objective_scorer
         return self
 
-    def set_mixed_effects(
+    def set_merf(
         self,
-        model_mixed_effects: bool = False,
+        model_mixed_effects: bool | None = False,
+        predict_known_groups_lmm: bool = True,
+        add_merf: bool = False,
         em_max_iterations: int = 100,
         em_stopping_threshold: float = None,
         em_stopping_window: int = None,
-        predict_known_groups_lmm: bool = True,
+
     ):
         """Configure mixed effects parameters.
 
         Args:
           model_mixed_effects (bool): If mixed effects will be modelled. Set the model_mapping attribute accordingly with set_models (Default value = False)
+          predict_known_groups_lmm (bool): For use with LMER, whether or not known groups should be predicted (Default value = True)
+          add_merf (bool): If True, the model is passed into the MERF class after it is evaluated, to obtain mixed effects corrected predictions. (Default value = False)
           em_max_iterations (int): For use with EM. Max number of iterations (Default value = 100)
           em_stopping_threshold (float): For use with EM. Threshold of GLL residuals for early stopping (Default value = None)
           em_stopping_window (int): For use with EM. Number of consecutive iterations to be below threshold for early stopping (Default value = None)
-          predict_known_groups_lmm (bool): For use with LMER, whether or not known groups should be predicted (Default value = True)
+
 
         Returns:
           (CrossValidation): self
@@ -381,14 +385,17 @@ class CrossValidation:
         # check values
         if not isinstance(model_mixed_effects, bool):
             raise TypeError("model_effects must be bool")
+        if not isinstance(predict_known_groups_lmm, bool):
+            raise TypeError("predict_known_groups_lmm must be a boolean")
+        if not isinstance(add_merf, bool):
+            raise TypeError("add_merf must be a boolean")
         if not isinstance(em_max_iterations, int):
             raise TypeError("em_max_iterations must be an integer")
         if em_stopping_threshold and not isinstance(em_stopping_threshold, float):
             raise TypeError("em_stopping_threshold must be a float")
         if em_stopping_window and not isinstance(em_stopping_window, int):
             raise TypeError("em_stopping_window must be an integer")
-        if not isinstance(predict_known_groups_lmm, bool):
-            raise TypeError("predict_known_groups_lmm must be a boolean")
+
 
         # assign values
         self.config["model_effects"] = "mixed" if model_mixed_effects else "fixed"
@@ -433,7 +440,15 @@ class CrossValidation:
 
     def _prepare_before_perform(self):
         """Make preparation steps before performing the cross validation.
-        Checks if a neptune run object has been set. If the user did not provide a neptune run object, a dummy run is instantiated.
+        
+        - Checks if a neptune run object has been set. If the user did not provide a neptune run object, a dummy run is instantiated.
+        - Checks if the split_out and split_in attributes are set to strings and converts the strings to a CrossValMethod enum.
+        
+        Iterates over the ModelMappingDict:
+        - Checks if n_trials is set for every model. If not, set to the value of self.config["n_trials"]. If n_trials is not set for a model and not set for the CrossValidation object, it is not used.
+        - Checks if "add_merf" is set for a model or if it set globally in the class. In the latter case, the value is set for the model.
+        - Checks if the model signature contains "clusters". If so, the model is a mixed effects model and we set a flag "consumes_clusters" to True.
+        
         This method is called by the `perform()` method.
         """
         if isinstance(self.config["split_out"], str):
@@ -447,12 +462,41 @@ class CrossValidation:
             
         # check for every key in config, if "n_trials" is set
         # if not, set to the value of self.config["n_trials"]
+        if not hasattr(self.config, "add_merf"):
+            self.config["add_merf"] = False
+        
+        # check if add_merf is set globally
+        # iterate over all items in the model mapping
+        # if the inenr dict has a key "add_merf" do nothing
+        # if it doesnt and add_merf is set globally, set it for the model
+        try:
+            self.config["add_merf"]
+        except KeyError:
+            self.config["add_merf"] = False
+            
         for model_key, inner_dict in self.config["mapping"].items():
-            if "n_trials" not in inner_dict:
+            if "n_trials" not in inner_dict or hasattr(self.config, "n_trials"):
                 self.config["mapping"][model_key]["n_trials"] = self.config["n_trials"]
+            
+            if "add_merf" not in inner_dict:
+                self.config["mapping"][model_key]["add_merf"] = self.config["add_merf"]
                 
-            elif not isinstance(inner_dict["n_trials"], int):
-                raise TypeError("n_trials must be an integer")
+            # check model signature for groups and slopes
+            # if the model signature contains groups and slopes, the model is a mixed effects model
+            model_class = inner_dict["model"]
+            model_signature_parameters = inspect.signature(model_class).parameters
+            model_fit_signature_parameters = inspect.signature(model_class.fit).parameters
+            
+            self.config["mapping"][model_key]["consumes_clusters"] = "clusters" in model_fit_signature_parameters
+            self.config["mapping"][model_key]["requires_formula"] = "formula" in model_fit_signature_parameters
+            
+            self.config["mapping"][model_key]["model_kwargs"] = {}
+            if "n_jobs" in model_signature_parameters:
+                self.config["mapping"][model_key]["model_kwargs"]["n_jobs"] = self.config["mapping"][model_key]["n_jobs_model"]
+                
+            if "random_state" in model_signature_parameters:
+                self.config["mapping"][model_key]["model_kwargs"]["random_state"] = self.config["random_seed"]
+  
 
     def _log(self):
         """Logs the config to Neptune. If None, a Dummy is instantiated.

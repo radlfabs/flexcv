@@ -61,7 +61,7 @@ class ModelConfigDict(Dict[str, Type]):
 
     Usage:
         ```python
-            {
+            {  # TODO update this to correct defaults
                 "requires_inner_cv": bool,
                         # this flag can be set to control if a model is used in the inner cross validation.
                         # if set to False, the model will be instantiated in the outer cross validation without hyper parameter optimization.
@@ -102,14 +102,10 @@ class ModelConfigDict(Dict[str, Type]):
         """Sets default values for the model configuration dict. This allows us to use the dict without having to pass all the keys every time."""
         # check if dict key exists, if not, set default value
         self._check_key_set_default("requires_inner_cv", False)
-        self._check_key_set_default("requires_formula", False)
-        self._check_key_set_default("allows_seed", True)
-        self._check_key_set_default("allows_n_jobs", True)
         self._check_key_set_default("n_trials", 100)
-        self._check_key_set_default("n_jobs_model", 1)
-        self._check_key_set_default("n_jobs_cv", 1)
+        self._check_key_set_default("n_jobs_model", -1)
+        self._check_key_set_default("n_jobs_cv", -1)
         self._check_key_set_default("params", {})
-        self._check_key_set_default("post_processor", empty_func)
 
         if self._has_key("mixed_model") and not self._has_key("mixed_name"):
             self["mixed_name"] = self["mixed_model"].__repr__()
