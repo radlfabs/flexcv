@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
 
-from flexcv.cv_logging import log_single_model_single_fold
+from flexcv.fold_logging import log_single_model_single_fold
 
 class TestLogSingleModelSingleFold(unittest.TestCase):
     def setUp(self):
@@ -19,7 +19,7 @@ class TestLogSingleModelSingleFold(unittest.TestCase):
         self.results_all_folds = {}
         self.study = MagicMock()
 
-    @patch("flexcv.cv_logging.plt.figure")
+    @patch("flexcv.fold_logging.plt.figure")
     def test_log_single_model_single_fold(self, mock_figure):
         result = log_single_model_single_fold(
             self.y_test,

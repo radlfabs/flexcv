@@ -15,13 +15,10 @@ def lmer_regression():
 
     model_map = ModelMappingDict(
         {
-            "LinearModel": ModelConfigDict(
+            "LMER": ModelConfigDict(
                 {
                     "requires_inner_cv": False,
-                    "requires_formula": True,
-                    "model": LinearModel,
-                    "mixed_model": LinearMixedEffectsModel,
-                    "mixed_name": "MixedLM",
+                    "model": LinearMixedEffectsModel,
                 }
             ),
         }
@@ -32,13 +29,13 @@ def lmer_regression():
         cv.set_data(X, y, group, random_slopes)
         .set_splits(n_splits_out=3)
         .set_models(model_map)
-        .set_mixed_effects(model_mixed_effects=True)
+        .set_merf(model_mixed_effects=True)
         .set_run(run=Run())
         .perform()
         .get_results()
     )
 
-    return np.mean(results["MixedLM"]["folds_by_metrics"]["r2"])
+    return np.mean(results["LMER"]["folds_by_metrics"]["r2"])
 
 
 def test_linear_mixed_effects():

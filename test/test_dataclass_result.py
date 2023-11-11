@@ -1,6 +1,6 @@
 import pandas as pd
 import pytest
-from flexcv.cv_logging import SingleModelFoldResult
+from flexcv.fold_logging import SingleModelFoldResult
 
 def test_single_model_fold_result_init():
     # Test initialization with valid arguments

@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import MagicMock
-from flexcv.cv_logging import CustomNeptuneCallback
+from flexcv.fold_logging import CustomNeptuneCallback
 from flexcv.run import Run
 
 class TestCustomNeptuneCallback(unittest.TestCase):
