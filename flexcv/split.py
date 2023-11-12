@@ -61,7 +61,7 @@ def string_to_crossvalmethod(method: str) -> CrossValMethod:
       (CrossValMethod): The CrossValMethod enum value.
 
     Raises:
-      (ValueError): If the given string does not match any CrossValMethod.
+      (TypeError): If the given string does not match any CrossValMethod.
 
     """
     keys = [e.value for e in CrossValMethod]
@@ -71,7 +71,7 @@ def string_to_crossvalmethod(method: str) -> CrossValMethod:
     if method in method_dict:
         return method_dict[method]
     else:
-        raise ValueError("Invalid Cross Validation method given.")
+        raise TypeError("Invalid Cross Validation method given.")
 
 
 def make_cross_val_split(
