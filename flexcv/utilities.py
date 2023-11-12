@@ -7,19 +7,6 @@ import neptune
 logger = logging.getLogger(__name__)
 
 
-def empty_func(*args, **kwargs) -> None:
-    """A function that does nothing.
-
-    Args:
-      *args: Any argument is accepted.
-      **kwargs: Any keayword argument is accepted.
-
-    Returns:
-      args, kwargs: The passed arguments and keyword arguments.
-    """
-    return args, kwargs
-
-
 def add_model_to_keys(param_grid):
     """This function adds the string "model__" to avery key of the param_grid dict.
     
