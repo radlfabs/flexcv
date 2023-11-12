@@ -40,8 +40,6 @@ Usage:
 
 from typing import Dict, Type
 
-from .utilities import empty_func
-
 
 class ModelConfigDict(Dict[str, Type]):
     """A dictionary that maps model configuration names to their corresponding types.
@@ -51,13 +49,10 @@ class ModelConfigDict(Dict[str, Type]):
         If you don't pass them, it will set
 
         - requires_inner_cv = False
-        - requires_formula = False
-        - allows_seed = True
-        - allows_n_jobs = True
         - n_trials = 100
-        - n_jobs = 1
+        - n_jobs_model = 1
         - n_jobs_cv = 1
-        - post_processor = empty_func
+        - params = {}
 
     Usage:
         ```python
@@ -76,15 +71,8 @@ class ModelConfigDict(Dict[str, Type]):
                         # pass your sklearn model here. It must be a class, not an instance.
                 "params": {},
                         # pass the parameters to be used in the model here. It must be a dictionary of optuna distributions or an empty dict.
-                "post_processor": mp.lm_post,
-                        # pass the post processor function to be used here. It must be a callable.
-                "mixed_model": BaseEstimator,
-                        # pass the mixed effects model to be used here. It must be a class, not an instance.
-                        # it's fit method must have the same signature as the fit method of the sklearn models.
-                "mixed_post_processor": mp.lmer_post,
-                        # pass the post processor function to be used here. It must be a callable.
-                "mixed_name": "MixedLM"
-                        # name of the mixed effects model. It is used to identify the model in the results dictionary.
+                "post_processor": flexcv.model_postprocessing.ModelPostrocessor,
+                        # pass the post processor class to be used here. It must inherit from the flexcv.model_postprocessing.ModelPostrocessor abstract base class.
             }
         ```
         See also:
@@ -155,22 +143,6 @@ class ModelMappingDict(Dict[str, ModelConfigDict]):
     """
 
     pass
-
-
-def map_backwards(mapping) -> dict:
-    """Maps a model mapping backwards:
-    From the mixed effects model to the fixed effects model.
-
-    Args:
-      mapping (dict): The model mapping to map backwards.
-
-    Returns:
-      (dict): The reversed mapped model mapping.
-    """
-    # reduce the nested mapping to key: value["mixed_name"]
-    reduced_mapping = {key: value["mixed_name"] for key, value in mapping.items()}
-    # invert the mapping
-    return {value: key for key, value in reduced_mapping.items()}
 
 
 if __name__ == "__main__":
