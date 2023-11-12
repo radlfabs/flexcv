@@ -276,6 +276,11 @@ class CrossValidation:
         if isinstance(split_in, str) and (split_in not in ALLOWED_STRINGS):
             raise TypeError(f"split_in must be a valid CrossValMethod name, was {split_in}. Choose from: " + ", ".join(ALLOWED_STRINGS) + ".")
         
+        if not isinstance(split_out, str) and not isinstance(split_out, CrossValMethod):
+            raise TypeError("split_out must be a valid CrossValMethod ")
+        
+        if not isinstance(split_in, str) and not isinstance(split_in, CrossValMethod):
+            raise TypeError("split_in must be a valid CrossValMethod")
         # check values
         if isinstance(split_out, CrossValMethod) and (split_out not in ALLOWED_METHODS):
             raise TypeError("split_out must be a valid CrossValMethod ")
@@ -298,6 +303,10 @@ class CrossValidation:
         if metrics and not isinstance(metrics, MetricsDict):
             raise TypeError("metrics must be a MetricsDict")
 
+        if isinstance(split_out, str):
+            split_out = string_to_crossvalmethod(split_out)
+        if isinstance(split_in, str):
+            split_in = string_to_crossvalmethod(split_in)
         # assign values
         self.config["split_out"] = split_out
         self.config["split_in"] = split_in
@@ -357,11 +366,27 @@ class CrossValidation:
         self.config["objective_scorer"] = objective_scorer
         return self
 
+    def set_lmer(self, predict_known_groups_lmm: bool = True):
+        """Configure parameters regarding linear mixed effects regression models.
+
+        Args:
+          predict_known_groups_lmm (bool): For use with LMER, whether or not known groups should be predicted (Default value = True)
+
+        Returns:
+          (CrossValidation): self
+
+        """
+        # check values
+        if not isinstance(predict_known_groups_lmm, bool):
+            raise TypeError("predict_known_groups_lmm must be a boolean")
+
+        # assign values
+        self.config["predict_known_groups_lmm"] = predict_known_groups_lmm
+        return self
+    
     def set_merf(
         self,
-        model_mixed_effects: bool | None = False,
-        predict_known_groups_lmm: bool = True,
-        add_merf: bool = False,
+        add_merf_global: bool = False,
         em_max_iterations: int = 100,
         em_stopping_threshold: float = None,
         em_stopping_window: int = None,
@@ -370,9 +395,7 @@ class CrossValidation:
         """Configure mixed effects parameters.
 
         Args:
-          model_mixed_effects (bool): If mixed effects will be modelled. Set the model_mapping attribute accordingly with set_models (Default value = False)
-          predict_known_groups_lmm (bool): For use with LMER, whether or not known groups should be predicted (Default value = True)
-          add_merf (bool): If True, the model is passed into the MERF class after it is evaluated, to obtain mixed effects corrected predictions. (Default value = False)
+          add_merf_global (bool): If True, the model is passed into the MERF class after it is evaluated, to obtain mixed effects corrected predictions. (Default value = False)
           em_max_iterations (int): For use with EM. Max number of iterations (Default value = 100)
           em_stopping_threshold (float): For use with EM. Threshold of GLL residuals for early stopping (Default value = None)
           em_stopping_window (int): For use with EM. Number of consecutive iterations to be below threshold for early stopping (Default value = None)
@@ -382,12 +405,7 @@ class CrossValidation:
           (CrossValidation): self
 
         """
-        # check values
-        if not isinstance(model_mixed_effects, bool):
-            raise TypeError("model_effects must be bool")
-        if not isinstance(predict_known_groups_lmm, bool):
-            raise TypeError("predict_known_groups_lmm must be a boolean")
-        if not isinstance(add_merf, bool):
+        if not isinstance(add_merf_global, bool):
             raise TypeError("add_merf must be a boolean")
         if not isinstance(em_max_iterations, int):
             raise TypeError("em_max_iterations must be an integer")
@@ -398,11 +416,10 @@ class CrossValidation:
 
 
         # assign values
-        self.config["model_effects"] = "mixed" if model_mixed_effects else "fixed"
+        self.config["add_merf_global"] = add_merf_global
         self.config["em_max_iterations"] = em_max_iterations
         self.config["em_stopping_threshold"] = em_stopping_threshold
         self.config["em_stopping_window"] = em_stopping_window
-        self.config["predict_known_groups_lmm"] = predict_known_groups_lmm
         return self
 
     def set_run(
@@ -459,27 +476,19 @@ class CrossValidation:
             
         if not hasattr(self.config, "run"):
             self.config["run"] = DummyRun()
-            
-        # check for every key in config, if "n_trials" is set
-        # if not, set to the value of self.config["n_trials"]
-        if not hasattr(self.config, "add_merf"):
-            self.config["add_merf"] = False
         
         # check if add_merf is set globally
         # iterate over all items in the model mapping
         # if the inenr dict has a key "add_merf" do nothing
         # if it doesnt and add_merf is set globally, set it for the model
-        try:
-            self.config["add_merf"]
-        except KeyError:
-            self.config["add_merf"] = False
+        self.config["add_merf_global"] = self.config.setdefault("add_merf_global", False)
             
         for model_key, inner_dict in self.config["mapping"].items():
             if "n_trials" not in inner_dict or hasattr(self.config, "n_trials"):
                 self.config["mapping"][model_key]["n_trials"] = self.config["n_trials"]
             
             if "add_merf" not in inner_dict:
-                self.config["mapping"][model_key]["add_merf"] = self.config["add_merf"]
+                self.config["mapping"][model_key]["add_merf"] = self.config["add_merf_global"]
                 
             # check model signature for groups and slopes
             # if the model signature contains groups and slopes, the model is a mixed effects model
