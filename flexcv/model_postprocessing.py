@@ -25,7 +25,7 @@ from statsmodels.tools.tools import maybe_unwrap_results
 
 from . import plot
 from .plot import permutation_importance
-from .fold_logging import SingleModelFoldResult
+from .fold_results_handling import SingleModelFoldResult
 
 
 logger = logging.getLogger(__name__)
