@@ -30,6 +30,7 @@ from .utilities import (
 )
 from .model_mapping import ModelMappingDict
 from .merf import MERF
+from .model_postprocessing import MERFModelPostprocessor
 
 warnings.filterwarnings("ignore", module=r"matplotlib\..*")
 warnings.filterwarnings("ignore", module=r"xgboost\..*")
@@ -37,17 +38,43 @@ warnings.simplefilter("ignore", ConvergenceWarning)
 logger = logging.getLogger(__name__)
 
 
-def preprocess_slopes(Z_train_slope, Z_test_slope, must_scale) -> tuple[np.ndarray, np.ndarray]:
+def preprocess_slopes(Z_train_slope: pd.DataFrame | pd.Series, Z_test_slope: pd.DataFrame | pd.Series, must_scale: bool) -> tuple[np.ndarray, np.ndarray]:
     """This function preprocesses the random slopes variable(s) for use in the mixed effects model.
     
     Args:
-        Z_train_slope (pd.DataFrame): Random slopes variable(s) for the training set.
-        Z_test_slope (pd.DataFrame): Random slopes variable(s) for the test set.
+        Z_train_slope (pd.DataFrame | pd.Series): Random slopes variable(s) for the training set.
+        Z_test_slope (pd.DataFrame | pd.Series): Random slopes variable(s) for the test set.
         must_scale (bool): If True, the random slopes are scaled to zero mean and unit variance.
         
     Returns:
         (tuple[np.ndarray, np.ndarray]): The preprocessed random slopes as a tuple of numpy arrays: (Z_train, Z_test)
     """
+    is_dataframe_train = isinstance(Z_train_slope, pd.DataFrame)
+    is_dataframe_test = isinstance(Z_test_slope, pd.DataFrame)
+    if not is_dataframe_train and not isinstance(Z_train_slope, pd.Series):
+        raise TypeError(
+            f"Z_train_slope must be a pandas DataFrame or pandas Series, not {type(Z_train_slope)}"
+        )
+    if not is_dataframe_test and not isinstance(Z_test_slope, pd.Series):
+        raise TypeError(
+            f"Z_test_slope must be a pandas DataFrame or pandas Series, not {type(Z_test_slope)}"
+        )
+    if not isinstance(must_scale, bool):
+        raise TypeError(
+            f"must_scale must be a bool, not {type(must_scale)}"
+        )
+    
+    # check dimensions
+    if is_dataframe_train and (Z_train_slope.shape[1] != Z_test_slope.shape[1]):
+        raise ValueError(
+            f"Z_train_slope and Z_test_slope must have the same number of columns. Z_train_slope has {Z_train_slope.shape[1]} columns, Z_test_slope has {Z_test_slope.shape[1]} columns."
+        )
+    # convert to DataFrame
+    if not is_dataframe_train:
+        Z_train_slope = pd.DataFrame(Z_train_slope)
+    if not is_dataframe_test:
+        Z_test_slope = pd.DataFrame(Z_test_slope)
+    
     if must_scale:
         scaler = StandardScaler()
         Z_train_slope_scaled = pd.DataFrame(
@@ -79,7 +106,7 @@ def preprocess_slopes(Z_train_slope, Z_test_slope, must_scale) -> tuple[np.ndarr
     return Z_train, Z_test
 
 
-def preprocess_features(X_train, X_test) -> tuple[pd.DataFrame, pd.DataFrame]:
+def preprocess_features(X_train: pd.DataFrame, X_test: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Scales the features to zero mean and unit variance.
     
     Args:
@@ -89,7 +116,21 @@ def preprocess_features(X_train, X_test) -> tuple[pd.DataFrame, pd.DataFrame]:
     Returns:
         (tuple[pd.DataFrame, pd.DataFrame]): The preprocessed features as a tuple of pandas DataFrames: (X_train_scaled, X_test_scaled)
     """
+    if not isinstance(X_train, pd.DataFrame):
+        raise TypeError(
+            f"X_train must be a pandas DataFrame, not {type(X_train)}"
+        )
+    if not isinstance(X_test, pd.DataFrame):
+        raise TypeError(
+            f"X_test must be a pandas DataFrame, not {type(X_test)}"
+        )
+    if X_train.shape[1] != X_test.shape[1]:
+        raise ValueError(
+            f"X_train and X_test must have the same number of columns. X_train has {X_train.shape[1]} columns, X_test has {X_test.shape[1]} columns."
+        )
+    
     scaler = StandardScaler()
+        
     X_train_scaled = pd.DataFrame(
         scaler.fit_transform(X_train),
         columns=X_train.columns,
@@ -100,13 +141,12 @@ def preprocess_features(X_train, X_test) -> tuple[pd.DataFrame, pd.DataFrame]:
     )
     return X_train_scaled, X_test_scaled
     
-    
+
 def cross_validate(
     *,
     X: pd.DataFrame,
     y: pd.Series,
     target_name: str,
-    dataset_name: str,
     run: NeptuneRun,
     groups: pd.Series,
     slopes: pd.DataFrame | pd.Series,
@@ -136,7 +176,6 @@ def cross_validate(
         X (pd.DataFrame): Features.
         y (pd.Series): Target.
         target_name (str): Custom target name.
-        dataset_name (str): Custom dataset name.
         run (NeptuneRun): A Run object to log to.
         groups (pd.Series): The grouping or clustering variable.
         slopes (pd.DataFrame | pd.Series): Random slopes variable(s)
