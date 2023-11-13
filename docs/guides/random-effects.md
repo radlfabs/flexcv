@@ -64,10 +64,7 @@ model_map =ModelMappingDict(
                 "n_jobs_cv": 1,
                 "model": LinearModel,
                 "params": {},
-                "post_processor": empty_func,
                 "mixed_model": LinearMixedEffectsModel,
-                "mixed_post_processor": empty_func,
-                "mixed_name": "MixedLM",
             }
         ),
     }
