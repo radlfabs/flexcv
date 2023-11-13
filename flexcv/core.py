@@ -30,7 +30,7 @@ from .utilities import (
 )
 from .model_mapping import ModelMappingDict
 from .merf import MERF
-from .model_postprocessing import MERFModelPostprocessor
+from .model_postprocessing import MERFModelPostProcessor
 from .utilities import handle_duplicate_kwargs
 
 
@@ -465,9 +465,9 @@ def cross_validate(
                 # call model postprocessing on the single results dataclass
                 postprocessor = mapping[model_name]["post_processor"]()
                 all_models_dict = postprocessor(
-                    results_all_folds,
-                    model_data,
-                    run,
+                    results_all_folds=results_all_folds,
+                    fold_result=model_data,
+                    run=run,
                     features=X_train.columns,
                 )
             except KeyError:
@@ -541,7 +541,7 @@ def cross_validate(
                 
                 all_models_dict = merf_data.make_results(study=study, metrics=metrics)
                 
-                postprocessor = MERFModelPostprocessor()
+                postprocessor = MERFModelPostProcessor()
                 all_models_dict = postprocessor(
                     results_all_folds=all_models_dict,
                     fold_result=merf_data,

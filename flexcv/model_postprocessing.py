@@ -367,7 +367,7 @@ class LinearRegDiagnostic:
             yield resid_index, x, y
 
 
-class ModelPostrocessor(ABC):
+class ModelPostProcessor(ABC):
     def __init__(self):
         pass
     
@@ -383,7 +383,7 @@ class ModelPostrocessor(ABC):
         pass
     
 
-class LinearModelPostprocessor(ModelPostrocessor):
+class LinearModelPostProcessor(ModelPostProcessor):
     def __init__(self):
         super().__init__()
 
@@ -419,7 +419,7 @@ class LinearModelPostprocessor(ModelPostrocessor):
         return results_all_folds
 
 
-class LMERModelPostprocessor(ModelPostrocessor):
+class LMERModelPostProcessor(ModelPostProcessor):
     def __init__(self):
         super().__init__()
 
@@ -448,7 +448,7 @@ class LMERModelPostprocessor(ModelPostrocessor):
         return results_all_folds
 
 
-class RandomForestModelPostprocessor(ModelPostrocessor):
+class RandomForestModelPostProcessor(ModelPostProcessor):
     def __init__(self):
         super().__init__()
         
@@ -497,7 +497,7 @@ class RandomForestModelPostprocessor(ModelPostrocessor):
         return results_all_folds
 
 
-class XGBoostModelPostprocessor(ModelPostrocessor):
+class XGBoostModelPostProcessor(ModelPostProcessor):
     def __init__(self):
         super().__init__()
         
@@ -547,7 +547,7 @@ class XGBoostModelPostprocessor(ModelPostrocessor):
         return results_all_folds
 
 
-class EarthModelPostprocessor(ModelPostrocessor):
+class EarthModelPostProcessor(ModelPostProcessor):
     def __init__(self):
         super().__init__()
     
@@ -593,7 +593,7 @@ class EarthModelPostprocessor(ModelPostrocessor):
         return results_all_folds
 
 
-class SVRModelPostprocessor(ModelPostrocessor):
+class SVRModelPostProcessor(ModelPostProcessor):
     def __init__(self):
         super().__init__()
         
@@ -629,7 +629,7 @@ class SVRModelPostprocessor(ModelPostrocessor):
 
         return results_all_folds
 
-class MERFModelPostprocessor(ModelPostrocessor):
+class MERFModelPostProcessor(ModelPostProcessor):
     def __init__(self):
         super().__init__()
         
