@@ -497,9 +497,10 @@ class CrossValidation:
         # if the inenr dict has a key "add_merf" do nothing
         # if it doesnt and add_merf is set globally, set it for the model
         self.config["add_merf_global"] = self.config.setdefault("add_merf_global", False)
-            
+        self.config["n_trials"] = self.config.setdefault("n_trials", 100)
+        
         for model_key, inner_dict in self.config["mapping"].items():
-            if "n_trials" not in inner_dict or hasattr(self.config, "n_trials"):
+            if "n_trials" not in inner_dict:
                 self.config["mapping"][model_key]["n_trials"] = self.config["n_trials"]
             
             if "add_merf" not in inner_dict:

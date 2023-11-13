@@ -49,7 +49,6 @@ class ModelConfigDict(Dict[str, Type]):
         If you don't pass them, it will set
 
         - requires_inner_cv = False
-        - n_trials = 100
         - n_jobs_model = 1
         - n_jobs_cv = 1
         - params = {}
@@ -71,8 +70,8 @@ class ModelConfigDict(Dict[str, Type]):
                         # pass your sklearn model here. It must be a class, not an instance.
                 "params": {},
                         # pass the parameters to be used in the model here. It must be a dictionary of optuna distributions or an empty dict.
-                "post_processor": flexcv.model_postprocessing.ModelPostrocessor,
-                        # pass the post processor class to be used here. It must inherit from the flexcv.model_postprocessing.ModelPostrocessor abstract base class.
+                "post_processor": flexcv.model_postprocessing.ModelPostProcessor,
+                        # pass the post processor class to be used here. It must inherit from the flexcv.model_postprocessing.ModelPostProcessor abstract base class.
             }
         ```
         See also:
@@ -90,7 +89,6 @@ class ModelConfigDict(Dict[str, Type]):
         """Sets default values for the model configuration dict. This allows us to use the dict without having to pass all the keys every time."""
         # check if dict key exists, if not, set default value
         self._check_key_set_default("requires_inner_cv", False)
-        self._check_key_set_default("n_trials", 100)
         self._check_key_set_default("n_jobs_model", -1)
         self._check_key_set_default("n_jobs_cv", -1)
         self._check_key_set_default("params", {})
