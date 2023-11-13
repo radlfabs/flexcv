@@ -318,6 +318,14 @@ def cross_validate(
             param_grid = mapping[model_name]["params"]
             model_kwargs = mapping[model_name]["model_kwargs"]
             n_trials = mapping[model_name]["n_trials"]
+            
+            requires_formula = mapping[model_name]["requires_formula"]
+            fit_kwargs = {}
+            
+            if requires_formula:
+                fit_kwargs["formula"] = formula
+                fit_kwargs["re_formula"] = re_formula
+            
             # build inner cv folds
             cross_val_split_in = make_cross_val_split(
                 method=split_in, groups=cluster_train, n_splits=n_splits_in, random_state=random_seed  # type: ignore
@@ -401,12 +409,11 @@ def cross_validate(
             train_pred_kwargs = {}
             test_pred_kwargs = {}
             pred_kwargs = {}
-            
+
+
             if mapping[model_name]["consumes_clusters"]:
-                model_kwargs["clusters"] = cluster_train
-                model_kwargs["re_formula"] = re_formula
-                model_kwargs["formula"] = formula
-                
+                fit_kwargs["clusters"] = cluster_train
+                                
                 pred_kwargs["predict_known_groups_lmm"] = predict_known_groups_lmm
                 
                 test_pred_kwargs["clusters"] = cluster_test
@@ -424,6 +431,7 @@ def cross_validate(
             fit_result = best_model.fit(
                     X=X_train_scaled,
                     y=y_train,
+                    **handle_duplicate_kwargs(fit_kwargs)
                 )
             # get test predictions
             y_pred = best_model.predict(
