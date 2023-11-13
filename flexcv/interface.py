@@ -276,12 +276,27 @@ class CrossValidation:
         if isinstance(split_in, str) and (split_in not in ALLOWED_STRINGS):
             raise TypeError(f"split_in must be a valid CrossValMethod name, was {split_in}. Choose from: " + ", ".join(ALLOWED_STRINGS) + ".")
         
-        if not isinstance(split_out, str) and not isinstance(split_out, CrossValMethod):
-            raise TypeError("split_out must be a valid CrossValMethod ")
-        
-        if not isinstance(split_in, str) and not isinstance(split_in, CrossValMethod):
-            raise TypeError("split_in must be a valid CrossValMethod")
-        # check values
+        if not any(
+            [
+                isinstance(split_out, str), 
+                isinstance(split_out, CrossValMethod),
+                isinstance(split_out, BaseCrossValidator),
+                isinstance(split_out, Iterator)
+                ]
+            ):
+            raise TypeError("split_out must be of Type str, CrossValMethod, BaseCrossValidator or Iterator.")
+
+        if not any(
+            [
+                isinstance(split_in, str), 
+                isinstance(split_in, CrossValMethod),
+                isinstance(split_in, BaseCrossValidator),
+                isinstance(split_in, Iterator)
+                ]
+            ):
+            raise TypeError("split_in must be of Type str, CrossValMethod, BaseCrossValidator or Iterator.")
+               
+
         if isinstance(split_out, CrossValMethod) and (split_out not in ALLOWED_METHODS):
             raise TypeError("split_out must be a valid CrossValMethod ")
 
