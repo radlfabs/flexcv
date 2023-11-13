@@ -232,51 +232,17 @@ def test_cross_validation_set_inner_cv_invalid_objective_scorer():
     with pytest.raises(TypeError):
         cv.set_inner_cv(objective_scorer="invalid type")
         
-def test_cross_validation_set_mixed_effects_valid():
-    # Test set_mixed_effects method with valid arguments
+def test_set_lmer_valid():
+    # Test set_lmer method with valid arguments
     cv = CrossValidation()
-    cv.set_mixed_effects(
-        model_mixed_effects=True, 
-        em_max_iterations=100, 
-        em_stopping_threshold=0.1, 
-        em_stopping_window=10, 
-        predict_known_groups_lmm=True
-        )
-    assert cv.config["model_effects"] == "mixed"
-    assert cv.config["em_max_iterations"] == 100
-    assert cv.config["em_stopping_threshold"] == 0.1
-    assert cv.config["em_stopping_window"] == 10
+    cv.set_lmer(predict_known_groups_lmm=True)
     assert cv.config["predict_known_groups_lmm"] == True
 
-def test_cross_validation_set_mixed_effects_invalid_model_mixed_effects():
-    # Test set_mixed_effects method with invalid model_mixed_effects
+def test_set_lmer_invalid_predict_known_groups_lmm():
+    # Test set_lmer method with invalid predict_known_groups_lmm
     cv = CrossValidation()
     with pytest.raises(TypeError):
-        cv.set_mixed_effects(model_mixed_effects="invalid type")
-
-def test_cross_validation_set_mixed_effects_invalid_em_max_iterations():
-    # Test set_mixed_effects method with invalid em_max_iterations
-    cv = CrossValidation()
-    with pytest.raises(TypeError):
-        cv.set_mixed_effects(em_max_iterations="invalid type")
-
-def test_cross_validation_set_mixed_effects_invalid_em_stopping_threshold():
-    # Test set_mixed_effects method with invalid em_stopping_threshold
-    cv = CrossValidation()
-    with pytest.raises(TypeError):
-        cv.set_mixed_effects(em_stopping_threshold="invalid type")
-
-def test_cross_validation_set_mixed_effects_invalid_em_stopping_window():
-    # Test set_mixed_effects method with invalid em_stopping_window
-    cv = CrossValidation()
-    with pytest.raises(TypeError):
-        cv.set_mixed_effects(em_stopping_window="invalid type")
-
-def test_cross_validation_set_mixed_effects_invalid_predict_known_groups_lmm():
-    # Test set_mixed_effects method with invalid predict_known_groups_lmm
-    cv = CrossValidation()
-    with pytest.raises(TypeError):
-        cv.set_mixed_effects(predict_known_groups_lmm="invalid type")
+        cv.set_lmer(predict_known_groups_lmm="invalid type")
         
 def test_cross_validation_set_run_valid():
     # Test set_run method with valid arguments
@@ -286,6 +252,65 @@ def test_cross_validation_set_run_valid():
     assert cv.config["run"] == run
     assert cv.config["diagnostics"] == True
     assert cv.config["random_seed"] == 123
+
+def test_set_merf_valid():
+    # Test set_merf method with valid arguments
+    cv = CrossValidation()
+    cv.set_merf(add_merf_global=True, em_max_iterations=100, em_stopping_threshold=0.1, em_stopping_window=10)
+    assert cv.config["add_merf_global"] == True
+    assert cv.config["em_max_iterations"] == 100
+    assert cv.config["em_stopping_threshold"] == 0.1
+    assert cv.config["em_stopping_window"] == 10
+    
+def test_set_merf_add_merf_defaults():
+    mapping = ModelMappingDict({
+        "RandomForestRegressor": ModelConfigDict({
+            "model": RandomForestRegressor,
+            "parameters": {"n_estimators": 100}
+        })
+    })
+    cv = CrossValidation()
+    cv.set_models(mapping)
+    cv._prepare_before_perform()
+    assert cv.config["mapping"]["RandomForestRegressor"]["add_merf"] == False
+    
+def test_set_merf_add_merf_override():
+    mapping = ModelMappingDict({
+        "RandomForestRegressor": ModelConfigDict({
+            "model": RandomForestRegressor,
+            "parameters": {"n_estimators": 100},
+            "add_merf": True
+        })
+    })
+    cv = CrossValidation()
+    cv.set_models(mapping)
+    cv.set_merf(add_merf_global=False)
+    cv._prepare_before_perform()
+    assert cv.config["mapping"]["RandomForestRegressor"]["add_merf"] == True
+
+def test_set_merf_invalid_add_merf_global():
+    # Test set_merf method with invalid add_merf_global
+    cv = CrossValidation()
+    with pytest.raises(TypeError):
+        cv.set_merf(add_merf_global="invalid type")
+
+def test_set_merf_invalid_em_max_iterations():
+    # Test set_merf method with invalid em_max_iterations
+    cv = CrossValidation()
+    with pytest.raises(TypeError):
+        cv.set_merf(em_max_iterations="invalid type")
+
+def test_set_merf_invalid_em_stopping_threshold():
+    # Test set_merf method with invalid em_stopping_threshold
+    cv = CrossValidation()
+    with pytest.raises(TypeError):
+        cv.set_merf(em_stopping_threshold="invalid type")
+
+def test_set_merf_invalid_em_stopping_window():
+    # Test set_merf method with invalid em_stopping_window
+    cv = CrossValidation()
+    with pytest.raises(TypeError):
+        cv.set_merf(em_stopping_window="invalid type")
 
 def test_cross_validation_set_run_invalid_run():
     # Test set_run method with invalid run
@@ -412,40 +437,82 @@ def test_cross_validation_results_not_performed():
 
 def test_prepare_before_perform():
     # Test _prepare_before_perform method
+    X, y = pd.DataFrame({'column1': [1, 2, 3]}), pd.Series([1, 2, 3])
     cv = CrossValidation()
-    cv.config["split_out"] = "kfold"
-    cv.config["split_in"] = "group"
-    cv.config["mapping"] = ModelMappingDict({
+    cv.set_data(X, y, target_name='target', dataset_name='dataset')
+    cv.set_models(ModelMappingDict({
         "RandomForestRegressor": ModelConfigDict({
             "model": RandomForestRegressor,
             "parameters": {"n_estimators": 100}
         })
-    })
-    cv.config["n_trials"] = 100
+    }))
     cv._prepare_before_perform()
     assert cv.config["split_out"] == CrossValMethod.KFOLD
-    assert cv.config["split_in"] == CrossValMethod.GROUP
+    assert cv.config["split_in"] == CrossValMethod.KFOLD
     assert isinstance(cv.config["run"], DummyRun)
-    assert cv.config["mapping"]["RandomForestRegressor"]["n_trials"] == 100
+    assert cv.config["add_merf_global"] == False
+    assert cv.config["mapping"]["RandomForestRegressor"]["n_trials"] == cv.config["n_trials"]
+    assert cv.config["mapping"]["RandomForestRegressor"]["add_merf"] == cv.config["add_merf_global"]
+    assert cv.config["mapping"]["RandomForestRegressor"]["consumes_clusters"] == False
+    assert cv.config["mapping"]["RandomForestRegressor"]["requires_formula"] == False
+    assert cv.config["mapping"]["RandomForestRegressor"]["model_kwargs"]["n_jobs"] == cv.config["mapping"]["RandomForestRegressor"]["n_jobs_model"]
+    assert cv.config["mapping"]["RandomForestRegressor"]["model_kwargs"]["random_state"] == cv.config["random_seed"]
 
-def test_prepare_before_perform_with_run():
-    # Test _prepare_before_perform method with a run already set
+def test_prepare_before_perform_n_trials_added_to_mapping():
+    # Test _prepare_before_perform method when n_trials is added to mapping
+    X, y = pd.DataFrame({'column1': [1, 2, 3]}), pd.Series([1, 2, 3])
     cv = CrossValidation()
-    cv.config["run"] = NeptuneRun()
-    cv._prepare_before_perform()
-    assert isinstance(cv.config["run"], NeptuneRun)
-
-def test_prepare_before_perform_with_n_trials():
-    # Test _prepare_before_perform method with n_trials already set in mapping
-    cv = CrossValidation()
-    cv.config["mapping"] = ModelMappingDict({
+    cv.config["n_trials"] = 10
+    cv.set_data(X, y, target_name='target', dataset_name='dataset')
+    cv.set_models(ModelMappingDict({
         "RandomForestRegressor": ModelConfigDict({
             "model": RandomForestRegressor,
             "parameters": {"n_estimators": 100},
-            "n_trials": 50
         })
-    })
-    cv.config["n_trials"] = 100
+    }))
     cv._prepare_before_perform()
-    assert cv.config["mapping"]["RandomForestRegressor"]["n_trials"] == 50
+    assert cv.config["mapping"]["RandomForestRegressor"]["n_trials"] == 10
     
+def test_prepare_before_perform_mapping_overrides_n_trials():
+    # Test _prepare_before_perform method when mapping overrides n_trials
+    X, y = pd.DataFrame({'column1': [1, 2, 3]}), pd.Series([1, 2, 3])
+    cv = CrossValidation()
+    cv.config["n_trials"] = 20
+    cv.set_data(X, y, target_name='target', dataset_name='dataset')
+    cv.set_models(ModelMappingDict({
+        "RandomForestRegressor": ModelConfigDict({
+            "model": RandomForestRegressor,
+            "parameters": {"n_estimators": 100},
+            "n_trials": 10
+        })
+    }))
+    cv._prepare_before_perform()
+    assert cv.config["mapping"]["RandomForestRegressor"]["n_trials"] == 10
+    
+def test_prepare_before_perform_invalid_split_out():
+    # Test _prepare_before_perform method with invalid split_out
+    cv = CrossValidation()
+    cv.config["split_out"] = "InvalidMethod"
+    with pytest.raises(TypeError):
+        cv._prepare_before_perform()
+
+def test_prepare_before_perform_invalid_split_in():
+    # Test _prepare_before_perform method with invalid split_in
+    cv = CrossValidation()
+    cv.config["split_in"] = "InvalidMethod"
+    with pytest.raises(TypeError):
+        cv._prepare_before_perform()
+
+def test_prepare_before_perform_invalid_model():
+    # Test _prepare_before_perform method with invalid model
+    X, y = pd.DataFrame({'column1': [1, 2, 3]}), pd.Series([1, 2, 3])
+    cv = CrossValidation()
+    cv.set_data(X, y, target_name='target', dataset_name='dataset')
+    cv.set_models(ModelMappingDict({
+        "InvalidModel": ModelConfigDict({
+            "model": "InvalidModel",
+            "parameters": {"n_estimators": 100}
+        })
+    }))
+    with pytest.raises(TypeError):
+        cv._prepare_before_perform()

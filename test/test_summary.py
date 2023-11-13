@@ -5,7 +5,6 @@ from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
 from flexcv.interface import CrossValidation
 from flexcv.run import Run
 from flexcv.models import LinearModel
-from flexcv.utilities import empty_func
 
 
 def regression_with_summary():
@@ -22,7 +21,6 @@ def regression_with_summary():
                     "n_jobs_model": 1,
                     "model": LinearModel,
                     "params": {},
-                    "post_processor": empty_func,
                 }
             ),
         }

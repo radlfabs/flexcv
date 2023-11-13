@@ -26,9 +26,8 @@ def two_models_regression():
             "RandomForest": ModelConfigDict(
                 {
                     "requires_inner_cv": True,
-                    "requires_formula": False,
                     "n_jobs_model": 1,
-                    "n_jobs_cv": -1,
+                    "n_jobs_cv": 1,
                     "model": RandomForestRegressor,
                     "params": {
                         "max_depth": optuna.distributions.IntDistribution(5, 100),
@@ -36,7 +35,6 @@ def two_models_regression():
                             [10]
                         ),
                     },
-                    "post_processor": mp.rf_post,
                 }
             ),
         }

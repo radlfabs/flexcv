@@ -1,12 +1,11 @@
 import numpy as np
 
 from flexcv.synthesizer import generate_regression
-from flexcv.utilities import empty_func
 from flexcv.interface import CrossValidation
 from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
-from flexcv.models import LinearMixedEffectsModel, LinearModel
+from flexcv.models import LinearMixedEffectsModel
 from flexcv.run import Run
-
+from flexcv.model_postprocessing import LMERModelPostProcessor
 
 def lmer_regression():
     X, y, group, random_slopes = generate_regression(
@@ -19,6 +18,7 @@ def lmer_regression():
                 {
                     "requires_inner_cv": False,
                     "model": LinearMixedEffectsModel,
+                    "post_processor": LMERModelPostProcessor,
                 }
             ),
         }
@@ -29,7 +29,7 @@ def lmer_regression():
         cv.set_data(X, y, group, random_slopes)
         .set_splits(n_splits_out=3)
         .set_models(model_map)
-        .set_merf(model_mixed_effects=True)
+        .set_lmer(predict_known_groups_lmm=True)
         .set_run(run=Run())
         .perform()
         .get_results()
