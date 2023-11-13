@@ -65,7 +65,7 @@ class LinearModel(BaseLinearModel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def fit(self, X, y, **kwargs):
+    def fit(self, X, y, formula, **kwargs):
         """Fit the LM to the given training data.
 
         Args:
@@ -90,7 +90,7 @@ class LinearModel(BaseLinearModel):
 
         data = pd.concat([y, X], axis=1, sort=False)
         data.columns = [y.name] + list(X.columns)
-        md = smf.ols(kwargs["formula"], data)
+        md = smf.ols(formula, data)
         self.md_ = md.fit()
         self.best_params = self.get_summary()
         return self
