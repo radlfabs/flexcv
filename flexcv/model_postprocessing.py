@@ -368,10 +368,11 @@ class LinearRegDiagnostic:
 
 
 class ModelPostrocessor(ABC):
-    def __init__(*args, **kwargs):
+    def __init__(self):
         pass
     
     def __call__(
+        self,
         results_all_folds: dict,
         fold_result: SingleModelFoldResult,
         features: pd.Index | list[str] | np.ndarray[str],
@@ -383,10 +384,10 @@ class ModelPostrocessor(ABC):
     
 
 class LinearModelPostprocessor(ModelPostrocessor):
-    def __init__(*args, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
 
-    def __call__(results_all_folds, fold_result, features, run, *args, **kwargs):
+    def __call__(self, results_all_folds, fold_result, features, run, *args, **kwargs):
         """Postprocessing function for the linear regression model.
         Logs the summary of the model, the VIF and the plots to neptune.
 
@@ -419,10 +420,10 @@ class LinearModelPostprocessor(ModelPostrocessor):
 
 
 class LMERModelPostprocessor(ModelPostrocessor):
-    def __init__(*args, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
 
-    def __call__(results_all_folds, fold_result, features, run, *args, **kwargs):
+    def __call__(self, results_all_folds, fold_result, features, run, *args, **kwargs):
         """Postprocessing function for the linear mixed effects model.
         Logs the summary of the model to neptune.
 
@@ -448,10 +449,10 @@ class LMERModelPostprocessor(ModelPostrocessor):
 
 
 class RandomForestModelPostprocessor(ModelPostrocessor):
-    def __init__(*args, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
         
-    def __call__(results_all_folds, fold_result, features, run, *args, **kwargs):
+    def __call__(self, results_all_folds, fold_result, features, run, *args, **kwargs):
         """Postprocessing function for the random forest model.
         Logs the parameters to Neptune.
         Generates beeswarm plots from SHAP explainers for the training and test data and logs them to Neptune.
@@ -497,10 +498,10 @@ class RandomForestModelPostprocessor(ModelPostrocessor):
 
 
 class XGBoostModelPostprocessor(ModelPostrocessor):
-    def __init__(*args, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
         
-    def __call__(results_all_folds, fold_result, features, run, *args, **kwargs):
+    def __call__(self, results_all_folds, fold_result, features, run, *args, **kwargs):
         """Postprocessing function for the xgboost model.
         Logs the parameters to Neptune.
         Generates beeswarm plots from SHAP explainers for the training and test data and logs them to Neptune.
@@ -547,10 +548,10 @@ class XGBoostModelPostprocessor(ModelPostrocessor):
 
 
 class EarthModelPostprocessor(ModelPostrocessor):
-    def __init__(*args, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
     
-    def __call__(results_all_folds, fold_result, features, run, *args, **kwargs):
+    def __call__(self, results_all_folds, fold_result, features, run, *args, **kwargs):
         """Postprocessing function for the MARS model.
         Logs the parameters to Neptune.
         Creates a variable importance table and logs barplots to neptune.
@@ -593,10 +594,10 @@ class EarthModelPostprocessor(ModelPostrocessor):
 
 
 class SVRModelPostprocessor(ModelPostrocessor):
-    def __init__(*args, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
         
-    def __call__(results_all_folds, fold_result, features, run, *args, **kwargs):
+    def __call__(self, results_all_folds, fold_result, features, run, *args, **kwargs):
         """Postprocessing function for the SVR model.
         Logs the parameters to Neptune.
         Logs permutation importance plots to Neptune.
@@ -629,10 +630,10 @@ class SVRModelPostprocessor(ModelPostrocessor):
         return results_all_folds
 
 class MERFModelPostprocessor(ModelPostrocessor):
-    def __init__(*args, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
         
-    def __call__(results_all_folds, fold_result, y_pred_base, run, *args, **kwargs):
+    def __call__(self, results_all_folds, fold_result, y_pred_base, run, *args, **kwargs):
         """Postprocessing function for the expectation maximization model (MERF).
         Logs training and test plots to Neptune.
 
