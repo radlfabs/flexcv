@@ -31,6 +31,8 @@ from .utilities import (
 from .model_mapping import ModelMappingDict
 from .merf import MERF
 from .model_postprocessing import MERFModelPostprocessor
+from .utilities import handle_duplicate_kwargs
+
 
 warnings.filterwarnings("ignore", module=r"matplotlib\..*")
 warnings.filterwarnings("ignore", module=r"xgboost\..*")
@@ -403,11 +405,9 @@ def cross_validate(
             pred_kwargs = {}
             
             if mapping[model_name]["consumes_clusters"]:
-                model_kwargs["formula"] = formula
-                
-            if mapping[model_name]["consumes_clusters"]:
                 model_kwargs["clusters"] = cluster_train
                 model_kwargs["re_formula"] = re_formula
+                model_kwargs["formula"] = formula
                 
                 pred_kwargs["predict_known_groups_lmm"] = predict_known_groups_lmm
                 
@@ -416,27 +416,26 @@ def cross_validate(
                 
                 train_pred_kwargs["clusters"] = cluster_train
                 train_pred_kwargs["Z"] = Z_train
-        
+            
             # make new instance of the model with the best parameters
-            best_model = model_class(**best_params)
+            best_model = model_class(
+                **handle_duplicate_kwargs(model_kwargs, best_params)
+                )
             
             # Fit the best model on the outer fold
             fit_result = best_model.fit(
                     X=X_train_scaled,
                     y=y_train,
-                    **model_kwargs,
                 )
             # get test predictions
             y_pred = best_model.predict(
                 X=X_test_scaled,
-                **pred_kwargs,
-                **test_pred_kwargs,
+                **handle_duplicate_kwargs(pred_kwargs, test_pred_kwargs),
             )
             # get training predictions
             y_pred_train = best_model.predict(
                 X=X_train_scaled,
-                **pred_kwargs,
-                **train_pred_kwargs,
+                **handle_duplicate_kwargs(pred_kwargs, train_pred_kwargs),
             )
             
             # store the results of the outer fold of the current model in a dataclass
