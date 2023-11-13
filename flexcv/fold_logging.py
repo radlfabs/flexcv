@@ -111,31 +111,31 @@ def log_diagnostics(
         return fig
 
     # log number of samples in each fold
-    run[f"diagnostics/fold_{namestring}/n_samples_train"].log(len(X_train))
-    run[f"diagnostics/fold_{namestring}/n_samples_test"].log(len(X_test))
+    run[f"diagnostics/fold_{namestring}/n_samples_train"].append(len(X_train))
+    run[f"diagnostics/fold_{namestring}/n_samples_test"].append(len(X_test))
 
     fig = get_df_hist_fig(X_train)
-    run[f"diagnostics/fold_{namestring}/train_histograms/X"].log(fig)
+    run[f"diagnostics/fold_{namestring}/train_histograms/X"].append(fig)
     del fig
     plt.close()
     fig = get_series_hist_fig(y_train)
-    run[f"diagnostics/fold_{namestring}/train_histograms/y"].log(fig)
+    run[f"diagnostics/fold_{namestring}/train_histograms/y"].append(fig)
     del fig
     plt.close()
     fig = get_df_hist_fig(X_test)
-    run[f"diagnostics/fold_{namestring}/test_histograms/X"].log(fig)
+    run[f"diagnostics/fold_{namestring}/test_histograms/X"].append(fig)
     del fig
     plt.close()
     fig = get_series_hist_fig(y_test)
-    run[f"diagnostics/fold_{namestring}/test_histograms/y"].log(fig)
+    run[f"diagnostics/fold_{namestring}/test_histograms/y"].append(fig)
     del fig
     plt.close()
 
     # log groups in each fold
     if effects == "mixed":
-        run[f"diagnostics/fold_{namestring}/groups_train"].log(
+        run[f"diagnostics/fold_{namestring}/groups_train"].append(
             str(cluster_train.unique().tolist())
         )
-        run[f"diagnostics/fold_{namestring}/groups_test"].log(
+        run[f"diagnostics/fold_{namestring}/groups_test"].append(
             str(cluster_test.unique().tolist())
         )

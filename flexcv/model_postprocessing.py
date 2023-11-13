@@ -405,14 +405,14 @@ class LinearModelPostProcessor(ModelPostProcessor):
         # therefore, we need to get the summary via the model object and simply overwrite the empty logs
         params = fold_result.fit_result.get_summary()
 
-        run[f"{fold_result.model_name}/Summary/{fold_result.k}"].upload(
+        run[f"{fold_result.model_name}/Summary"].append(
             File.from_content(params, extension="html")
         )
         results_all_folds[fold_result.model_name]["parameters"][fold_result.k] = params
 
         vif, fig, ax = LinearRegDiagnostic(fold_result.fit_result.md_)()  # type: ignore   instance has to be called after __init__
-        run[f"{fold_result.model_name}/VIF/{fold_result.k}"].upload(File.as_html(vif))
-        run[f"{fold_result.model_name}/Plots"].log(fig)
+        run[f"{fold_result.model_name}/VIF"].append(File.as_html(vif))
+        run[f"{fold_result.model_name}/Plots"].append(fig)
         del fig
         del vif
         del ax
@@ -441,7 +441,7 @@ class LMERModelPostProcessor(ModelPostProcessor):
         # therefore, we need to get the summary via the model object and simply overwrite the empty logs
         params = fold_result.fit_result.get_summary()
 
-        run[f"{fold_result.model_name}/Summary/{fold_result.k}"].upload(
+        run[f"{fold_result.model_name}/Summary"].append(
             File.from_content(params, extension="html")
         )
         results_all_folds[fold_result.model_name]["parameters"][fold_result.k] = params
@@ -518,7 +518,6 @@ class XGBoostModelPostProcessor(ModelPostProcessor):
         """
         explainer = shap.TreeExplainer(fold_result.best_model)
         shap_values = explainer.shap_values(fold_result.X_train)
-        shap_explainer = explainer(fold_result.X_train)
         plot.plot_shap(
             shap_values=shap_values,
             X=fold_result.X_train,
@@ -570,7 +569,7 @@ class EarthModelPostProcessor(ModelPostProcessor):
             imp_df: pd.DataFrame = fold_result.best_model.get_variable_importance(
                 kwargs["features"]
             )
-            run["MARS/FeatImportance/Table"].upload(File.as_html(imp_df))
+            run["MARS/FeatImportance/Table"].append(File.as_html(imp_df))
             for col in imp_df.columns:
                 # plot all rows of col where col is not 0
                 fig = plt.figure()
@@ -579,16 +578,14 @@ class EarthModelPostProcessor(ModelPostProcessor):
                 try:
                     tmp.plot.barh()
                     plt.title(f"{col} Variable Importance")
-                    run[f"MARS/FeatImportance/{fold_result.k}"].log(fig)
+                    run[f"MARS/FeatImportance/"].append(fig)
                 except Exception as e:
                     logger.info(f"{e}")
                     logger.info("Could not plot MARS barplot. Continuing.")
                 del fig
                 plt.close()
 
-            run[f"{fold_result.model_name}/BestParams/{fold_result.k}"] = pformat(
-                fold_result.best_params
-            )
+            run[f"{fold_result.model_name}/BestParams"].append(pformat(fold_result.best_params))
 
         return results_all_folds
 
@@ -624,8 +621,8 @@ class SVRModelPostProcessor(ModelPostProcessor):
                 fold_result.y_test,
                 fold_result.X_test.columns,
             )
-            run["SVR/PermFeatImportance/Figures"].log(fig)
-            run["SVR/PermFeatImportance/Table"].upload(File.as_html(tmp_df))
+            run["SVR/PermFeatImportance/Figures"].append(fig)
+            run["SVR/PermFeatImportance/Table"].append(File.as_html(tmp_df))
 
         return results_all_folds
 

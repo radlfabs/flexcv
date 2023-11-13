@@ -120,16 +120,11 @@ class SingleModelFoldResult:
         results_all_folds[self.model_name]["y_train"].append(self.y_train)
 
         for key, value in eval_metrics.items():
-            run[f"{self.model_name}/{key}"].log(value)
-        if inner_cv_exists:
-            run[f"{self.model_name}/MSE_IN"].log(mse_in_test)
-            run[f"{self.model_name}/MSETRAIN_IN"].log(mse_in_train)
-        else:
-            run[f"{self.model_name}/MSE_IN"].log("N/A")
-            run[f"{self.model_name}/MSETRAIN_IN"].log("N/A")
-        run[f"{self.model_name}/OF"].log(of)
+            run[f"{self.model_name}/{key}"].append(value)
+
+        run[f"{self.model_name}/ObjectiveValue"].append(of)
         run[f"{self.model_name}/Model/{self.k}"].upload(File.as_pickle(self.best_model))
-        run[f"{self.model_name}/Parameters/{self.k}"] = pformat(self.best_params)
-        run[f"{self.model_name}/ResPlot/{self.k}"].log(res_vs_fitted_plot(self.y_test, self.y_pred))
+        run[f"{self.model_name}/Parameters/"].append(pformat(self.best_params))
+        run[f"{self.model_name}/ResPlot/"].append(res_vs_fitted_plot(self.y_test, self.y_pred))
         plt.close()
         return results_all_folds

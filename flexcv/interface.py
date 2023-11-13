@@ -80,6 +80,8 @@ class CrossValidation:
     def __init__(self) -> None:
         self._was_logged_ = False
         self._was_performed_ = False
+        self._config_logged_ = False
+        self._result_logged_ = False
         self.config = {
             # Data related
             "X": None,
@@ -195,7 +197,7 @@ class CrossValidation:
         if target_name:
             self.config["target_name"] = target_name
         else:
-            self.config["target_name"] = y.name
+            self.config["target_name"] = str(y.name)
         if dataset_name:
             self.config["dataset_name"] = dataset_name
         return self
@@ -489,7 +491,7 @@ class CrossValidation:
         if isinstance(self.config["split_in"], str):
             self.config["split_in"] = string_to_crossvalmethod(self.config["split_in"])
             
-        if not hasattr(self.config, "run"):
+        if not "run" in self.config:
             self.config["run"] = DummyRun()
         
         # check if add_merf is set globally
@@ -523,7 +525,7 @@ class CrossValidation:
                 self.config["mapping"][model_key]["model_kwargs"]["random_state"] = self.config["random_seed"]
   
 
-    def _log(self):
+    def _log_config(self):
         """Logs the config to Neptune. If None, a Dummy is instantiated.
 
         Args:
@@ -535,60 +537,61 @@ class CrossValidation:
         """
         run = self.config["run"]
 
-        run["data/dataset_name"].log(self.config["dataset_name"])
-        run["data/target_name"].log(self.config["target_name"])
-        run["data/model_effects"].log(self.config["model_effects"])
-
-        run["data/X"].upload(File.as_html(self.config["X"]))
-        run["data/y"].upload(File.as_html(pd.DataFrame(self.config["y"])))
+        #run["Data/DatasetName"] = self.config["dataset_name"] if self.config["dataset_name"] is not None else "None"
+        run["Data/TargetName"] = self.config["target_name"]
+        run["Data/model_effects"] = self.config["model_effects"]
+        run["Data/X"].upload(File.as_html(self.config["X"]))
+        run["Data/y"].upload(File.as_html(pd.DataFrame(self.config["y"])))
+        
         if self.config["groups"] is not None:
-            run["data/groups"].upload(File.as_html(pd.DataFrame(self.config["groups"])))
-            run["data/groups_name"].log(self.config["groups"].name)
+            run["Data/groups"].upload(File.as_html(pd.DataFrame(self.config["groups"])))
+            run["Data/groups_name"] = self.config["groups"].name
+            
         if self.config["slopes"] is not None:
-            run["data/slopes"].upload(File.as_html(pd.DataFrame(self.config["slopes"])))
-            run["data/slopes_name"].log(
-                pd.DataFrame(self.config["slopes"]).columns.tolist()
-            )
+            run["Data/slopes"].upload(File.as_html(pd.DataFrame(self.config["slopes"])))
+            run["Data/slopes_name"] = pd.DataFrame(self.config["slopes"]).columns.tolist()
+    
         try:
-            run["cross_val/cross_val_method_out"].log(self.config["split_out"].value)
+            run["Config/Split/cross_val_method_out"] = self.config["split_out"].value
         except AttributeError:
-            run["cross_val/cross_val_method_out"].log(self.config["split_out"])
+            run["Config/Split/cross_val_method_out"] = self.config["split_out"]
         try:
-            run["cross_val/cross_val_method_in"].log(self.config["split_in"].value)
+            run["Config/Split/cross_val_method_in"] = self.config["split_in"].value
         except AttributeError:
-            run["cross_val/cross_val_method_in"].log(self.config["split_in"])
-        run["cross_val/n_splits_out"].log(self.config["n_splits_out"])
-        run["cross_val/n_splits_in"].log(self.config["n_splits_in"])
-        run["cross_val/scale_in"].log(self.config["scale_in"])
-        run["cross_val/scale_out"].log(self.config["scale_out"])
-        run["cross_val/break_cross_val"].log(self.config["break_cross_val"])
-        run["cross_val/metrics"].log(pformat(self.config["metrics"]))
+            run["Config/Split/cross_val_method_in"] = self.config["split_in"]
 
-        run["models/mapping"].log(pformat(self.config["mapping"]))
-        run["optimization/n_trials"].log(self.config["n_trials"])
-        run["optimization/objective_scorer"].log(
-            pformat(self.config["objective_scorer"])
-        )
-        run["mixed_effects/em_max_iterations"].log(self.config["em_max_iterations"])
-        run["mixed_effects/em_stopping_threshold"].log(
-            self.config["em_stopping_threshold"]
-        )
-        run["mixed_effects/em_stopping_window"].log(self.config["em_stopping_window"])
-        run["mixed_effects/predict_known_groups_lmm"].log(
-            self.config["predict_known_groups_lmm"]
-        )
+        
+        if self.config["metrics"] is not None:
+            run["Config/Split/metrics"] = pformat(self.config["metrics"])
+        else:
+            run["Config/Split/metrics"] = "default"
+            
+        run["Config/Split/n_splits_out"] = self.config["n_splits_out"]
+        run["Config/Split/n_splits_in"] = self.config["n_splits_in"]
+        run["Config/Split/scale_in"] = self.config["scale_in"]
+        run["Config/Split/scale_out"] = self.config["scale_out"]
+        run["Config/Split/break_cross_val"] = self.config["break_cross_val"]
+        run["ModelMapping"] = pformat(self.config["mapping"])
+        run["Config/Optimization/n_trials"] = self.config["n_trials"]
+        run["Config/Optimization/objective_scorer"] = pformat(self.config["objective_scorer"])
+        run["Config/MixedEffects/em_max_iterations"] = self.config["em_max_iterations"]
+        run["Config/MixedEffects/em_stopping_threshold"] = self.config["em_stopping_threshold"]
+        run["Config/MixedEffects/em_stopping_window"] = self.config["em_stopping_window"]
+        run["Config/MixedEffects/predict_known_groups_lmm"] = self.config["predict_known_groups_lmm"]
+        run["Config/Run/diagnostics"] = self.config["diagnostics"]
+        run["Config/Run/random_seed"] = self.config["random_seed"]
+        self._config_logged_ = True
 
-        run["run/diagnostics"].log(self.config["diagnostics"])
-        run["run/random_seed"].log(self.config["random_seed"])
-
+    def _log_results(self):
+        """This function logs the results to Neptune."""
         if hasattr(self, "results_"):
             summary_df = self.results_.summary
-            run["results/summary"].upload(File.as_html(summary_df))
+            self.config["run"]["Results/Summary"].upload(File.as_html(summary_df))
         else:
             logger.warning(
                 "You have not called perform() yet. No results to log. Call perform() to log the results."
             )
-        self._was_logged_ = True
+        self._result_logged_ = True
         return self
 
     @run_padding
@@ -602,10 +605,12 @@ class CrossValidation:
             (CrossValidation): self
         """
         self._prepare_before_perform()
+        self._log_config()
         results = cross_validate(**self.config)
         self._was_performed_ = True
         self.results_ = CrossValidationResults(results)
-        self._log()
+        self._log_results()
+        self._was_logged_ = self._config_logged_ and self._result_logged_
         return self
 
     def get_results(self) -> CrossValidationResults:

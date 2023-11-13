@@ -117,7 +117,7 @@ class LinearMixedEffectsModel(BaseLinearModel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def fit(self, X, y, clusters, re_formula, **kwargs):
+    def fit(self, X, y, clusters, formula, re_formula, **kwargs):
         """Fit the LMER model to the given training data.
 
         Args:
@@ -164,7 +164,7 @@ class LinearMixedEffectsModel(BaseLinearModel):
         # if re_formula is None we pass a empty dict, else we pass the re_formula
         re_formula_dict = {"re_formula": re_formula} if self.re_formula else {}
         md = smf.mixedlm(
-            formula=kwargs["formula"],
+            formula=formula,
             data=data,
             groups=clusters.name,
             **re_formula_dict,

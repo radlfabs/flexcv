@@ -90,7 +90,7 @@ def plot_merf_training_stats(run, model, model_name, num_clusters_to_plot=5) -> 
     tmp_title = "$b_i$ vs iterations\n" + f"({num_clusters_to_plot} clusters shown)"
     axs[1, 1].set_title(tmp_title)
     set_axes_params(axs[1, 1])
-    run[f"{model_name}/Plots/Training_Stats"].log(fig)
+    run[f"{model_name}/Plots/Training_Stats"].append(fig)
     plt.close(fig)
 
     num_random_effects = model.trained_b.shape[1]
@@ -117,7 +117,7 @@ def plot_merf_training_stats(run, model, model_name, num_clusters_to_plot=5) -> 
                 "Errors"
             ] = "Error in plot_merf_training_stats: model.trained_b.hist(bins=100, ax=ax)"
     plt.tight_layout()
-    run[f"{model_name}/Plots/Training_Hists"].log(fig)
+    run[f"{model_name}/Plots/Training_Hists"].append(fig)
     plt.close(fig)
 
     return None
@@ -142,7 +142,7 @@ def plot_merf_results(
     plt.legend()
     plt.tight_layout()
 
-    run[f"{model_name}/Plots/Predictions"].log(fig)
+    run[f"{model_name}/Plots/Predictions"].append(fig)
     plt.close(fig)
     plot_merf_training_stats(
         run=run,
@@ -166,8 +166,9 @@ def plot_shap(
     plt.close()
     plt.cla()
     shap.summary_plot(shap_values, X, show=False)
+    matplotlib_settings()
     f = plt.gcf()
-    run[f"{log_destination}Importance"].log(f)
+    run[f"{log_destination}Importance"].append(f)
     del f
 
     if dependency:
@@ -176,7 +177,7 @@ def plot_shap(
             plt.cla()
             shap.dependence_plot(col_name, shap_values, X, show=False, alpha=0.5)
             f = plt.gcf()
-            run[f"{log_destination}Dependency"].log(f)
+            run[f"{log_destination}Dependency"].append(f)
             del f
 
     return None
@@ -194,7 +195,7 @@ def plot_qq(
     plt.cla()
     fig = sm.qqplot(y - yhat, line="r")
     plt.title(f"QQ plot of residuals - {model_name}")
-    run[f"{log_destination}{model_name}_QQ"].log(fig)
+    run[f"{log_destination}{model_name}_QQ"].append(fig)
     del fig
     return None
 
