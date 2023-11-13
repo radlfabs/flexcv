@@ -161,7 +161,6 @@ def cross_validate(
     n_splits_in: int,
     random_seed: int,
     model_effects: str,
-    n_trials: int,
     mapping: ModelMappingDict,
     metrics: MetricsDict,
     objective_scorer: ObjectiveScorer,
@@ -190,7 +189,6 @@ def cross_validate(
         n_splits_in (int): Number of inner cross-validation folds.
         random_seed (int): Seed for all random number generators.
         model_effects (str): If "fixed", only fixed effects are used. If "mixed", both fixed and random effects are used.
-        n_trials (int): Number of trials for the inner cross-validation, i.e. the number of hyperparameter combinations to sample from the distributions.
         mapping (ModelMappingDict): The mapping providing model instances, hyperparameter distributions, and postprocessing functions.
         metrics (MetricsDict): A dict of metrics to be used as the evaluation metric for the outer cross-validation.
         objective_scorer (ObjectiveScorer): A custom objective scorer object to provide the evaluation metric for the inner cross-validation.
@@ -319,7 +317,7 @@ def cross_validate(
             model_class = mapping[model_name]["model"]
             param_grid = mapping[model_name]["params"]
             model_kwargs = mapping[model_name]["model_kwargs"]
-            
+            n_trials = mapping[model_name]["n_trials"]
             # build inner cv folds
             cross_val_split_in = make_cross_val_split(
                 method=split_in, groups=cluster_train, n_splits=n_splits_in, random_state=random_seed  # type: ignore
