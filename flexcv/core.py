@@ -413,7 +413,7 @@ def cross_validate(
 
             if mapping[model_name]["consumes_clusters"]:
                 fit_kwargs["clusters"] = cluster_train
-                                
+                fit_kwargs["re_formula"] = re_formula
                 pred_kwargs["predict_known_groups_lmm"] = predict_known_groups_lmm
                 
                 test_pred_kwargs["clusters"] = cluster_test
@@ -479,7 +479,7 @@ def cross_validate(
             ###### MERF EVALUATION #################
             # The base model is passed to the MERF class for evaluation in Expectation Maximization (EM) algorithm
 
-                merf_name = f"{model_name}_MERF"
+                merf_name = f"MERF({model_name})"
                 logger.info(f"Evaluating {merf_name}...")
                 
                 # tag the base prediction
@@ -492,42 +492,31 @@ def cross_validate(
                     gll_early_stop_threshold=em_stopping_threshold,
                     gll_early_stopping_window=em_stopping_window,
                     log_gll_per_iteration=False,
-                    **model_seed,
                 )
                 # fit the mixed model using cluster variable and Z for slopes
                 fit_result = merf.fit(
                     X=X_train_scaled,
                     y=y_train,
-                    clusters=cluster_train,
                     Z=Z_train,
+                    clusters=cluster_train,
                 )
 
-                # fit the model using the cluster variable and re_formula for slopes
-                fit_result = merf.fit(
-                        X=X_train_scaled,
-                        y=y_train,
-                        clusters=cluster_train,
-                        formula=formula,
-                        re_formula=re_formula,
-                    )
                 # get test predictions
                 y_pred = merf.predict(
                     X=X_test_scaled,
                     clusters=cluster_test,
                     Z=Z_test,
-                    predict_known_groups_lmm=predict_known_groups_lmm,
                 )
                 # get training predictions
                 y_pred_train = merf.predict(
                     X=X_train_scaled,
                     clusters=cluster_train,
                     Z=Z_train,
-                    predict_known_groups_lmm=predict_known_groups_lmm,
                 )
 
                 merf_data = SingleModelFoldResult(
                     k=k,
-                    model_name=mapping[model_name]["mixed_name"],
+                    model_name=merf_name,
                     best_model=merf,
                     best_params=best_params,
                     y_pred=y_pred,
@@ -539,7 +528,7 @@ def cross_validate(
                     fit_result=fit_result,
                 )
                 
-                all_models_dict = merf_data.make_results(study=study, metrics=metrics)
+                all_models_dict = merf_data.make_results(run=run, results_all_folds=results_all_folds, study=study, metrics=metrics)
                 
                 postprocessor = MERFModelPostProcessor()
                 all_models_dict = postprocessor(
@@ -547,7 +536,7 @@ def cross_validate(
                     fold_result=merf_data,
                     run=run,
                     y_pred_base=y_pred_base,
-                    mixed_name=mapping[model_name]["mixed_name"],
+                    mixed_name=merf_name,
                 )
 
         print()
