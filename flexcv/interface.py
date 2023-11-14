@@ -7,6 +7,7 @@ import warnings
 from dataclasses import dataclass
 from pprint import pformat
 from typing import Iterator
+import pathlib
 
 import pandas as pd
 import numpy as np
@@ -23,6 +24,8 @@ from .utilities import add_module_handlers, run_padding
 from .model_mapping import ModelConfigDict, ModelMappingDict
 from .run import Run as DummyRun
 from .model_postprocessing import ModelPostProcessor
+from .yaml_parser import read_mapping_from_yaml_file
+
 
 logger = logging.getLogger(__name__)
 add_module_handlers(logger)
@@ -357,17 +360,44 @@ class CrossValidation:
 
     def set_models(
         self,
-        mapping: ModelMappingDict,
+        mapping: ModelMappingDict = None,
+        path: str | pathlib.Path = None,
     ):
-        """Set your models and related parameters.
+        """Set your models and related parameters. Pass a ModelMappingDict or a path to a yaml file.
 
         Args:
-          mapping (ModelMappingDict[str, ModelConfigDict]): Dict of model names and model configurations. See ModelMappingDict for more information.
-
+          mapping (ModelMappingDict[str, ModelConfigDict]): Dict of model names and model configurations. See ModelMappingDict for more information. (Default value = None)
+          path (str | pathlib.Path): Path to a yaml file containing a model mapping. See ModelMappingDict for more information. (Default value = None)
         Returns:
           (CrossValidation): self
-
+          
+        Example:
+            In your yaml file:
+            ```yaml
+            RandomForest:
+                model: sklearn.ensemble.RandomForestRegressor
+                post_processor: flexcv.model_postprocessing.MixedEffectsPostProcessor
+                requires_inner_cv: True
+                params:
+                    max_depth: !Int
+                        low: 1
+                        high: 10
+            ```
+            In your code:
+            ```python
+            >>> from flexcv import CrossValidation
+            >>> cv = CrossValidation()
+            >>> cv.set_models(path="path/to/your/yaml/file")          
+            ```
+            This will automatically read the yaml file and create a ModelMappingDict.
+            It even takes care of the imports and instantiates the classes of model, postprocessor and for the optune distributions.
         """
+        if mapping is None and path is None:
+            raise ValueError("You must provide either a mapping or a path to a yaml file")
+        
+        if isinstance(mapping, str) or isinstance(mapping, pathlib.Path):
+            mapping = read_mapping_from_yaml_file(mapping)
+        
         # check values
         if not isinstance(mapping, ModelMappingDict):
             raise TypeError("mapping must be a ModelMappingDict")
