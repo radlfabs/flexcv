@@ -1,0 +1,52 @@
+LinearModel:
+    requires_inner_cv: False
+    n_trials: 100
+    n_jobs_model: 1
+    n_jobs_cv: 1
+    model: flexcv.models.LinearModel
+    params: {}
+    post_processor: flexcv.model_postprocessing.LinearModelPostProcessor
+
+RandomForest:
+  requires_inner_cv: true
+  n_trials: 400
+  n_jobs_model: 1
+  n_jobs_cv: -1
+  model: sklearn.ensemble.RandomForestRegressor
+  params:
+    max_depth: !Int
+      low: 5
+      high: 100
+    min_samples_split: !Int
+      low: 2
+      high: 1000
+      log: true
+    min_samples_leaf: !Int
+      low: 2
+      high: 5000
+      log: true
+    max_samples: !Float
+      low: 0.0021
+      high: 0.9
+    max_features: !Int
+      low: 1
+      high: 10
+    max_leaf_nodes: !Int
+      low: 10
+      high: 40000
+    min_impurity_decrease: !Float
+      low: 0.0000000008
+      high: 0.02
+      _kwargs:
+        log: true
+    min_weight_fraction_leaf: !Float
+      low: 0, 
+      high: 0.5
+    ccp_alpha: !Float
+      low: 1e-08
+      high: 0.01
+    n_estimators: !Int
+      low: 2
+      high: 7000
+  post_processor: flexcv.model_postprocessing.RandomForestModelPostProcessor
+  add_merf: true
