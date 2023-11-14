@@ -9,6 +9,11 @@ from flexcv.interface import ModelConfigDict
 from flexcv.interface import ModelMappingDict
 from flexcv.run import Run
 from flexcv.models import LinearModel
+from flexcv.model_postprocessing import (
+    LinearModelPostProcessor,
+    LMERModelPostProcessor,
+    RandomForestModelPostProcessor,
+)
 
 
 def simple_regression():
@@ -28,11 +33,7 @@ def simple_regression():
 
     cv = CrossValidation()
     results = (
-        cv.set_data(X, y)
-        .set_models(model_map)
-        .set_run(Run())
-        .perform()
-        .get_results()
+        cv.set_data(X, y).set_models(model_map).set_run(Run()).perform().get_results()
     )
 
     return np.mean(results["LinearModel"]["folds_by_metrics"]["r2"])
@@ -49,6 +50,7 @@ def set_splits_input_kfold_with_linear_model():
                 {
                     "model": LinearModel,
                     "requires_formula": True,
+                    "post_processor": LinearModelPostProcessor,
                 }
             ),
         }
@@ -68,7 +70,9 @@ def set_splits_input_kfold_with_linear_model():
 
 
 def test_set_splits_input_kfold_with_linear_model():
-    assert np.isclose([set_splits_input_kfold_with_linear_model()], [0.4265339487499462])
+    assert np.isclose(
+        [set_splits_input_kfold_with_linear_model()], [0.4265339487499462]
+    )
 
 
 def random_forest_regression():
@@ -82,7 +86,7 @@ def random_forest_regression():
                 {
                     "requires_inner_cv": True,
                     "requires_formula": False,
-                    "n_jobs_model": 1,
+                    "n_jobs_model": -1,
                     "n_jobs_cv": -1,
                     "model": RandomForestRegressor,
                     "params": {
@@ -91,7 +95,8 @@ def random_forest_regression():
                             [10]
                         ),
                     },
-                    "post_processor": mp.rf_post,
+                    "n_trials": 3,
+                    "post_processor": RandomForestModelPostProcessor,
                 }
             ),
         }
@@ -101,7 +106,6 @@ def random_forest_regression():
     results = (
         cv.set_data(X, y)
         .set_models(model_map)
-        .set_inner_cv(3)
         .set_splits(n_splits_out=3)
         .perform()
         .get_results()

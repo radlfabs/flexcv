@@ -1,55 +1,89 @@
 ## Evaluating multiple models
 
-`flexcv` offers a great way of working with multiple models in a single machine learning run. It just iterates through the `ModelMappingDict`. As additional benefit, it provides extensive logging, results summaries and useful information such as progress bars for all layers of processes.
+`flexcv` offers two ways of passing multiple models in set-up to our CrossValidation interface class. You either can call `.add_model` multiple times on the class instance or you can pass a `ModelMappingDict` to the class instance. The latter may be the preferred way of doing it when the number of models gets larger and you want to reuse the configuration. We will discuss both ways in this guide.
+For both ways of interacting with the `CrossValidation` class instance, a `ModelMappingDict` is created internally and stored to the instance's `config` attribute. The core function `cross_validate` then just iterates over the `ModelMappingDict` and fits every model to the data. As additional benefit, this provides extensive logging, results summaries and useful information such as progress bars for all layers of processes.
 
-It is actually as simple as
+So let's start with the way of adding two models the way we learned before. Say, we want to compare a LinearMixedEffectsModel to a RandomForestRegressor and a MERF correction for clustered data.
+Thats as simple as this:
+
+```python
+import optuna
+from sklearn.ensemble import RandomForestRegressor
+from flexcv import CrossValidation
+from flexcv.models import LinearMixedEffectsModel
+from flexcv.merf import MERF
+from flexcv.model_postprocessing import RandomForestModelPostProcessor, LinearMixedEffectsModelPostProcessor
+from flexcv.synthesizer import generate_regression
+
+
+# lets start with generating some clustered data
+X, y, group, random_slopes =generate_regression(
+    10,100,n_slopes=1,noise_level=9.1e-2
+)
+# define our hyperparameters
+params = {
+    "max_depth": optuna.distributions.IntDistribution(5,100),
+    "n_estimators": optuna.distributions.CategoricalDistribution([10]),
+}
+
+cv =CrossValidation()
+results = (
+    cv.set_data(X, y, group, random_slopes)
+    .set_models(model_map)
+    .set_inner_cv(3)
+    .set_splits(n_splits_out=3)
+    .add_model(model=LinearMixedEffectsModel, post_processor=LinearMixedEffectsModelPostProcessor)
+    .add_model(model=RandomForestRegressor, requires_inner_cv=True, params=params, post_processor=RandomForestModelPostProcessor, add_merf=True)
+    .perform()
+    .get_results()
+)
+```
+Now when you want to compare a larger number of models it could make sense to pass the mapping directly to the `.set_models` method.
 
 ```python
 model_map = ModelMappingDict(
     {
         "LinearModel": ModelConfigDict(
             {
-                "requires_inner_cv": False,
-                "requires_formula": True,
-                "n_jobs_model": 1,
-                "n_jobs_cv": 1,
                 "model": LinearModel,
-                "params": {},
-                "post_processor": empty_func,
-                "mixed_model": LinearMixedEffectsModel,
-                "mixed_post_processor": empty_func,
-                "mixed_name": "MixedLM",
-            },
-
+                "post_processor": mp.LinearModelPostProcessor,
+                "requires_inner_cv": False,
+            }
+            ),
+        "LinearMixedEffectsModel": ModelConfigDict(
+            {
+                "model": LinearMixedEffectsModel,
+                "post_processor": mp.LMERPostProcessor,
+                "requires_inner_cv": False,
+            }
+        ),
         "RandomForest": ModelConfigDict(
             {
-                "requires_inner_cv": True,
-                "requires_formula": False,
-                "allows_seed": True,
-                "allows_n_jobs": True,
-                "n_jobs_model": -1,
-                "n_jobs_cv": -1,
                 "model": RandomForestRegressor,
                 "params": {
                     "max_depth": optuna.distributions.IntDistribution(5,100),
                     "n_estimators": optuna.distributions.CategoricalDistribution(
                         [10]
                     ),
+                "post_processor": mp.RandomForestModelPostProcessor
+                "requires_inner_cv": True,
+                "add_merf": True,
+
                 },
-                "mixed_model": MERF,
-                "post_processor": mp.rf_post,
-                "mixed_post_processor": mp.expectation_maximation_post,
-                "mixed_name": "MERF",
             }
-        ),
+        )
     }
 )
+
+# and then call .set_models on your CrossValidation instance
+cv = CrossValidation()
+cv.set_models(model_map)
 
 ```
 
 Have a look at this section from `flexcv.model_mapping_template` for how to add multiple models to a `ModelMappingDict`:
 
-```python
+```python # TODO redo this template
 import optuna
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.svm importSVR
@@ -70,10 +104,18 @@ MODEL_MAPPING=ModelMappingDict(
                 "n_jobs_cv": 1,
                 "model": LinearModel,
                 "params": {},
-                "post_processor": mp.lm_post,
-                "mixed_model": LinearMixedEffectsModel,
-                "mixed_post_processor": mp.lmer_post,
-                "mixed_name": "MixedLM",
+                "post_processor": mp.LinearModelPostProcessor,
+            }
+        ),
+        "LinearMixedEffectsModel": ModelConfigDict(
+            {
+                "requires_inner_cv": False,
+                "n_trials": 100,
+                "n_jobs_model": 1,
+                "n_jobs_cv": 1,
+                "model": LinearMixedEffectsModel,
+                "params": {},
+                "post_processor": mp.LMERPostProcessor,
             }
         ),
         "RandomForest": ModelConfigDict(
@@ -103,10 +145,6 @@ MODEL_MAPPING=ModelMappingDict(
                     "ccp_alpha": optuna.distributions.FloatDistribution(1e-8,0.01),
                     "n_estimators": optuna.distributions.IntDistribution(2,7000),
                 },
-                "post_processor": mp.rf_post,
-                "mixed_model": MERF,
-                "mixed_post_processor": mp.expectation_maximation_post,
-                "mixed_name": "MERF",
             }
         ),
         "XGBoost": ModelConfigDict(
@@ -145,10 +183,6 @@ MODEL_MAPPING=ModelMappingDict(
                     "reg_alpha": optuna.distributions.FloatDistribution(0.1,500),
                     "reg_lambda": optuna.distributions.FloatDistribution(0.001,800),
                 },
-                "post_processor": mp.xgboost_post,
-                "mixed_model": MERF,
-                "mixed_post_processor": mp.expectation_maximation_post,
-                "mixed_name": "XGBEM",
             }
         ),
         "MARS": ModelConfigDict(
@@ -162,10 +196,6 @@ MODEL_MAPPING=ModelMappingDict(
                     "nprune": optuna.distributions.IntDistribution(1,300),
                     "newvar_penalty": optuna.distributions.FloatDistribution(0.01,0.2),
                 },
-                "post_processor": mp.mars_post,
-                "mixed_model": MERF,
-                "mixed_post_processor": mp.expectation_maximation_post,
-                "mixed_name": "EarthEM",
             }
         ),
         "SVR": ModelConfigDict(
@@ -187,10 +217,6 @@ MODEL_MAPPING=ModelMappingDict(
                     # "tol": optuna.distributions.FloatDistribution(1e-4, 10),
                     # "shrinking": default "True" yielded best restults
                 },
-                "post_processor": mp.svr_post,
-                "mixed_model": MERF,
-                "mixed_post_processor": mp.expectation_maximation_post,
-                "mixed_name": "SVREM",
             }
         ),
     }

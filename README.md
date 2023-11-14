@@ -104,23 +104,8 @@ from flexcv.synthesizer import generate_regression
 # import the model class
 from flexcv.models import LinearModel
   
-# make sample data
+# generate some random sample data that is clustered
 X, y, group, _ = generate_regression(10, 100, n_slopes=1, noise_level=9.1e-2, random_seed=42)
-```
-
-Now we configure a simple linear model to fit on our data. We use the `ModelMappingDict` to map a model name to a `ModelConfigDict` which holds the model class and some additional information. We can then pass this mapping to the `CrossValidation` class to perform the cross validation.
-
-```python
-# create a model mapping
-model_map = ModelMappingDict({
-    "LinearModel": ModelConfigDict({
-
-	# pass the model class but NOT the instance ;)
-        "model": LinearModel,
-	# specify if your model needs a R-style formula for the fit
-	"requires_formula": True,
-    }),
-})
 ```
 
 The `CrossValidation` class is the core of this package. It holds all the information about the data, the models, the cross validation splits and the results. It is also responsible for performing the cross validation and logging the results. Setting up the `CrossValidation` object is easy. We can use method chaining to set up our configuration and perform the cross validation. You might be familiar with this pattern from `pandas` and other packages. The set-methods all return the `CrossValidation` object itself, so we can chain them together. The `perform` method then performs the cross validation and returns the `CrossValidation` object again. The `get_results` method returns a `CrossValidationResults` object which holds all the results of the cross validation. It has a `summary` property which returns a `pandas.DataFrame` with all the results. We can then use the `to_excel` method of the `DataFrame` to save the results to an excel file.
@@ -133,10 +118,11 @@ cv = CrossValidation()
 results = (
     cv
     .set_data(X, y, group, dataset_name="ExampleData")
+    # configure our split strategies. Lets go for a GroupKFold since our data is clustered
     .set_splits(
-        method_outer_split=flexcv.CrossValMethod.GROUP, 
-        method_inner_split=flexcv.CrossValMethod.KFOLD)
-    .set_models(model_map)
+        method_outer_split=flexcv.CrossValMethod.GROUP
+    # add the model class
+    .add_model(LinearModel)
     .perform()
     .get_results()
 )

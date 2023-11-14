@@ -3,6 +3,7 @@ from sklearn.datasets import make_regression
 import numpy as np
 import pandas as pd
 
+
 def test_concatenated_stratified_kfold_init():
     # Test initialization
     cv = ConcatenatedStratifiedKFold(n_splits=5, shuffle=True, random_state=42)
@@ -10,6 +11,7 @@ def test_concatenated_stratified_kfold_init():
     assert cv.n_splits == 5
     assert cv.shuffle == True
     assert cv.random_state == 42
+
 
 def test_concatenated_stratified_kfold_split():
     # Test split method
@@ -23,6 +25,7 @@ def test_concatenated_stratified_kfold_split():
     for train_index, test_index in splits:
         assert len(set(train_index) & set(test_index)) == 0
 
+
 def test_concatenated_stratified_kfold_split_with_series():
     # Test split method with y as a Series
     X, y = make_regression(n_samples=100, n_features=20, random_state=42)
@@ -35,6 +38,7 @@ def test_concatenated_stratified_kfold_split_with_series():
     # Check that the training and test sets are disjoint
     for train_index, test_index in splits:
         assert len(set(train_index) & set(test_index)) == 0
+
 
 def test_concatenated_stratified_kfold_get_n_splits():
     # Test get_n_splits method

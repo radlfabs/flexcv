@@ -65,7 +65,7 @@ class LinearModel(BaseLinearModel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def fit(self, X, y, **kwargs):
+    def fit(self, X, y, formula, **kwargs):
         """Fit the LM to the given training data.
 
         Args:
@@ -90,7 +90,7 @@ class LinearModel(BaseLinearModel):
 
         data = pd.concat([y, X], axis=1, sort=False)
         data.columns = [y.name] + list(X.columns)
-        md = smf.ols(kwargs["formula"], data)
+        md = smf.ols(formula, data)
         self.md_ = md.fit()
         self.best_params = self.get_summary()
         return self
@@ -117,15 +117,16 @@ class LinearMixedEffectsModel(BaseLinearModel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def fit(self, X, y, re_formula, **kwargs):
+    def fit(self, X, y, clusters, formula, re_formula, **kwargs):
         """Fit the LMER model to the given training data.
 
         Args:
-          X (array-like of shape (n_samples, n_features)): The training input samples.
-          y (array-like of shape (n_samples,)): The target values.
-          clusters (array-like of shape (n_samples,)):
+          X (pd.DataFrame): The training input samples.
+          y (pd.Series): The target values.
+          clusters (pd.Series): The clustering data.
+          re_formula (str): The random effects formula for the random slopes and intercepts.
           **kwargs (dict): Additional parameters to pass to the underlying model's `fit` method.
-          re_formula:
+
 
         Returns:
           (object): Returns self.
@@ -138,23 +139,34 @@ class LinearMixedEffectsModel(BaseLinearModel):
         ), "Number of X samples must match number of y samples."
         assert type(X) == pd.DataFrame, "X must be a pandas DataFrame."
         assert type(y) == pd.Series, "y must be a pandas Series."
-        assert "clusters" in kwargs, "clusters must be present in kwargs."
+        assert type(clusters) == pd.Series, "clusters must be a pandas Series."
         assert (
-            len(kwargs["clusters"]) == X.shape[0]
-        ), "Number of clusters must match number of samples."
+            len(y) == X.shape[0]
+        ), "Number of target must match number of feature samples."
+        assert (
+            len(clusters) == X.shape[0]
+        ), "Number of clusters must match number of feature samples."
+
+        assert (
+            re_formula is not None
+        ), "re_formula must be specified for the LMER model."
+
+        assert (
+            len(clusters.unique()) > 1
+        ), "Only one cluster found. There might be a problem with the cluster column."
 
         self.X_ = X
         self.y_ = y
-        self.cluster_counts = kwargs["clusters"].value_counts()
+        self.cluster_counts = clusters.value_counts()
         self.re_formula = re_formula
-        data = pd.concat([y, X, kwargs["clusters"]], axis=1, sort=False)
-        data.columns = [y.name] + list(X.columns) + [kwargs["clusters"].name]
+        data = pd.concat([y, X, clusters], axis=1, sort=False)
+        data.columns = [y.name] + list(X.columns) + [clusters.name]
         # if re_formula is None we pass a empty dict, else we pass the re_formula
         re_formula_dict = {"re_formula": re_formula} if self.re_formula else {}
         md = smf.mixedlm(
-            formula=kwargs["formula"],
+            formula=formula,
             data=data,
-            groups=kwargs["clusters"].name,
+            groups=clusters.name,
             **re_formula_dict,
         )
 
@@ -164,12 +176,13 @@ class LinearMixedEffectsModel(BaseLinearModel):
         self.best_params = self.get_summary()
         return self
 
-    def predict(self, X, **kwargs):
+    def predict(self, X: pd.DataFrame, clusters: pd.Series, **kwargs):
         """
         Make predictions using the fitted model.
 
         Args:
-          X (array-like): Features
+          X (pd.DataFrame): Features
+          clusters (pd.Series): The clustering data.
           **kwargs: Any other keyword arguments to pass to the underlying model's `predict` method. This is necessary to prevent raising an error when passing the `clusters` argument.
 
         Returns:
@@ -177,12 +190,17 @@ class LinearMixedEffectsModel(BaseLinearModel):
 
         """
         check_is_fitted(self, ["X_", "y_", "md_"])
-        clusters = kwargs["clusters"]
         predict_known_groups_lmm = kwargs["predict_known_groups_lmm"]
         Z = kwargs["Z"]
+        assert type(X) == pd.DataFrame, "X must be a pandas DataFrame."
+        assert type(clusters) == pd.Series, "clusters must be a pandas Series."
         assert (
             len(clusters) == X.shape[0]
         ), "Number of clusters must match number of samples."
+        if len(clusters.unique()) == 1:
+            logger.warning(
+                "Only one cluster found. There might be a problem with the cluster column."
+            )
 
         if predict_known_groups_lmm == True:
             yp = self.md_.predict(exog=X)

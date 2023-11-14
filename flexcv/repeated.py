@@ -44,6 +44,7 @@ def try_mean(x):
 
     """
     from numpy.core._exceptions import UFuncTypeError
+
     try:
         return np.mean(x)
     except (ValueError, UFuncTypeError):
@@ -78,7 +79,7 @@ def aggregate_(repeated_runs) -> pd.DataFrame:
 
     model_keys = list(repeated_runs[0].keys())
 
-    # we want the metrics keys 
+    # we want the metrics keys
     # index [0] gives us first run
     # index [model_keys[0]] -> gives us the dict for the first model
     # index ["fold_by_metrics"] -> gives us a dict[metrics: list]
@@ -268,12 +269,12 @@ class RepeatedCV(CrossValidation):
         for seed, inner_run in zip(self.seeds, self.children_runs):
             # handle neptune
             inner_id = inner_run["sys/id"].fetch()
-            
+
             # if inner_id is not a string, we are not using neptune and need to generate a run id
             if not isinstance(inner_id, str):
-                i = - 1
+                i = -1
                 inner_id = f"run_{i+1}"
-            
+
             inner_run["HostRun"] = repeated_id
             inner_run["seed"] = seed
 
@@ -310,7 +311,7 @@ class RepeatedCV(CrossValidation):
         return df
 
     def perform(self):
-        """Wrapper method to perform repeated cross-validation.
+        """Wrapper method to perform repeated cross-validation. Overwrites the perform method of CrossValidation.
 
         Returns:
             (RepeatedCV): self

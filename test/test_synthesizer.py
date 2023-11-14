@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from flexcv.synthesizer import generate_regression
 
+
 def test_generate_regression():
     # Test generate_regression function
     m_features = 5
@@ -12,7 +13,15 @@ def test_generate_regression():
     noise_level = 0.1
     fixed_random_ratio = 0.01
 
-    X, y, group, random_slopes = generate_regression(m_features, n_samples, n_groups, n_slopes, random_seed, noise_level, fixed_random_ratio)
+    X, y, group, random_slopes = generate_regression(
+        m_features,
+        n_samples,
+        n_groups,
+        n_slopes,
+        random_seed,
+        noise_level,
+        fixed_random_ratio,
+    )
 
     # Check that the returned X, y, group, and random_slopes are of the correct types
     assert isinstance(X, pd.DataFrame)

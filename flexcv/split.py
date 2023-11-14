@@ -13,7 +13,7 @@ from numpy import ndarray
 from sklearn.model_selection._split import (
     BaseCrossValidator,
     GroupsConsumerMixin,
-    )
+)
 from sklearn.model_selection import (
     GroupKFold,
     KFold,
@@ -24,7 +24,7 @@ from sklearn.model_selection import (
 from .stratification import (
     ContinuousStratifiedKFold,
     ContinuousStratifiedGroupKFold,
-    ConcatenatedStratifiedKFold
+    ConcatenatedStratifiedKFold,
 )
 
 
@@ -61,7 +61,7 @@ def string_to_crossvalmethod(method: str) -> CrossValMethod:
       (CrossValMethod): The CrossValMethod enum value.
 
     Raises:
-      (ValueError): If the given string does not match any CrossValMethod.
+      (TypeError): If the given string does not match any CrossValMethod.
 
     """
     keys = [e.value for e in CrossValMethod]
@@ -71,7 +71,7 @@ def string_to_crossvalmethod(method: str) -> CrossValMethod:
     if method in method_dict:
         return method_dict[method]
     else:
-        raise ValueError("Invalid Cross Validation method given.")
+        raise TypeError("Invalid Cross Validation method given.")
 
 
 def make_cross_val_split(
@@ -96,30 +96,28 @@ def make_cross_val_split(
       (TypeError): If the given method is not one of KFOLD
 
     """
-    
+
     match method:
         case CrossValMethod.KFOLD:
-            kf = KFold(
-                n_splits=n_splits, random_state=random_state, shuffle=True
-            )
+            kf = KFold(n_splits=n_splits, random_state=random_state, shuffle=True)
             return kf.split
-        
+
         case CrossValMethod.STRAT:
             strat_skf = StratifiedKFold(
                 n_splits=n_splits, random_state=random_state, shuffle=True
             )
             return strat_skf.split
-        
+
         case CrossValMethod.CONTISTRAT:
             conti_skf = ContinuousStratifiedKFold(
                 n_splits=n_splits, random_state=random_state, shuffle=True
             )
             return conti_skf.split
-        
+
         case CrossValMethod.GROUP:
             gkf = GroupKFold(n_splits=n_splits)
             return partial(gkf.split, groups=groups)
-        
+
         case CrossValMethod.STRATGROUP:
             strat_gkf = StratifiedGroupKFold(
                 n_splits=n_splits, random_state=random_state, shuffle=True
@@ -137,21 +135,20 @@ def make_cross_val_split(
                 n_splits=n_splits, random_state=random_state, shuffle=True
             )
             return partial(concat_skf.split, groups=groups)
-        
-        case _:
 
+        case _:
             is_cross_validator = isinstance(method, BaseCrossValidator)
             is_groups_consumer = isinstance(method, GroupsConsumerMixin)
-            
+
             if is_cross_validator and is_groups_consumer:
                 return partial(method.split, groups=groups)
-            
+
             if is_cross_validator:
                 return method.split
-    
+
             if isinstance(method, Iterator):
                 return method
-            
+
             else:
                 raise TypeError("Invalid Cross Validation method given.")
 

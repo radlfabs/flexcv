@@ -23,9 +23,6 @@ def merf_mixed_regression():
             "RandomForest": ModelConfigDict(
                 {
                     "requires_inner_cv": True,
-                    "requires_formula": False,
-                    "allows_seed": True,
-                    "allows_n_jobs": True,
                     "n_jobs_model": -1,
                     "n_jobs_cv": -1,
                     "model": RandomForestRegressor,
@@ -35,10 +32,7 @@ def merf_mixed_regression():
                             [10]
                         ),
                     },
-                    "mixed_model": MERF,
-                    "post_processor": mp.rf_post,
-                    "mixed_post_processor": mp.expectation_maximation_post,
-                    "mixed_name": "MERF",
+                    "post_processor": mp.RandomForestModelPostProcessor,
                 }
             ),
         }
@@ -50,12 +44,12 @@ def merf_mixed_regression():
         .set_models(model_map)
         .set_inner_cv(3)
         .set_splits(n_splits_out=3)
-        .set_mixed_effects(True, 5)
+        .set_merf(add_merf_global=True, em_max_iterations=5)
         .perform()
         .get_results()
     )
 
-    return np.mean(results["MERF"]["folds_by_metrics"]["r2"])
+    return np.mean(results["MERF(RandomForest)"]["folds_by_metrics"]["r2"])
 
 
 def test_merf_rf():
@@ -70,21 +64,17 @@ def merf_mixed_xgboost():
 
     model_map = ModelMappingDict(
         {
-        "XGBoost": ModelConfigDict(
-                    {
-                        "requires_inner_cv": True,
-                        "allows_seed": True,
-                        "n_jobs_model": -1,
-                        "n_jobs_cv": -1,
-                        "model": XGBRegressor,
-                        "params": {
-                            "max_depth": optuna.distributions.IntDistribution(2, 700),
-                        },
-                        "post_processor": mp.xgboost_post,
-                        "mixed_model": MERF,
-                        "mixed_post_processor": mp.expectation_maximation_post,
-                        "mixed_name": "XGBEM",
-                    }
+            "XGBoost": ModelConfigDict(
+                {
+                    "requires_inner_cv": True,
+                    "n_jobs_model": -1,
+                    "n_jobs_cv": -1,
+                    "model": XGBRegressor,
+                    "params": {
+                        "max_depth": optuna.distributions.IntDistribution(2, 700),
+                    },
+                    "post_processor": mp.XGBoostModelPostProcessor,
+                }
             ),
         }
     )
@@ -95,21 +85,17 @@ def merf_mixed_xgboost():
         .set_models(model_map)
         .set_inner_cv(3)
         .set_splits(n_splits_out=3)
-        .set_run(Run(), random_seed=42)
-        .set_mixed_effects(True, 5)
+        .set_merf(add_merf_global=True, em_max_iterations=5)
         .perform()
         .get_results()
     )
 
-    return np.mean(results["XGBEM"]["folds_by_metrics"]["r2"])
+    return np.mean(results["MERF(XGBoost)"]["folds_by_metrics"]["r2"])
 
 
 def test_merf_xgboost():
     """Test if the mean r2 value of the random forest regression is is exactly the same over time."""
-    assert np.isclose(
-        [merf_mixed_xgboost()],
-        [-0.12340731619124896]
-        )
+    assert np.isclose([merf_mixed_xgboost()], [-0.12340731619124896])
 
 
 def merf_earth_regression():
@@ -128,10 +114,7 @@ def merf_earth_regression():
                     "params": {  # 'degree', 'endspan', 'fast_beta', 'fast_k', 'minspan', 'newvar_penalty', 'nk', 'nprune', 'pmethod', 'random_state', 'thresh'
                         "degree": optuna.distributions.IntDistribution(1, 5),
                     },
-                    "post_processor": mp.mars_post,
-                    "mixed_model": MERF,
-                    "mixed_post_processor": mp.expectation_maximation_post,
-                    "mixed_name": "EarthEM",
+                    "post_processor": mp.EarthModelPostProcessor,
                 }
             ),
         }
@@ -143,13 +126,12 @@ def merf_earth_regression():
         .set_models(model_map)
         .set_inner_cv(3)
         .set_splits(n_splits_out=3)
-        .set_run(Run(), random_seed=42)
-        .set_mixed_effects(True, 5)
+        .set_merf(add_merf_global=True, em_max_iterations=5)
         .perform()
         .get_results()
     )
 
-    return np.mean(results["EarthEM"]["folds_by_metrics"]["r2"])
+    return np.mean(results["MERF(Earth)"]["folds_by_metrics"]["r2"])
 
 
 def test_merf_earth():
@@ -165,19 +147,18 @@ def merf_svr_regression():
     model_map = ModelMappingDict(
         {
             "SVR": ModelConfigDict(
-            {
-                "requires_inner_cv": True,
-                "allows_n_jobs": False,
-                "allows_seed": False,
-                "model": SVR,
-                "params": {
-                    "C": optuna.distributions.FloatDistribution(0.001, 50, log=True),
-                },
-                "post_processor": mp.svr_post,
-                "mixed_model": MERF,
-                "mixed_post_processor": mp.expectation_maximation_post,
-                "mixed_name": "SVREM",
-            }
+                {
+                    "requires_inner_cv": True,
+                    "allows_n_jobs": False,
+                    "allows_seed": False,
+                    "model": SVR,
+                    "params": {
+                        "C": optuna.distributions.FloatDistribution(
+                            0.001, 50, log=True
+                        ),
+                    },
+                    "post_processor": mp.SVRModelPostProcessor,
+                }
             ),
         }
     )
@@ -188,13 +169,12 @@ def merf_svr_regression():
         .set_models(model_map)
         .set_inner_cv(3)
         .set_splits(n_splits_out=3)
-        .set_run(Run(), random_seed=42)
-        .set_mixed_effects(True, 5)
+        .set_merf(add_merf_global=True, em_max_iterations=5)
         .perform()
         .get_results()
     )
 
-    return np.mean(results["SVREM"]["folds_by_metrics"]["r2"])
+    return np.mean(results["MERF(SVR)"]["folds_by_metrics"]["r2"])
 
 
 def test_merf_svr_mixed():

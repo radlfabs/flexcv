@@ -9,28 +9,18 @@ Also, we use a model post processing function to extract the feature importances
 ```python
 import optuna
 from sklearn.ensemble import RandomForestRegressor
-import flexcv.model_postprocessing as mp
+from flexcv.model_postprocessing import RandomForestModelPostProcessor
 
-model_map =ModelMappingDict({
-    "RandomForest": ModelConfigDict({
-    # now we specify, that we do want to evaluate the inner cross validation loop
-        "requires_inner_cv": True,
-    # let's specify the model's ability to run in parallel
-        "n_jobs_model": -1,
-        "n_jobs_cv": -1,
-    # pass the model class
-       "model": RandomForestRegressor,
-    # pass the parameter distribution
-        "params": {
-            # we use optuna distributions to specify the hyperparameter search space
-            # let's tune the max_depth of the trees between 5 and 100
-            "max_depth": optuna.distributions.IntDistribution(5,100), 
-        },
-    # pass a model post processing function
-    # this can be useful for plotting, logging or additional results routines...
-        "post_processor": mp.rf_post,
-    }),
-})
+# lets start with generating some clustered data
+X, y, group, random_slopes =generate_regression(
+    10, 100, n_slopes=1 ,noise_level=9.1e-2
+)
+
+# define a set of hyperparameters to tune
+params = {
+    "max_depth": optuna.distributions.IntDistribution(5, 100),
+    "n_estimators": optuna.distributions.CategoricalDistribution([10]),
+}
 
 # instantiate the CrossValidation class
 cv =CrossValidation()
@@ -38,7 +28,12 @@ cv =CrossValidation()
 # pass everything to CrossValidation using method chaining
 results = (
     cv.set_data(X, y)
-    .set_models(model_map)
+    .add_model(
+        model=RandomForestRegressor,
+        requires_inner_cv=True,
+        params=params,
+        post_processor=RandomForestModelPostProcessor,
+    )
     .set_inner_cv(3)
     .set_splits(n_splits_out=3)
     .set_run(Run())
@@ -47,8 +42,8 @@ results = (
 )
 
 # Print the averaged R²
-n_values =len(results["RandomForest"]["metrics"])
-r2_values =[results["RandomForest"]["metrics"][k]["r2"]for k inrange(n_values)]
+n_values =len(results["RandomForestRegressor"]["metrics"])
+r2_values =[results["RandomForestRegressor"]["metrics"][k]["r2"]for k inrange(n_values)]
 print(np.mean(r2_values))
 # save the results table to an excel file
 results.summary.to_excel("results.xlsx")

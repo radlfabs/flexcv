@@ -5,7 +5,7 @@ To get started with `flexcv`, we take you through a couple of quick and basic co
 First we will use a LinearModel on a randomly generated regression dataset. Because Linear Models do not have any hyperparameters, we naturally don't need an inner cross validation loop.
 
 ```py
-# import the most important object
+# import the class interface
 from flexcv import CrossValidation
 # import the function for data generation
 from flexcv.synthesizer import generate_regression
@@ -14,16 +14,6 @@ from flexcv.models import LinearModel
   
 # make sample data
 X, y, group, random_slopes = generate_regression(10, 100, n_slopes=1, noise_level=9.1e-2, random_seed=42)
-  
-# create a model mapping
-model_map = ModelMappingDict({
-    "LinearModel": ModelConfigDict({
-	# pass the model class but NOT the instance ;)
-        "model": LinearModel,
-	# specify if your model needs a R-style formula for the fit
-	"requires_formula": True,
-    }),
-})
 
 # instantiate our cross validation class
 cv = CrossValidation()
@@ -33,7 +23,7 @@ results = (
     cv
     .set_data(X, y, group, dataset_name="ExampleData")
     .set_splits(method_outer_split=flexcv.CrossValMethod.GROUP, method_inner_split=flexcv.CrossValMethod.KFOLD)
-    .set_models(model_map)
+    .add_model(LinearModel)
     .perform()
     .get_results()
 )

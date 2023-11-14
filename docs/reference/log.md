@@ -1,4 +1,4 @@
-# ::: flexcv.cv_logging
+# ::: flexcv.fold_logging
     options:
         show_root_full_path: true
         show_root_members_full_path: true

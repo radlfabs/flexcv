@@ -7,25 +7,42 @@ import neptune
 logger = logging.getLogger(__name__)
 
 
-def empty_func(*args, **kwargs) -> None:
-    """A function that does nothing.
+def handle_duplicate_kwargs(*args) -> dict:
+    """This function removes duplicate kwargs from mutiple dicts.
+    If a key is present in multiple dicts, we check if the values are the same.
+    If they are, we keep the key-value pair. If they are not, we raise a ValueError.
 
     Args:
-      *args: Any argument is accepted.
-      **kwargs: Any keayword argument is accepted.
+        kwargs (dict): A dict of kwargs.
 
     Returns:
-      args, kwargs: The passed arguments and keyword arguments.
+        (dict): The dict without duplicate kwargs.
     """
-    return args, kwargs
+    return_kwargs = {}
+    for arg in args:
+        if not isinstance(arg, dict):
+            raise TypeError("All arguments must be of type dict")
+        for key, value in arg.items():
+            if not key in return_kwargs.keys():
+                return_kwargs[key] = value
+                # compare values
+            else:
+                if arg[key] != return_kwargs[key]:
+                    raise ValueError(
+                        f"Duplicate key {key} found with different values. Overwriting."
+                    )
+                else:
+                    logger.info(f"Duplicate key {key} found with same value. Keeping.")
+
+    return return_kwargs
 
 
 def add_model_to_keys(param_grid):
     """This function adds the string "model__" to avery key of the param_grid dict.
-    
+
     Args:
       param_grid (dict): A dictionary of parameters for a model.
-      
+
     Returns:
       (dict): A dictionary of parameters for a model with the string "model__" added to each key.
     """
@@ -34,10 +51,10 @@ def add_model_to_keys(param_grid):
 
 def rm_model_from_keys(param_grid):
     """This function removes the string "model__" from avery key of the param_grid dict.
-    
+
     Args:
       param_grid (dict): A dictionary of parameters for a model.
-      
+
     Returns:
       (dict): A dictionary of parameters for a model with the string "model__" removed from each key.
     """
@@ -69,7 +86,7 @@ def add_module_handlers(logger: logging.Logger) -> None:
 
 def get_fixed_effects_formula(target_name, X_data) -> str:
     """Returns the fixed effects formula for the dataset.
-    
+
     Scheme: "target ~ column1 + column2 + ...
 
     Args:
@@ -88,6 +105,7 @@ def get_fixed_effects_formula(target_name, X_data) -> str:
 
 def get_re_formula(random_slopes_data):
     """Returns a random effects formula for use in statsmodels. Scheme: ~ random_slope1 + random_slope2 + ...
+    Returns an empty string if no random slopes are provided.
 
     Args:
       random_slopes_data: pd.Series | pd.DataFrame: The random slopes data.

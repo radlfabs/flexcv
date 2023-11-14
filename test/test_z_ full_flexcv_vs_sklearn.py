@@ -12,8 +12,10 @@ from flexcv.run import Run
 
 ##### Test kfold #####
 
+
 def flexcv_lm_kfold(X, y):
     from sklearn.linear_model import LinearRegression
+
     model_map = ModelMappingDict(
         {
             "LinearModel": ModelConfigDict(
@@ -29,11 +31,7 @@ def flexcv_lm_kfold(X, y):
 
     cv = CrossValidation()
     results = (
-        cv.set_data(X, y)
-        .set_models(model_map)
-        .set_run(Run())
-        .perform()
-        .get_results()
+        cv.set_data(X, y).set_models(model_map).set_run(Run()).perform().get_results()
     )
 
     n_values = len(results["LinearModel"]["metrics"])
@@ -47,7 +45,7 @@ def sklearn_lm_kfold(X, y):
     from sklearn.model_selection import cross_val_score as sklearn_score
     from sklearn.linear_model import LinearRegression
     from sklearn.model_selection import KFold
-    
+
     kf = KFold(n_splits=5, shuffle=True, random_state=42)
     sklearn_cv_results = sklearn_score(
         LinearRegression(),
@@ -70,7 +68,7 @@ def test_kfold_flexcv_roughly_equals_sklearn():
         10, 100, n_slopes=1, noise_level=9.1e-2, random_seed=42
     )
     flexcv_val = flexcv_lm_kfold(X, y)
-    sklearn_val = - sklearn_lm_kfold(X, y)
+    sklearn_val = -sklearn_lm_kfold(X, y)
     assert np.isclose(np.array([flexcv_val]), np.array([sklearn_val]))
 
 
@@ -80,6 +78,7 @@ def test_kfold_flexcv_roughly_equals_sklearn():
 def flexcv_lm_groupkfold(X, y, group):
     """Computes flexcv cross validation score for linear model and groupkfold on random data."""
     from sklearn.linear_model import LinearRegression
+
     model_map = ModelMappingDict(
         {
             "LinearModel": ModelConfigDict(
@@ -114,7 +113,7 @@ def sklearn_lm_groupkfold(X, y, group):
     from sklearn.model_selection import cross_val_score as sklearn_score
     from sklearn.linear_model import LinearRegression
     from sklearn.model_selection import GroupKFold
-    
+
     gkf = GroupKFold(n_splits=5)
     sklearn_cv_results = sklearn_score(
         LinearRegression(),
@@ -138,14 +137,16 @@ def test_groupkfold_flexcv_roughly_equals_sklearn():
         10, 100, n_slopes=1, noise_level=9.1e-2, random_seed=42
     )
     flexcv_val = flexcv_lm_groupkfold(X, y, group)
-    sklearn_val = - sklearn_lm_groupkfold(X, y, group)
+    sklearn_val = -sklearn_lm_groupkfold(X, y, group)
     assert np.isclose(np.array([flexcv_val]), np.array([sklearn_val]))
 
 
 ##### Test sklearn.LinearRegression vs flexcv.models.LinearModel #####
 
+
 def flexcv_lm_kfold(X, y):
     from flexcv.models import LinearModel
+
     model_map = ModelMappingDict(
         {
             "LinearModel": ModelConfigDict(
@@ -161,11 +162,7 @@ def flexcv_lm_kfold(X, y):
 
     cv = CrossValidation()
     results = (
-        cv.set_data(X, y)
-        .set_models(model_map)
-        .set_run(Run())
-        .perform()
-        .get_results()
+        cv.set_data(X, y).set_models(model_map).set_run(Run()).perform().get_results()
     )
 
     n_values = len(results["LinearModel"]["metrics"])
@@ -179,7 +176,7 @@ def sklearn_lm_kfold(X, y):
     from sklearn.model_selection import cross_val_score as sklearn_score
     from sklearn.linear_model import LinearRegression
     from sklearn.model_selection import KFold
-    
+
     kf = KFold(n_splits=5, shuffle=True, random_state=42)
     sklearn_cv_results = sklearn_score(
         LinearRegression(),
@@ -202,5 +199,5 @@ def test_linearmodels_flexcv_roughly_equals_sklearn():
         10, 100, n_slopes=1, noise_level=9.1e-2, random_seed=42
     )
     flexcv_val = flexcv_lm_kfold(X, y)
-    sklearn_val = - sklearn_lm_kfold(X, y)
+    sklearn_val = -sklearn_lm_kfold(X, y)
     assert np.isclose(np.array([flexcv_val]), np.array([sklearn_val]))
