@@ -23,7 +23,7 @@ from .metrics import MetricsDict, mse_wrapper
 from .model_selection import ObjectiveScorer, objective_cv
 from .split import CrossValMethod, make_cross_val_split
 from .utilities import (
-    get_fixed_effects_formula, 
+    get_fixed_effects_formula,
     get_re_formula,
     add_model_to_keys,
     rm_model_from_keys,
@@ -40,14 +40,18 @@ warnings.simplefilter("ignore", ConvergenceWarning)
 logger = logging.getLogger(__name__)
 
 
-def preprocess_slopes(Z_train_slope: pd.DataFrame | pd.Series, Z_test_slope: pd.DataFrame | pd.Series, must_scale: bool) -> tuple[np.ndarray, np.ndarray]:
+def preprocess_slopes(
+    Z_train_slope: pd.DataFrame | pd.Series,
+    Z_test_slope: pd.DataFrame | pd.Series,
+    must_scale: bool,
+) -> tuple[np.ndarray, np.ndarray]:
     """This function preprocesses the random slopes variable(s) for use in the mixed effects model.
-    
+
     Args:
         Z_train_slope (pd.DataFrame | pd.Series): Random slopes variable(s) for the training set.
         Z_test_slope (pd.DataFrame | pd.Series): Random slopes variable(s) for the test set.
         must_scale (bool): If True, the random slopes are scaled to zero mean and unit variance.
-        
+
     Returns:
         (tuple[np.ndarray, np.ndarray]): The preprocessed random slopes as a tuple of numpy arrays: (Z_train, Z_test)
     """
@@ -62,10 +66,8 @@ def preprocess_slopes(Z_train_slope: pd.DataFrame | pd.Series, Z_test_slope: pd.
             f"Z_test_slope must be a pandas DataFrame or pandas Series, not {type(Z_test_slope)}"
         )
     if not isinstance(must_scale, bool):
-        raise TypeError(
-            f"must_scale must be a bool, not {type(must_scale)}"
-        )
-    
+        raise TypeError(f"must_scale must be a bool, not {type(must_scale)}")
+
     # check dimensions
     if is_dataframe_train and (Z_train_slope.shape[1] != Z_test_slope.shape[1]):
         raise ValueError(
@@ -76,7 +78,7 @@ def preprocess_slopes(Z_train_slope: pd.DataFrame | pd.Series, Z_test_slope: pd.
         Z_train_slope = pd.DataFrame(Z_train_slope)
     if not is_dataframe_test:
         Z_test_slope = pd.DataFrame(Z_test_slope)
-    
+
     if must_scale:
         scaler = StandardScaler()
         Z_train_slope_scaled = pd.DataFrame(
@@ -108,31 +110,29 @@ def preprocess_slopes(Z_train_slope: pd.DataFrame | pd.Series, Z_test_slope: pd.
     return Z_train, Z_test
 
 
-def preprocess_features(X_train: pd.DataFrame, X_test: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+def preprocess_features(
+    X_train: pd.DataFrame, X_test: pd.DataFrame
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Scales the features to zero mean and unit variance.
-    
+
     Args:
         X_train (pd.DataFrame): Features for the training set.
         X_test (pd.DataFrame): Features for the test set.
-        
+
     Returns:
         (tuple[pd.DataFrame, pd.DataFrame]): The preprocessed features as a tuple of pandas DataFrames: (X_train_scaled, X_test_scaled)
     """
     if not isinstance(X_train, pd.DataFrame):
-        raise TypeError(
-            f"X_train must be a pandas DataFrame, not {type(X_train)}"
-        )
+        raise TypeError(f"X_train must be a pandas DataFrame, not {type(X_train)}")
     if not isinstance(X_test, pd.DataFrame):
-        raise TypeError(
-            f"X_test must be a pandas DataFrame, not {type(X_test)}"
-        )
+        raise TypeError(f"X_test must be a pandas DataFrame, not {type(X_test)}")
     if X_train.shape[1] != X_test.shape[1]:
         raise ValueError(
             f"X_train and X_test must have the same number of columns. X_train has {X_train.shape[1]} columns, X_test has {X_test.shape[1]} columns."
         )
-    
+
     scaler = StandardScaler()
-        
+
     X_train_scaled = pd.DataFrame(
         scaler.fit_transform(X_train),
         columns=X_train.columns,
@@ -142,7 +142,7 @@ def preprocess_features(X_train: pd.DataFrame, X_test: pd.DataFrame) -> tuple[pd
         scaler.transform(X_test), columns=X_test.columns, index=X_test.index
     )
     return X_train_scaled, X_test_scaled
-    
+
 
 def cross_validate(
     *,
@@ -169,7 +169,7 @@ def cross_validate(
     em_stopping_window: int = None,
     predict_known_groups_lmm: bool = True,
     diagnostics: bool = False,
-    **kwargs
+    **kwargs,
 ) -> Dict[str, Dict[str, list]]:
     """This function performs a cross-validation for a given regression formula, using one or a number of specified machine learning models and a configurable cross-validation method.
 
@@ -259,14 +259,14 @@ def cross_validate(
         )
     ):
         print()  # for beautiful tqdm progressbar
-        
+
         groups_exist = groups is not None
-        slopes_exist = slopes is not None 
-        
+        slopes_exist = slopes is not None
+
         # check if break is requested and if this is the 2nd outer fold
         if break_cross_val and k == 1:
             break
-        
+
         # Assign the outer folds data
         X_train = X.iloc[train_index]
         y_train = y.iloc[train_index]  # type: ignore
@@ -286,9 +286,9 @@ def cross_validate(
 
         if slopes_exist:
             Z_train, Z_test = preprocess_slopes(
-                Z_train_slope=slopes.iloc[train_index], 
-                Z_test_slope=slopes.iloc[test_index], 
-                must_scale=scale_out
+                Z_train_slope=slopes.iloc[train_index],
+                Z_test_slope=slopes.iloc[test_index],
+                must_scale=scale_out,
             )
 
         else:
@@ -297,11 +297,15 @@ def cross_validate(
 
         # run diagnostics if requested
         if diagnostics:
-            to_diagnose = {
-                "effects": model_effects,
-                "cluster_train": cluster_train,
-                "cluster_test": cluster_test,
-            } if model_effects == "mixed" else {"effects": model_effects}
+            to_diagnose = (
+                {
+                    "effects": model_effects,
+                    "cluster_train": cluster_train,
+                    "cluster_test": cluster_test,
+                }
+                if model_effects == "mixed"
+                else {"effects": model_effects}
+            )
 
             log_diagnostics(
                 X_train_scaled, X_test_scaled, y_train, y_test, run, **to_diagnose
@@ -310,22 +314,24 @@ def cross_validate(
         # Loop over all models
         for model_name in mapping.keys():
             logger.info(f"Evaluating {model_name}...")
-        
-            skip_inner_cv = not mapping[model_name]["requires_inner_cv"]  # get bool in mapping[model_name]["requires_inner_cv"] and negate it
+
+            skip_inner_cv = not mapping[model_name][
+                "requires_inner_cv"
+            ]  # get bool in mapping[model_name]["requires_inner_cv"] and negate it
             evaluate_merf = mapping[model_name]["add_merf"]
 
             model_class = mapping[model_name]["model"]
             param_grid = mapping[model_name]["params"]
             model_kwargs = mapping[model_name]["model_kwargs"]
             n_trials = mapping[model_name]["n_trials"]
-            
+
             requires_formula = mapping[model_name]["requires_formula"]
             fit_kwargs = {}
-            
+
             if requires_formula:
                 fit_kwargs["formula"] = formula
                 fit_kwargs["re_formula"] = re_formula
-            
+
             # build inner cv folds
             cross_val_split_in = make_cross_val_split(
                 method=split_in, groups=cluster_train, n_splits=n_splits_in, random_state=random_seed  # type: ignore
@@ -334,16 +340,14 @@ def cross_validate(
             if skip_inner_cv:
                 # Instantiate model directly without inner cross-validation
                 # has to be best_model because it is the only one instantiated
-                best_model = model_class(
-                    **model_kwargs
-                )
+                best_model = model_class(**model_kwargs)
                 best_params = best_model.get_params()
                 # set study to None since no study is instantiated otherwise
                 study = None
 
             else:
                 # this block performs the inner cross-validation with Optuna
-                
+
                 n_trials = mapping[model_name]["n_trials"]
                 n_jobs_cv_int = mapping[model_name]["n_jobs_cv"]
 
@@ -359,7 +363,7 @@ def cross_validate(
 
                 # add "model__" to all keys of the param_grid
                 param_grid = add_model_to_keys(param_grid)
-                
+
                 neptune_callback = CustomNeptuneCallback(
                     run[f"{model_name}/Optuna/{k}"],
                     # reduce load on neptune, i.e., reduce number of items and plots
@@ -375,7 +379,7 @@ def cross_validate(
 
                 # get sampler to be used for the inner cross-validation
                 sampler = optuna.samplers.TPESampler(seed=sampler_seed)
-                
+
                 # instantiate the study object
                 study = optuna.create_study(sampler=sampler, direction="maximize")
 
@@ -410,29 +414,26 @@ def cross_validate(
             test_pred_kwargs = {}
             pred_kwargs = {}
 
-
             if mapping[model_name]["consumes_clusters"]:
                 fit_kwargs["clusters"] = cluster_train
                 fit_kwargs["re_formula"] = re_formula
                 pred_kwargs["predict_known_groups_lmm"] = predict_known_groups_lmm
-                
+
                 test_pred_kwargs["clusters"] = cluster_test
                 test_pred_kwargs["Z"] = Z_test
-                
+
                 train_pred_kwargs["clusters"] = cluster_train
                 train_pred_kwargs["Z"] = Z_train
-            
+
             # make new instance of the model with the best parameters
             best_model = model_class(
                 **handle_duplicate_kwargs(model_kwargs, best_params)
-                )
-            
+            )
+
             # Fit the best model on the outer fold
             fit_result = best_model.fit(
-                    X=X_train_scaled,
-                    y=y_train,
-                    **handle_duplicate_kwargs(fit_kwargs)
-                )
+                X=X_train_scaled, y=y_train, **handle_duplicate_kwargs(fit_kwargs)
+            )
             # get test predictions
             y_pred = best_model.predict(
                 X=X_test_scaled,
@@ -443,7 +444,7 @@ def cross_validate(
                 X=X_train_scaled,
                 **handle_duplicate_kwargs(pred_kwargs, train_pred_kwargs),
             )
-            
+
             # store the results of the outer fold of the current model in a dataclass
             # this makes passing to the postprocessor easier
             model_data = SingleModelFoldResult(
@@ -459,8 +460,13 @@ def cross_validate(
                 X_train=X_train_scaled,
                 fit_result=fit_result,
             )
-            all_models_dict = model_data.make_results(run=run, results_all_folds=results_all_folds, study=study, metrics=metrics)
-            
+            all_models_dict = model_data.make_results(
+                run=run,
+                results_all_folds=results_all_folds,
+                study=study,
+                metrics=metrics,
+            )
+
             try:
                 # call model postprocessing on the single results dataclass
                 postprocessor = mapping[model_name]["post_processor"]()
@@ -471,17 +477,15 @@ def cross_validate(
                     features=X_train.columns,
                 )
             except KeyError:
-                logger.info(
-                    f"No postprocessor passed for {model_name}. Moving on..."
-                )
+                logger.info(f"No postprocessor passed for {model_name}. Moving on...")
 
             if evaluate_merf:
-            ###### MERF EVALUATION #################
-            # The base model is passed to the MERF class for evaluation in Expectation Maximization (EM) algorithm
+                ###### MERF EVALUATION #################
+                # The base model is passed to the MERF class for evaluation in Expectation Maximization (EM) algorithm
 
                 merf_name = f"MERF({model_name})"
                 logger.info(f"Evaluating {merf_name}...")
-                
+
                 # tag the base prediction
                 y_pred_base = y_pred.copy()
 
@@ -527,9 +531,14 @@ def cross_validate(
                     X_train=X_train_scaled,
                     fit_result=fit_result,
                 )
-                
-                all_models_dict = merf_data.make_results(run=run, results_all_folds=results_all_folds, study=study, metrics=metrics)
-                
+
+                all_models_dict = merf_data.make_results(
+                    run=run,
+                    results_all_folds=results_all_folds,
+                    study=study,
+                    metrics=metrics,
+                )
+
                 postprocessor = MERFModelPostProcessor()
                 all_models_dict = postprocessor(
                     results_all_folds=all_models_dict,

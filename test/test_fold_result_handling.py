@@ -4,8 +4,9 @@ import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 
-from flexcv.run import Run 
+from flexcv.run import Run
 from flexcv.fold_results_handling import SingleModelFoldResult
+
 
 def test_single_model_fold_result_init():
     # Test initialization
@@ -45,6 +46,7 @@ def test_single_model_fold_result_init():
     pd.testing.assert_frame_equal(single_model_fold_result.X_train, X_train)
     assert single_model_fold_result.fit_result == fit_result
 
+
 def test_single_model_fold_result_make_results_invalid_run():
     # Test make_results method with invalid run
     k = 1
@@ -78,6 +80,7 @@ def test_single_model_fold_result_make_results_invalid_run():
     with pytest.raises(TypeError):
         single_model_fold_result.make_results(run, results_all_folds, study, metrics)
 
+
 def test_single_model_fold_result_make_results_eval_metrics():
     # Test make_results method with focus on evaluation metrics
     k = 1
@@ -108,7 +111,9 @@ def test_single_model_fold_result_make_results_eval_metrics():
     results_all_folds = {}
     study = None
     metrics = {"mse": mean_squared_error}
-    results = single_model_fold_result.make_results(run, results_all_folds, study, metrics)
+    results = single_model_fold_result.make_results(
+        run, results_all_folds, study, metrics
+    )
     assert isinstance(results, dict)
     assert model_name in results
     assert isinstance(results[model_name], dict)
@@ -118,5 +123,10 @@ def test_single_model_fold_result_make_results_eval_metrics():
     assert isinstance(results[model_name]["metrics"][0], dict)
     assert "mse" in results[model_name]["metrics"][0]
     assert "mse_train" in results[model_name]["metrics"][0]
-    assert np.isclose(results[model_name]["metrics"][0]["mse"], mean_squared_error(y_test, y_pred))
-    assert np.isclose(results[model_name]["metrics"][0]["mse_train"], mean_squared_error(y_train, y_pred_train))
+    assert np.isclose(
+        results[model_name]["metrics"][0]["mse"], mean_squared_error(y_test, y_pred)
+    )
+    assert np.isclose(
+        results[model_name]["metrics"][0]["mse_train"],
+        mean_squared_error(y_train, y_pred_train),
+    )

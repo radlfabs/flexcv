@@ -146,11 +146,11 @@ class LinearMixedEffectsModel(BaseLinearModel):
         assert (
             len(clusters) == X.shape[0]
         ), "Number of clusters must match number of feature samples."
-        
+
         assert (
             re_formula is not None
         ), "re_formula must be specified for the LMER model."
-        
+
         assert (
             len(clusters.unique()) > 1
         ), "Only one cluster found. There might be a problem with the cluster column."
@@ -201,7 +201,7 @@ class LinearMixedEffectsModel(BaseLinearModel):
             logger.warning(
                 "Only one cluster found. There might be a problem with the cluster column."
             )
-        
+
         if predict_known_groups_lmm == True:
             yp = self.md_.predict(exog=X)
 

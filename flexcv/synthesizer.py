@@ -21,7 +21,7 @@ def generate_regression(
       noise_level (float): The data will be generated with added standard normal noise which is multiplied with noise_level. (Default value = 0.1)
       fixed_random_ratio (float): The ratio of the fixed effects to the random effects. (Default value = 0.01)
       random_seed (int): The random seed to be used for reproducibility. (Default value = 42)
-      
+
     Returns:
       (tuple): A tuple containing the following elements:
                 (The feature matrix DataFrame, the target vector Series, the group labels Series, the random slopes DataFrame)

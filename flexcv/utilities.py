@@ -11,10 +11,10 @@ def handle_duplicate_kwargs(*args) -> dict:
     """This function removes duplicate kwargs from mutiple dicts.
     If a key is present in multiple dicts, we check if the values are the same.
     If they are, we keep the key-value pair. If they are not, we raise a ValueError.
-    
+
     Args:
         kwargs (dict): A dict of kwargs.
-        
+
     Returns:
         (dict): The dict without duplicate kwargs.
     """
@@ -28,19 +28,21 @@ def handle_duplicate_kwargs(*args) -> dict:
                 # compare values
             else:
                 if arg[key] != return_kwargs[key]:
-                  raise ValueError(f"Duplicate key {key} found with different values. Overwriting.")
+                    raise ValueError(
+                        f"Duplicate key {key} found with different values. Overwriting."
+                    )
                 else:
-                  logger.info(f"Duplicate key {key} found with same value. Keeping.")
+                    logger.info(f"Duplicate key {key} found with same value. Keeping.")
 
     return return_kwargs
 
 
 def add_model_to_keys(param_grid):
     """This function adds the string "model__" to avery key of the param_grid dict.
-    
+
     Args:
       param_grid (dict): A dictionary of parameters for a model.
-      
+
     Returns:
       (dict): A dictionary of parameters for a model with the string "model__" added to each key.
     """
@@ -49,10 +51,10 @@ def add_model_to_keys(param_grid):
 
 def rm_model_from_keys(param_grid):
     """This function removes the string "model__" from avery key of the param_grid dict.
-    
+
     Args:
       param_grid (dict): A dictionary of parameters for a model.
-      
+
     Returns:
       (dict): A dictionary of parameters for a model with the string "model__" removed from each key.
     """
@@ -84,7 +86,7 @@ def add_module_handlers(logger: logging.Logger) -> None:
 
 def get_fixed_effects_formula(target_name, X_data) -> str:
     """Returns the fixed effects formula for the dataset.
-    
+
     Scheme: "target ~ column1 + column2 + ...
 
     Args:

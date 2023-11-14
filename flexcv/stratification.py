@@ -17,14 +17,15 @@ from sklearn.preprocessing import KBinsDiscretizer
 
 class ContinuousStratifiedKFold(BaseCrossValidator):
     """Continuous Stratified k-Folds cross validator, i.e. it works with *continuous* target variables instead of multiclass targets.
-    
-    This is a variation of StratifiedKFold that 
-    
+
+    This is a variation of StratifiedKFold that
+
         - makes a copy of the target variable and discretizes it.
         - applies stratified k-folds based on this discrete target to ensure equal percentile distribution across folds
         - does not further use or pass this discrete target.
         - does not apply grouping rules.
     """
+
     def __init__(self, n_splits, shuffle=True, random_state=42, groups=None):
         self.n_splits = n_splits
         self.shuffle = shuffle
@@ -56,7 +57,7 @@ class ContinuousStratifiedKFold(BaseCrossValidator):
             y_cat = pd.Series(y_cat, index=y.index)
         else:
             y_cat = kbins.fit_transform(y.reshape(-1, 1)).flatten().astype(int)  # type: ignore
-            
+
         return self.skf.split(X, y_cat)
 
     def get_n_splits(self, X=None, y=None, groups=None):
@@ -75,7 +76,7 @@ class ContinuousStratifiedKFold(BaseCrossValidator):
 
 class ContinuousStratifiedGroupKFold(GroupsConsumerMixin, BaseCrossValidator):
     """Continuous Stratified Group k-Folds cross validator.
-    This is a variation of StratifiedKFold that 
+    This is a variation of StratifiedKFold that
         - makes a temporal discretization of the target variable.
         - apply stratified group k-fold based on the passed groups and the discretized target.
         - does not further use this discretized target
@@ -128,7 +129,7 @@ class ContinuousStratifiedGroupKFold(GroupsConsumerMixin, BaseCrossValidator):
 class ConcatenatedStratifiedKFold(GroupsConsumerMixin, BaseCrossValidator):
     """Group Concatenated Continuous Stratified k-Folds cross validator.
     This is a variation of StratifiedKFold that uses a concatenation of target and grouping variable.
-        
+
         - The target is discretized.
         - Each discrete target label is casted to type(str) and concatenated with the grouping label
         - Stratification is applied to this new temporal concatenated target
@@ -136,6 +137,7 @@ class ConcatenatedStratifiedKFold(GroupsConsumerMixin, BaseCrossValidator):
         - The procedure allows overlapping groups which could be interpreted as data leakage in many cases.
         - Population (i.e. the input data set) distribution is leaking into the folds' distribution.
     """
+
     def __init__(self, n_splits, shuffle=True, random_state=42, groups=None):
         self.n_splits = n_splits
         self.shuffle = shuffle
@@ -172,7 +174,9 @@ class ConcatenatedStratifiedKFold(GroupsConsumerMixin, BaseCrossValidator):
             y_concat = y_cat.astype(str) + "_" + groups.astype(str)
         except UFuncTypeError:
             # Why easy when you can do it the hard way?
-            y_concat = np.core.defchararray.add(np.core.defchararray.add(y_cat.astype(str), "_"), groups.astype(str))
+            y_concat = np.core.defchararray.add(
+                np.core.defchararray.add(y_cat.astype(str), "_"), groups.astype(str)
+            )
 
         return self.skf.split(X, y_concat)
 

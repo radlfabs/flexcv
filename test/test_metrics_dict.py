@@ -1,6 +1,7 @@
 from flexcv.metrics import MetricsDict
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 
+
 def test_metrics_dict_init():
     # Test initialization
     metrics = MetricsDict()
@@ -8,6 +9,7 @@ def test_metrics_dict_init():
     assert metrics["r2"] == r2_score
     assert metrics["mse"] == mean_squared_error
     assert metrics["mae"] == mean_absolute_error
+
 
 def test_metrics_dict_custom_metric():
     # Test adding a custom metric
@@ -17,6 +19,7 @@ def test_metrics_dict_custom_metric():
     metrics = MetricsDict()
     metrics["custom"] = custom_metric
     assert metrics["custom"] == custom_metric
+
 
 def test_metrics_dict_metric_calculation():
     # Test calculation of a metric

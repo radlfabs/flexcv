@@ -9,10 +9,12 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 from unittest.mock import MagicMock, patch
 
+
 def test_linear_model_postprocessor_init():
     # Test initialization
     linear_model_postprocessor = LinearModelPostProcessor()
     assert isinstance(linear_model_postprocessor, LinearModelPostProcessor)
+
 
 @patch("flexcv.model_postprocessing.File.from_content")
 def test_lmer_model_postprocessor_call(mock_from_content):

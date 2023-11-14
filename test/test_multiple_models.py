@@ -51,8 +51,8 @@ def two_models_regression():
     )
 
     return (
-        np.mean([results["LinearModel"]["metrics"][k]["r2"] for k in range(3)]), 
-        np.mean([results["RandomForest"]["metrics"][k]["r2"] for k in range(3)])
+        np.mean([results["LinearModel"]["metrics"][k]["r2"] for k in range(3)]),
+        np.mean([results["RandomForest"]["metrics"][k]["r2"] for k in range(3)]),
     )
 
 

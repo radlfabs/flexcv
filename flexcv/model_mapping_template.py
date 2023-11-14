@@ -53,7 +53,7 @@ MODEL_MAPPING = ModelMappingDict(
                     "n_estimators": optuna.distributions.IntDistribution(2, 7000),
                 },
                 "post_processor": mp.RandomForestModelPostProcessor,
-                "add_merf": True
+                "add_merf": True,
             }
         ),
         "XGBoost": ModelConfigDict(
@@ -93,15 +93,14 @@ MODEL_MAPPING = ModelMappingDict(
                     "reg_lambda": optuna.distributions.FloatDistribution(0.001, 800),
                 },
                 "post_processor": mp.XGBoostModelPostProcessor,
-                "add_merf": True
-
+                "add_merf": True,
             }
         ),
         "EarthRegressor": ModelConfigDict(
             {
                 "requires_inner_cv": True,
                 "n_trials": 200,
-                "allows_n_jobs": False
+                "allows_n_jobs": False,
                 "model": EarthRegressor,
                 "params": {  # 'degree', 'endspan', 'fast_beta', 'fast_k', 'minspan', 'newvar_penalty', 'nk', 'nprune', 'pmethod', 'random_state', 'thresh'
                     "degree": optuna.distributions.IntDistribution(1, 5),
@@ -114,7 +113,7 @@ MODEL_MAPPING = ModelMappingDict(
                     # "fast_beta": # default(=1) yielded best results
                 },
                 "post_processor": mp.EarthRegressor,
-                "add_merf": True
+                "add_merf": True,
             }
         ),
         "SVR": ModelConfigDict(
@@ -137,7 +136,7 @@ MODEL_MAPPING = ModelMappingDict(
                     # "shrinking": default "True" yielded best restults
                 },
                 "post_processor": mp.SVRModelPostProcessor,
-                "add_merf": True
+                "add_merf": True,
             }
         ),
     }

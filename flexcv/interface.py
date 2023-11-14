@@ -206,8 +206,14 @@ class CrossValidation:
 
     def set_splits(
         self,
-        split_out: str | CrossValMethod | BaseCrossValidator | Iterator = CrossValMethod.KFOLD,
-        split_in: str | CrossValMethod | BaseCrossValidator | Iterator  = CrossValMethod.KFOLD,
+        split_out: str
+        | CrossValMethod
+        | BaseCrossValidator
+        | Iterator = CrossValMethod.KFOLD,
+        split_in: str
+        | CrossValMethod
+        | BaseCrossValidator
+        | Iterator = CrossValMethod.KFOLD,
         n_splits_out: int = 5,
         n_splits_in: int = 5,
         scale_out: bool = True,
@@ -269,37 +275,48 @@ class CrossValidation:
             Read more about it in the respective documentation of the `CrossValMethod` enum.
 
         """
-        
+
         # get values of CrossValMethod enums
         ALLOWED_STRINGS = [method.value for method in CrossValMethod]
         ALLOWED_METHODS = [method for method in CrossValMethod]
-        
+
         if isinstance(split_out, str) and (split_out not in ALLOWED_STRINGS):
-            raise TypeError(f"split_out must be a valid CrossValMethod name, was {split_out}. Choose from: " + ", ".join(ALLOWED_STRINGS) + ".")
-        
+            raise TypeError(
+                f"split_out must be a valid CrossValMethod name, was {split_out}. Choose from: "
+                + ", ".join(ALLOWED_STRINGS)
+                + "."
+            )
+
         if isinstance(split_in, str) and (split_in not in ALLOWED_STRINGS):
-            raise TypeError(f"split_in must be a valid CrossValMethod name, was {split_in}. Choose from: " + ", ".join(ALLOWED_STRINGS) + ".")
-        
-        if not any(
-            [
-                isinstance(split_out, str), 
-                isinstance(split_out, CrossValMethod),
-                isinstance(split_out, BaseCrossValidator),
-                isinstance(split_out, Iterator)
-                ]
-            ):
-            raise TypeError("split_out must be of Type str, CrossValMethod, BaseCrossValidator or Iterator.")
+            raise TypeError(
+                f"split_in must be a valid CrossValMethod name, was {split_in}. Choose from: "
+                + ", ".join(ALLOWED_STRINGS)
+                + "."
+            )
 
         if not any(
             [
-                isinstance(split_in, str), 
+                isinstance(split_out, str),
+                isinstance(split_out, CrossValMethod),
+                isinstance(split_out, BaseCrossValidator),
+                isinstance(split_out, Iterator),
+            ]
+        ):
+            raise TypeError(
+                "split_out must be of Type str, CrossValMethod, BaseCrossValidator or Iterator."
+            )
+
+        if not any(
+            [
+                isinstance(split_in, str),
                 isinstance(split_in, CrossValMethod),
                 isinstance(split_in, BaseCrossValidator),
-                isinstance(split_in, Iterator)
-                ]
-            ):
-            raise TypeError("split_in must be of Type str, CrossValMethod, BaseCrossValidator or Iterator.")
-               
+                isinstance(split_in, Iterator),
+            ]
+        ):
+            raise TypeError(
+                "split_in must be of Type str, CrossValMethod, BaseCrossValidator or Iterator."
+            )
 
         if isinstance(split_out, CrossValMethod) and (split_out not in ALLOWED_METHODS):
             raise TypeError("split_out must be a valid CrossValMethod ")
@@ -402,14 +419,13 @@ class CrossValidation:
         # assign values
         self.config["predict_known_groups_lmm"] = predict_known_groups_lmm
         return self
-    
+
     def set_merf(
         self,
         add_merf_global: bool = False,
         em_max_iterations: int = 100,
         em_stopping_threshold: float = None,
         em_stopping_window: int = None,
-
     ):
         """Configure mixed effects parameters.
 
@@ -432,7 +448,6 @@ class CrossValidation:
             raise TypeError("em_stopping_threshold must be a float")
         if em_stopping_window and not isinstance(em_stopping_window, int):
             raise TypeError("em_stopping_window must be an integer")
-
 
         # assign values
         self.config["add_merf_global"] = add_merf_global
@@ -473,9 +488,17 @@ class CrossValidation:
         self.config["diagnostics"] = diagnostics
         self.config["random_seed"] = random_seed
         return self
-    
-    def add_model(self, model_class: object, requires_inner_cv: bool = False, model_name: str = "", post_processor: ModelPostProcessor = None, params: dict = None, **kwargs):
-        """Add a model to the model mapping dict. 
+
+    def add_model(
+        self,
+        model_class: object,
+        requires_inner_cv: bool = False,
+        model_name: str = "",
+        post_processor: ModelPostProcessor = None,
+        params: dict = None,
+        **kwargs,
+    ):
+        """Add a model to the model mapping dict.
         This method is a convenience method to add a model to the model mapping dict without needing the ModelMappingDict and ModelConfigDict classes.
 
         Args:
@@ -487,7 +510,7 @@ class CrossValidation:
 
         Returns:
             (CrossValidation): self
-            
+
         Example:
             ```python
             >>> from flexcv import CrossValidation
@@ -515,34 +538,37 @@ class CrossValidation:
             ```
             As you can see the `add_model()` method is a convenience method to add a model to the model mapping dict without needing the ModelMappingDict and ModelConfigDict classes.
             In cases of multiple models per run, or if you want to reuse the model mapping dict, you should look into the `ModelMappingDict` and the `set_models()` method.
-        
+
         """
-        
+
         # check values
         if not isinstance(model_name, str):
             raise TypeError("model_name must be a string")
 
         if not issubclass(model_class, object):
             raise TypeError("model_class must be a class")
-        
+
         if not isinstance(requires_inner_cv, bool):
             raise TypeError("skip_inner_cv must be a boolean")
-        
+
         if params is not None and not isinstance(params, dict):
             raise TypeError("params must be a dict")
-        
+
         if requires_inner_cv and params is None:
-            warnings.warn(f"You did not provide hyperparameters for the model {model_name} but set requires_inner_cv to True.", UserWarning)
+            warnings.warn(
+                f"You did not provide hyperparameters for the model {model_name} but set requires_inner_cv to True.",
+                UserWarning,
+            )
 
         if not requires_inner_cv and params is not None and params != {}:
             requires_inner_cv = True
-        
+
         if not params:
             params = {}
 
         if not model_name:
             model_name = model_class.__name__
-        
+
         # check if post_processor is a class that inherits ModelPostProcessor object that is not instantiated
         if post_processor and not issubclass(post_processor, ModelPostProcessor):
             raise TypeError("post_processor must be a ModelPostProcessor")
@@ -550,83 +576,100 @@ class CrossValidation:
         # params and kwargs may not contain the same keys
         if kwargs is not None and not isinstance(kwargs, dict):
             raise TypeError("kwargs must be a dict")
-        
+
         if kwargs is not None and (set(params.keys()) & set(kwargs.keys())):
-            raise ValueError("params and additional kwargs may not contain the same keys")
+            raise ValueError(
+                "params and additional kwargs may not contain the same keys"
+            )
 
         if kwargs is None:
             kwargs = {}
-        
+
         config_dict = {
-                "model": model_class,
-                "post_processor": post_processor,
-                "requires_inner_cv": requires_inner_cv,
-                "params": params,
-                **kwargs,
-            }
+            "model": model_class,
+            "post_processor": post_processor,
+            "requires_inner_cv": requires_inner_cv,
+            "params": params,
+            **kwargs,
+        }
 
         self.config["mapping"][model_name] = ModelConfigDict(config_dict)
         return self
-    
+
     def _describe_config(self):
         """This function creates a representation of the config dict for logging purposes. It includes the Model Mapping and a target variable description."""
-        
+
         mapping_str = " + ".join(self.config["mapping"].keys())
         target_str = self.config["target_name"]
         return f"CrossValidation Summary for Regression of Target {target_str} with Models {mapping_str}"
 
     def _prepare_before_perform(self):
         """Make preparation steps before performing the cross validation.
-        
+
         - Checks if a neptune run object has been set. If the user did not provide a neptune run object, a dummy run is instantiated.
         - Checks if the split_out and split_in attributes are set to strings and converts the strings to a CrossValMethod enum.
-        
+
         Iterates over the ModelMappingDict:
         - Checks if n_trials is set for every model. If not, set to the value of self.config["n_trials"]. If n_trials is not set for a model and not set for the CrossValidation object, it is not used.
         - Checks if "add_merf" is set for a model or if it set globally in the class. In the latter case, the value is set for the model.
         - Checks if the model signature contains "clusters". If so, the model is a mixed effects model and we set a flag "consumes_clusters" to True.
-        
+
         This method is called by the `perform()` method.
         """
         if isinstance(self.config["split_out"], str):
-            self.config["split_out"] = string_to_crossvalmethod(self.config["split_out"])
+            self.config["split_out"] = string_to_crossvalmethod(
+                self.config["split_out"]
+            )
 
         if isinstance(self.config["split_in"], str):
             self.config["split_in"] = string_to_crossvalmethod(self.config["split_in"])
-            
+
         if not "run" in self.config:
             self.config["run"] = DummyRun()
-        
+
         # check if add_merf is set globally
         # iterate over all items in the model mapping
         # if the inenr dict has a key "add_merf" do nothing
         # if it doesnt and add_merf is set globally, set it for the model
-        self.config["add_merf_global"] = self.config.setdefault("add_merf_global", False)
+        self.config["add_merf_global"] = self.config.setdefault(
+            "add_merf_global", False
+        )
         self.config["n_trials"] = self.config.setdefault("n_trials", 100)
-        
+
         for model_key, inner_dict in self.config["mapping"].items():
             if "n_trials" not in inner_dict:
                 self.config["mapping"][model_key]["n_trials"] = self.config["n_trials"]
-            
+
             if "add_merf" not in inner_dict:
-                self.config["mapping"][model_key]["add_merf"] = self.config["add_merf_global"]
-                
+                self.config["mapping"][model_key]["add_merf"] = self.config[
+                    "add_merf_global"
+                ]
+
             # check model signature for groups and slopes
             # if the model signature contains groups and slopes, the model is a mixed effects model
             model_class = inner_dict["model"]
             model_signature_parameters = inspect.signature(model_class).parameters
-            model_fit_signature_parameters = inspect.signature(model_class.fit).parameters
-            
-            self.config["mapping"][model_key]["consumes_clusters"] = "clusters" in model_fit_signature_parameters
-            self.config["mapping"][model_key]["requires_formula"] = "formula" in model_fit_signature_parameters
-            
+            model_fit_signature_parameters = inspect.signature(
+                model_class.fit
+            ).parameters
+
+            self.config["mapping"][model_key]["consumes_clusters"] = (
+                "clusters" in model_fit_signature_parameters
+            )
+            self.config["mapping"][model_key]["requires_formula"] = (
+                "formula" in model_fit_signature_parameters
+            )
+
             self.config["mapping"][model_key]["model_kwargs"] = {}
             if "n_jobs" in model_signature_parameters:
-                self.config["mapping"][model_key]["model_kwargs"]["n_jobs"] = self.config["mapping"][model_key]["n_jobs_model"]
-                
+                self.config["mapping"][model_key]["model_kwargs"][
+                    "n_jobs"
+                ] = self.config["mapping"][model_key]["n_jobs_model"]
+
             if "random_state" in model_signature_parameters:
-                self.config["mapping"][model_key]["model_kwargs"]["random_state"] = self.config["random_seed"]
-  
+                self.config["mapping"][model_key]["model_kwargs"][
+                    "random_state"
+                ] = self.config["random_seed"]
 
     def _log_config(self):
         """Logs the config to Neptune. If None, a Dummy is instantiated.
@@ -640,20 +683,22 @@ class CrossValidation:
         """
         run = self.config["run"]
 
-        #run["Data/DatasetName"] = self.config["dataset_name"] if self.config["dataset_name"] is not None else "None"
+        # run["Data/DatasetName"] = self.config["dataset_name"] if self.config["dataset_name"] is not None else "None"
         run["Data/TargetName"] = self.config["target_name"]
         run["Data/model_effects"] = self.config["model_effects"]
         run["Data/X"].upload(File.as_html(self.config["X"]))
         run["Data/y"].upload(File.as_html(pd.DataFrame(self.config["y"])))
-        
+
         if self.config["groups"] is not None:
             run["Data/groups"].upload(File.as_html(pd.DataFrame(self.config["groups"])))
             run["Data/groups_name"] = self.config["groups"].name
-            
+
         if self.config["slopes"] is not None:
             run["Data/slopes"].upload(File.as_html(pd.DataFrame(self.config["slopes"])))
-            run["Data/slopes_name"] = pd.DataFrame(self.config["slopes"]).columns.tolist()
-    
+            run["Data/slopes_name"] = pd.DataFrame(
+                self.config["slopes"]
+            ).columns.tolist()
+
         try:
             run["Config/Split/cross_val_method_out"] = self.config["split_out"].value
         except AttributeError:
@@ -663,12 +708,11 @@ class CrossValidation:
         except AttributeError:
             run["Config/Split/cross_val_method_in"] = self.config["split_in"]
 
-        
         if self.config["metrics"] is not None:
             run["Config/Split/metrics"] = pformat(self.config["metrics"])
         else:
             run["Config/Split/metrics"] = "default"
-            
+
         run["Config/Split/n_splits_out"] = self.config["n_splits_out"]
         run["Config/Split/n_splits_in"] = self.config["n_splits_in"]
         run["Config/Split/scale_in"] = self.config["scale_in"]
@@ -676,11 +720,19 @@ class CrossValidation:
         run["Config/Split/break_cross_val"] = self.config["break_cross_val"]
         run["ModelMapping"] = pformat(self.config["mapping"])
         run["Config/Optimization/n_trials"] = self.config["n_trials"]
-        run["Config/Optimization/objective_scorer"] = pformat(self.config["objective_scorer"])
+        run["Config/Optimization/objective_scorer"] = pformat(
+            self.config["objective_scorer"]
+        )
         run["Config/MixedEffects/em_max_iterations"] = self.config["em_max_iterations"]
-        run["Config/MixedEffects/em_stopping_threshold"] = self.config["em_stopping_threshold"]
-        run["Config/MixedEffects/em_stopping_window"] = self.config["em_stopping_window"]
-        run["Config/MixedEffects/predict_known_groups_lmm"] = self.config["predict_known_groups_lmm"]
+        run["Config/MixedEffects/em_stopping_threshold"] = self.config[
+            "em_stopping_threshold"
+        ]
+        run["Config/MixedEffects/em_stopping_window"] = self.config[
+            "em_stopping_window"
+        ]
+        run["Config/MixedEffects/predict_known_groups_lmm"] = self.config[
+            "predict_known_groups_lmm"
+        ]
         run["Config/Run/diagnostics"] = self.config["diagnostics"]
         run["Config/Run/random_seed"] = self.config["random_seed"]
         self._config_logged_ = True
@@ -740,12 +792,12 @@ class CrossValidation:
     def was_performed(self) -> bool:
         """Returns True if the cross validation was performed."""
         return self._was_performed_
-    
+
     @property
     def was_logged(self) -> bool:
         """Returns True if the cross validation was logged."""
         return self._was_logged_
-    
+
     @property
     def cv_description(self) -> str:
         """Returns a string describing the cross validation configuration."""

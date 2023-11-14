@@ -64,17 +64,17 @@ def merf_mixed_xgboost():
 
     model_map = ModelMappingDict(
         {
-        "XGBoost": ModelConfigDict(
-                    {
-                        "requires_inner_cv": True,
-                        "n_jobs_model": -1,
-                        "n_jobs_cv": -1,
-                        "model": XGBRegressor,
-                        "params": {
-                            "max_depth": optuna.distributions.IntDistribution(2, 700),
-                        },
-                        "post_processor": mp.XGBoostModelPostProcessor,
-                    }
+            "XGBoost": ModelConfigDict(
+                {
+                    "requires_inner_cv": True,
+                    "n_jobs_model": -1,
+                    "n_jobs_cv": -1,
+                    "model": XGBRegressor,
+                    "params": {
+                        "max_depth": optuna.distributions.IntDistribution(2, 700),
+                    },
+                    "post_processor": mp.XGBoostModelPostProcessor,
+                }
             ),
         }
     )
@@ -95,10 +95,7 @@ def merf_mixed_xgboost():
 
 def test_merf_xgboost():
     """Test if the mean r2 value of the random forest regression is is exactly the same over time."""
-    assert np.isclose(
-        [merf_mixed_xgboost()],
-        [-0.12340731619124896]
-        )
+    assert np.isclose([merf_mixed_xgboost()], [-0.12340731619124896])
 
 
 def merf_earth_regression():
@@ -150,16 +147,18 @@ def merf_svr_regression():
     model_map = ModelMappingDict(
         {
             "SVR": ModelConfigDict(
-            {
-                "requires_inner_cv": True,
-                "allows_n_jobs": False,
-                "allows_seed": False,
-                "model": SVR,
-                "params": {
-                    "C": optuna.distributions.FloatDistribution(0.001, 50, log=True),
-                },
-                "post_processor": mp.SVRModelPostProcessor,
-            }
+                {
+                    "requires_inner_cv": True,
+                    "allows_n_jobs": False,
+                    "allows_seed": False,
+                    "model": SVR,
+                    "params": {
+                        "C": optuna.distributions.FloatDistribution(
+                            0.001, 50, log=True
+                        ),
+                    },
+                    "post_processor": mp.SVRModelPostProcessor,
+                }
             ),
         }
     )

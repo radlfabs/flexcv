@@ -9,7 +9,12 @@ from flexcv.interface import ModelConfigDict
 from flexcv.interface import ModelMappingDict
 from flexcv.run import Run
 from flexcv.models import LinearModel
-from flexcv.model_postprocessing import LinearModelPostProcessor, LMERModelPostProcessor, RandomForestModelPostProcessor
+from flexcv.model_postprocessing import (
+    LinearModelPostProcessor,
+    LMERModelPostProcessor,
+    RandomForestModelPostProcessor,
+)
+
 
 def simple_regression():
     X, y, _, _ = generate_regression(
@@ -28,11 +33,7 @@ def simple_regression():
 
     cv = CrossValidation()
     results = (
-        cv.set_data(X, y)
-        .set_models(model_map)
-        .set_run(Run())
-        .perform()
-        .get_results()
+        cv.set_data(X, y).set_models(model_map).set_run(Run()).perform().get_results()
     )
 
     return np.mean(results["LinearModel"]["folds_by_metrics"]["r2"])
@@ -69,7 +70,9 @@ def set_splits_input_kfold_with_linear_model():
 
 
 def test_set_splits_input_kfold_with_linear_model():
-    assert np.isclose([set_splits_input_kfold_with_linear_model()], [0.4265339487499462])
+    assert np.isclose(
+        [set_splits_input_kfold_with_linear_model()], [0.4265339487499462]
+    )
 
 
 def random_forest_regression():

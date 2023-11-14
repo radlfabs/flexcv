@@ -1,4 +1,3 @@
-
 from dataclasses import dataclass
 from pprint import pformat
 from typing import Any
@@ -12,11 +11,12 @@ from optuna.study import Study
 
 from .metrics import METRICS, MetricsDict
 
+
 @dataclass
 class SingleModelFoldResult:
     """This dataclass is used to store the fold data as well as the predictions of a single model in a single fold.
     It's make_results method is used to evaluate the model with the metrics and log the results to Neptune.
-    
+
     Attributes:
         k (int): The fold number.
         model_name (str): The name of the model.
@@ -29,8 +29,9 @@ class SingleModelFoldResult:
         y_pred_train (pd.Series): The predictions of the model.
         X_train (pd.DataFrame): The train data.
         fit_result (Any): The result of the fit method of the model.
-    
+
     """
+
     k: int
     model_name: str
     best_model: object
@@ -42,7 +43,7 @@ class SingleModelFoldResult:
     y_pred_train: pd.Series
     X_train: pd.DataFrame
     fit_result: Any
-    
+
     def make_results(
         self,
         run,
@@ -51,16 +52,17 @@ class SingleModelFoldResult:
         metrics: MetricsDict = METRICS,
     ):
         """This method is used to evaluate the model with the metrics and log the results to Neptune.
-        
+
         Args:
           run (neptune.run): Neptune run object.
           results_all_folds (dict): Dictionary containing the results of all models and folds.
           study (optuna.study): Optuna study object.
           metrics (dict): Dictionary containing the metrics to be evaluated.
-        
+
         Returns:
           (dict): Dictionary containing the results of all models and folds.
         """
+
         def res_vs_fitted_plot(y_test, y_pred):
             fig = plt.figure()
             residuals = y_test - y_pred
@@ -85,11 +87,13 @@ class SingleModelFoldResult:
             mse_in_train = np.nan
             mse_in_test = np.nan
             of = np.nan
-        
+
         eval_metrics = {}
         for metric_name, metric_func in metrics.items():
             eval_metrics[metric_name] = metric_func(self.y_test, self.y_pred)
-            eval_metrics[metric_name + "_train"] = metric_func(self.y_train, self.y_pred_train)
+            eval_metrics[metric_name + "_train"] = metric_func(
+                self.y_train, self.y_pred_train
+            )
 
         eval_metrics["mse_in_test"] = mse_in_test
         eval_metrics["mse_in_train"] = mse_in_train
@@ -125,6 +129,8 @@ class SingleModelFoldResult:
         run[f"{self.model_name}/ObjectiveValue"].append(of)
         run[f"{self.model_name}/Model/{self.k}"].upload(File.as_pickle(self.best_model))
         run[f"{self.model_name}/Parameters/"].append(pformat(self.best_params))
-        run[f"{self.model_name}/ResPlot/"].append(res_vs_fitted_plot(self.y_test, self.y_pred))
+        run[f"{self.model_name}/ResPlot/"].append(
+            res_vs_fitted_plot(self.y_test, self.y_pred)
+        )
         plt.close()
         return results_all_folds

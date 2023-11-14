@@ -372,13 +372,14 @@ class ModelPostProcessor(ABC):
     All postprocessing functions must inherit from this class.
     Implement your own post processing routing by inheriting from this class and implementing the __call__ method.
     The class instance is called in the cross validation loop.
-    
+
     Methods:
         __call__ (abstract): method to be implemented by the user. This method is called in the cross validation loop.
     """
+
     def __init__(self):
         pass
-    
+
     def __call__(
         self,
         results_all_folds: dict,
@@ -386,11 +387,11 @@ class ModelPostProcessor(ABC):
         features: pd.Index | list[str] | np.ndarray[str],
         run: Run,
         *args,
-        **kwargs
-        ) -> dict:
+        **kwargs,
+    ) -> dict:
         """This method is called in the cross validation loop.
         Implement your own post processing routing by inheriting from this class and implementing the __call__ method.
-        
+
         Args:
             results_all_folds (dict): A dict of results for all folds
             fold_result (SingleModelFoldResult): A dataclass containing the results for the current fold
@@ -398,13 +399,13 @@ class ModelPostProcessor(ABC):
             run (Run): neptune run object
             *args: any additional arguments
             **kwargs: any additional keyword arguments
-        
+
         Returns:
             results_all_folds (dict): updated results dictionary
         """
-        
+
         pass
-    
+
 
 class LinearModelPostProcessor(ModelPostProcessor):
     def __init__(self):
@@ -474,7 +475,7 @@ class LMERModelPostProcessor(ModelPostProcessor):
 class RandomForestModelPostProcessor(ModelPostProcessor):
     def __init__(self):
         super().__init__()
-        
+
     def __call__(self, results_all_folds, fold_result, features, run, *args, **kwargs):
         """Postprocessing function for the random forest model.
         Logs the parameters to Neptune.
@@ -523,7 +524,7 @@ class RandomForestModelPostProcessor(ModelPostProcessor):
 class XGBoostModelPostProcessor(ModelPostProcessor):
     def __init__(self):
         super().__init__()
-        
+
     def __call__(self, results_all_folds, fold_result, features, run, *args, **kwargs):
         """Postprocessing function for the xgboost model.
         Logs the parameters to Neptune.
@@ -572,7 +573,7 @@ class XGBoostModelPostProcessor(ModelPostProcessor):
 class EarthModelPostProcessor(ModelPostProcessor):
     def __init__(self):
         super().__init__()
-    
+
     def __call__(self, results_all_folds, fold_result, features, run, *args, **kwargs):
         """Postprocessing function for the MARS model.
         Logs the parameters to Neptune.
@@ -608,7 +609,9 @@ class EarthModelPostProcessor(ModelPostProcessor):
                 del fig
                 plt.close()
 
-            run[f"{fold_result.model_name}/BestParams"].append(pformat(fold_result.best_params))
+            run[f"{fold_result.model_name}/BestParams"].append(
+                pformat(fold_result.best_params)
+            )
 
         return results_all_folds
 
@@ -616,7 +619,7 @@ class EarthModelPostProcessor(ModelPostProcessor):
 class SVRModelPostProcessor(ModelPostProcessor):
     def __init__(self):
         super().__init__()
-        
+
     def __call__(self, results_all_folds, fold_result, features, run, *args, **kwargs):
         """Postprocessing function for the SVR model.
         Logs the parameters to Neptune.
@@ -649,11 +652,14 @@ class SVRModelPostProcessor(ModelPostProcessor):
 
         return results_all_folds
 
+
 class MERFModelPostProcessor(ModelPostProcessor):
     def __init__(self):
         super().__init__()
-        
-    def __call__(self, results_all_folds, fold_result, y_pred_base, run, *args, **kwargs):
+
+    def __call__(
+        self, results_all_folds, fold_result, y_pred_base, run, *args, **kwargs
+    ):
         """Postprocessing function for the expectation maximization model (MERF).
         Logs training and test plots to Neptune.
 

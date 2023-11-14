@@ -1,5 +1,5 @@
-
 from flexcv.run import Run
+
 
 def test_run_methods_no_exception():
     # Test all methods
