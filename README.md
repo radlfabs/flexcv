@@ -97,11 +97,9 @@ Now you have installed everything you need to perform flexible cross validation 
 Let's set up a minimal working example using a LinearRegression estimator and some randomly generated regression data.
 
 ```py
-# import the most important object
+# import the interface class, a data generator and our model
 from flexcv import CrossValidation
-# import the function for data generation
 from flexcv.synthesizer import generate_regression
-# import the model class
 from flexcv.models import LinearModel
   
 # generate some random sample data that is clustered
