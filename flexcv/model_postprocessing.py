@@ -141,7 +141,7 @@ class LinearRegDiagnostic:
         self.nparams = len(self.results.params)
         self.nresids = len(self.residual_norm)
 
-    def __call__(self, plot_context="seaborn-paper", **kwargs):
+    def __call__(self, plot_context="seaborn-v0_8-paper", **kwargs):
         # print(plt.style.available)
         with plt.style.context(plot_context):
             fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(10, 10))
