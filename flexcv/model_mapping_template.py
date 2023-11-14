@@ -1,7 +1,6 @@
 """
 This module provides a template dictionary that maps mutiple machine learning model names to the respective model configuration dicts.
 """
-# TODO redo this template
 import optuna
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.svm import SVR
