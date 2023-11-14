@@ -15,28 +15,18 @@ Here is the full code to perform cross validation 3 times and get summary statis
 ```python
 from flexcv.synthesizer import generate_regression
 from flexcv.models import LinearModel
-from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
+from flexcv.model_postprocessing import LinearModelPostProcessor
 from flexcv.repeated import RepeatedCV
 
 # make sample data
 X, y, group, random_slopes =generate_regression(10,100,n_slopes=1,noise_level=9.1e-2, random_seed=42
 
-# create a basic model mapping
-model_map =ModelMappingDict(
-    {
-        "LinearModel": ModelConfigDict(
-        {
-            "model": LinearModel,
-        }
-    ),
-    }
-)
-
 credentials = {}
 
 rcv = (
     RepeatedCV()
-    .set_data(X, y, group,dataset_name="ExampleData")
+    .add_model(LinearModel, post_processor=LinearModelPostProcessor)
+    .set_data(X, y, group, dataset_name="ExampleData")
     .set_models(model_map)
     .set_n_repeats(3)
     .set_neptune(credentials)

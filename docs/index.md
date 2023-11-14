@@ -22,12 +22,12 @@ The `flexcv` package provides the following features:
 3. Customization of objective functions for optimization to select meaningful model parameters.
 4. Fixed and mixed effects modeling (random intercepts and slopes).
 5. Scaling of inner and outer cross-validation folds separately.
-6. Easy usage of the state-of-the-art logging dashboard `neptune` to track all of your experiments.
-7. Adaptations for cross validation splits with stratification for continuous target variables.
-8. Easy local summary of all evaluation metrics in a single table.
-9. Wrapper classes for the R `earth` package to use the powerful regression splines in Python. Read more about that package [here](https://www.rdocumentation.org/packages/earth/versions/5.3.2).
-10. Wrapper classes for the `statsmodels` package to use their mixed effects models inside of a `sklearn` Pipeline. Read more about that package [here](https://github.com/manifoldai/merf).
-11. Uses the `merf` package to apply correction for clustered data using the expectation maximization algorithm and supporting any `sklearn` BaseEstimator. Read more about that package [here](https://github.com/manifoldai/merf).
+6. Easy usage of the state-of-the-art MLops platform `neptune` to track all of your experiments. Have a look at their [website](https://neptune.ai/) or explore our [neptune project](https://ui.neptune.ai/radlfabs/flexcv-testing) that we used for testing this package.
+7. Integrates the `merf` package to apply correction for clustered data using the expectation maximization algorithm and supporting any `sklearn` BaseEstimator. Read more about that package [here](https://github.com/manifoldai/merf).
+8. Adaptations for cross validation splits with stratification for continuous target variables.
+9. Easy local summary of all evaluation metrics in a single table.
+10. Wrapper classes for the R `earth` package to use the powerful regression splines in Python. Read more about the package [here](https://www.rdocumentation.org/packages/earth/versions/5.3.2).
+11. Wrapper classes for the `statsmodels` package to use their mixed effects models inside of a `sklearn` Pipeline. Read more about that package [here](https://github.com/manifoldai/merf).
 12. Inner cross validation implementation that let's you push groups to the inner split, e. g. to apply GroupKFold.
 13. Customizable ObjectiveScorer function for hyperparameter tuning, that let's you make a trade-off between under- and overfitting.
 

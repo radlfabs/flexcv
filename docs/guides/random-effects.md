@@ -50,33 +50,19 @@ Here is an example how you would apply an LMM to grouped sample data.
 In our implementation, we think of the model names passed as keys in the `ModelMappingDict` as referring to base estimators, i. e. fixed effects models. Mixed effects models often make use of base estimators. Therefore, we just append the LMM to the linear model's configuration.
 
 ```python
+from flexcv import CrossValidation
+from flexcv.models import LinearModel, LinearMixedEffectsModel
+from flexcv.synthesizer import generate_regression
+
 X, y, group, random_slopes =generate_regression(
     10,100,n_slopes=1,noise_level=9.1e-2
-)
-
-model_map =ModelMappingDict(
-    {
-        "LinearModel": ModelConfigDict(
-            {
-                "requires_inner_cv": False,
-                "requires_formula": True,
-                "n_jobs_model": 1,
-                "n_jobs_cv": 1,
-                "model": LinearModel,
-                "params": {},
-                "mixed_model": LinearMixedEffectsModel,
-            }
-        ),
-    }
 )
 
 cv =CrossValidation()
 results = (
     cv.set_data(X, y, group, random_slopes)
     .set_splits(n_splits_out=3)
-    .set_models(model_map)
-    .set_mixed_effects(True)
-    .set_run(Run())
+    .add_model(LinearMixedEffectsModel)
     .perform()
     .get_results()
 )
@@ -87,35 +73,23 @@ results = (
 The MERF class can be used to optimize any base estimator for mixed effects utilizing the expectation maximization (EM) algorithm. In the cross validation process, the base estimator is passed to MERF after hyperparameter tuning. There, a new instantance is created and fit to the data using the EM algorithm.
 
 ```python
+import optuna
+from sklearn.ensemble import RandomForestRegressor
+from flexcv import CrossValidation
+from flexcv.merf import MERF
+from flexcv.model_postprocessing import RandomForestModelPostProcessor
+from flexcv.synthesizer import generate_regression
+
+
+# lets start with generating some clustered data
 X, y, group, random_slopes =generate_regression(
     10,100,n_slopes=1,noise_level=9.1e-2
 )
-
-model_map =ModelMappingDict(
-    {
-        "RandomForest": ModelConfigDict(
-            {
-                "requires_inner_cv": True,
-                "requires_formula": False,
-                "allows_seed": True,
-                "allows_n_jobs": True,
-                "n_jobs_model": -1,
-                "n_jobs_cv": -1,
-                "model": RandomForestRegressor,
-                "params": {
-                    "max_depth": optuna.distributions.IntDistribution(5,100),
-                    "n_estimators": optuna.distributions.CategoricalDistribution(
-                        [10]
-                    ),
-                },
-                "mixed_model": MERF,
-                "post_processor": mp.rf_post,
-                "mixed_post_processor": mp.expectation_maximation_post,
-                "mixed_name": "MERF",
-           }
-        ),
-    }
-)
+# define our hyperparameters
+params = {
+    "max_depth": optuna.distributions.IntDistribution(5,100),
+    "n_estimators": optuna.distributions.CategoricalDistribution([10]),
+}
 
 cv =CrossValidation()
 results = (
@@ -123,8 +97,8 @@ results = (
     .set_models(model_map)
     .set_inner_cv(3)
     .set_splits(n_splits_out=3)
-    .set_run(Run(),random_seed=42)
-    .set_mixed_effects(True,25)
+    .add_model(model=RandomForestRegressor, requires_inner_cv=True, params=params, post_processor=RandomForestModelPostProcessor)
+    .set_merf(True)
     .perform()
     .get_results()
 )
