@@ -6,12 +6,15 @@ from unittest.mock import MagicMock
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import KFold
 import numpy as np
-    
+from xgboost import XGBRegressor
+
+from flexcv.models import LinearModel, LinearMixedEffectsModel
 from flexcv.interface import CrossValidationResults, CrossValidation
 from flexcv.split import CrossValMethod
 from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
 from flexcv.run import NeptuneRun
 from flexcv.run import Run as DummyRun
+from flexcv import model_postprocessing
 
 
 def test_cross_validation_init():
@@ -368,8 +371,8 @@ def test_cross_validation_log_no_run():
     cv.results_ = MagicMock()
     cv.results_.summary = pd.DataFrame({'column1': [1, 2, 3]})
     cv._prepare_before_perform()
-    cv._log()
-    assert cv._was_logged_ == True
+    cv._log_config()
+    assert cv._config_logged_ == True
 
 def test_cross_validation_log_with_run():
     # Test _log method with run
@@ -383,8 +386,8 @@ def test_cross_validation_log_with_run():
     cv.config["slopes"] = None
     run = DummyRun()
     cv.config["run"] = run
-    cv._log()
-    assert cv._was_logged_ == True
+    cv._log_config()
+    assert cv._config_logged_ == True
 
 def test_cross_validation_log_no_results():
     # Test _log method when results_ does not exist
@@ -398,7 +401,8 @@ def test_cross_validation_log_no_results():
     cv.config["slopes"] = None
     cv._was_logged_ = False
     with patch('flexcv.interface.logger.warning') as mock_warning:
-        cv._log()
+        cv._log_config()
+        cv._log_results()
         mock_warning.assert_called_once_with("You have not called perform() yet. No results to log. Call perform() to log the results.")
 
 def test_cross_validation_get_results_was_performed():
@@ -511,8 +515,122 @@ def test_prepare_before_perform_invalid_model():
     cv.set_models(ModelMappingDict({
         "InvalidModel": ModelConfigDict({
             "model": "InvalidModel",
-            "parameters": {"n_estimators": 100}
+            "params": {"n_estimators": 100}
         })
     }))
     with pytest.raises(TypeError):
         cv._prepare_before_perform()
+
+def test_add_model_valid():
+    # Test add_model method with valid arguments
+    cv = CrossValidation()
+    model_class = RandomForestRegressor
+    model_name = "RandomForestRegressor"
+    post_processor = model_postprocessing.ModelPostProcessor
+    params = {"n_estimators": 100}
+    cv.add_model(model_class, False, model_name, post_processor, params)
+    assert model_name in cv.config["mapping"]
+    assert isinstance(cv.config["mapping"][model_name], ModelConfigDict)
+    assert cv.config["mapping"][model_name]["model"] == model_class
+    assert cv.config["mapping"][model_name]["post_processor"] == post_processor
+    assert cv.config["mapping"][model_name]["params"]["n_estimators"] == params["n_estimators"]
+
+def test_add_model_no_model_name():
+    # Test add_model method with no model_name
+    cv = CrossValidation()
+    model_class = RandomForestRegressor
+    post_processor = model_postprocessing.ModelPostProcessor
+    params = {"n_estimators": 100}
+    cv.add_model(model_class, False, "", post_processor, params)
+    model_name = model_class.__name__
+    assert model_name in cv.config["mapping"]
+    assert isinstance(cv.config["mapping"][model_name], ModelConfigDict)
+    assert cv.config["mapping"][model_name]["model"] == model_class
+    assert cv.config["mapping"][model_name]["post_processor"] == post_processor
+    assert cv.config["mapping"][model_name]["params"]["n_estimators"] == params["n_estimators"]
+
+
+def test_add_model_invalid_model_name():
+    # Test add_model method with invalid model_name
+    cv = CrossValidation()
+    model_class = RandomForestRegressor
+    model_name = 123
+    with pytest.raises(TypeError):
+        cv.add_model(model_class, model_name)
+
+def test_add_model_invalid_model_class():
+    # Test add_model method with invalid model_class
+    cv = CrossValidation()
+    model_class = "invalid type"
+    with pytest.raises(TypeError):
+        cv.add_model(model_class)
+
+def test_add_model_invalid_post_processor():
+    # Test add_model method with invalid post_processor
+    cv = CrossValidation()
+    model_class = RandomForestRegressor
+    post_processor = "invalid type"
+    with pytest.raises(TypeError):
+        cv.add_model(model_class, post_processor=post_processor)
+        
+def test_add_model_invalid_skip_inner_cv():
+    # Test add_model method with invalid skip_inner_cv
+    cv = CrossValidation()
+    model_class = RandomForestRegressor
+    skip_inner_cv = "invalid type"
+    with pytest.raises(TypeError):
+        cv.add_model(model_class, skip_inner_cv)
+
+def test_add_model_invalid_params():
+    # Test add_model method with invalid params
+    cv = CrossValidation()
+    model_class = RandomForestRegressor
+    params = "invalid type"
+    with pytest.raises(TypeError):
+        cv.add_model(model_class, True, params=params)
+
+def test_add_model_requires_inner_cv_without_params_warns():
+    # Test add_model method with skip_inner_cv=True and params provided
+    cv = CrossValidation()
+    model_class = RandomForestRegressor
+    with pytest.warns(UserWarning):
+        cv.add_model(model_class, True)
+        
+def test_add_model_requires_inner_cv_with_params_adds():
+    # Test add_model method with skip_inner_cv=True and params provided
+    cv = CrossValidation()
+    model_class = RandomForestRegressor
+    params = {"n_estimators": 100}
+    cv.add_model(model_class, params=params)
+    assert cv.config["mapping"][model_class.__name__]["requires_inner_cv"] == True
+        
+def test_add_model_multiple_model_calls():
+    # Test add_model with multiple calls
+    cv = CrossValidation()
+    model_class_rf = RandomForestRegressor
+    model_class_lm = LinearModel
+    model_class_xgb = XGBRegressor
+    params_rf = {"n_estimators": [10, 100]}
+    params_xgb = {"n_estimators": [100, 1000]}
+    cv.add_model(model_class_rf, params=params_rf)
+    cv.add_model(model_class_lm)
+    cv.add_model(model_class_xgb, params=params_xgb)
+    
+    assert len(cv.config["mapping"]) == 3
+    assert model_class_rf.__name__ in cv.config["mapping"]
+    assert model_class_lm.__name__ in cv.config["mapping"]
+    assert model_class_xgb.__name__ in cv.config["mapping"]
+    
+    assert isinstance(cv.config["mapping"][model_class_rf.__name__], ModelConfigDict)
+    assert isinstance(cv.config["mapping"][model_class_lm.__name__], ModelConfigDict)
+    assert isinstance(cv.config["mapping"][model_class_xgb.__name__], ModelConfigDict)
+    assert cv.config["mapping"][model_class_rf.__name__]["model"] == model_class_rf
+    assert cv.config["mapping"][model_class_rf.__name__]["params"]["n_estimators"] == params_rf["n_estimators"]
+    
+    assert cv.config["mapping"][model_class_lm.__name__]["model"] == model_class_lm
+    # TODO assert requires_cv depending on params not None??
+    with pytest.raises(KeyError):
+        cv.config["mapping"][model_class_lm.__name__]["params"]["n_estimators"]
+        
+    assert cv.config["mapping"][model_class_xgb.__name__]["model"] == model_class_xgb
+    assert cv.config["mapping"][model_class_xgb.__name__]["params"]["n_estimators"] == params_xgb["n_estimators"]

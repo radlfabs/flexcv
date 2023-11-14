@@ -1,7 +1,7 @@
 """
 This module provides a template dictionary that maps mutiple machine learning model names to the respective model configuration dicts.
 """
-
+# TODO redo this template
 import optuna
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.svm import SVR
@@ -22,10 +22,7 @@ MODEL_MAPPING = ModelMappingDict(
                 "n_jobs_cv": 1,
                 "model": LinearModel,
                 "params": {},
-                "post_processor": mp.lm_post,
-                "mixed_model": LinearMixedEffectsModel,
-                "mixed_post_processor": mp.lmer_post,
-                "mixed_name": "MixedLM",
+                "post_processor": mp.LinearModelPostProcessor,
             }
         ),
         "RandomForest": ModelConfigDict(
@@ -55,10 +52,8 @@ MODEL_MAPPING = ModelMappingDict(
                     "ccp_alpha": optuna.distributions.FloatDistribution(1e-8, 0.01),
                     "n_estimators": optuna.distributions.IntDistribution(2, 7000),
                 },
-                "post_processor": mp.rf_post,
-                "mixed_model": MERF,
-                "mixed_post_processor": mp.expectation_maximation_post,
-                "mixed_name": "MERF",
+                "post_processor": mp.RandomForestModelPostProcessor,
+                "add_merf": True
             }
         ),
         "XGBoost": ModelConfigDict(
@@ -97,13 +92,12 @@ MODEL_MAPPING = ModelMappingDict(
                     "reg_alpha": optuna.distributions.FloatDistribution(0.1, 500),
                     "reg_lambda": optuna.distributions.FloatDistribution(0.001, 800),
                 },
-                "post_processor": mp.xgboost_post,
-                "mixed_model": MERF,
-                "mixed_post_processor": mp.expectation_maximation_post,
-                "mixed_name": "XGBEM",
+                "post_processor": mp.XGBoostModelPostProcessor,
+                "add_merf": True
+
             }
         ),
-        "MARS": ModelConfigDict(
+        "EarthRegressor": ModelConfigDict(
             {
                 "requires_inner_cv": True,
                 "n_trials": 200,
@@ -119,10 +113,8 @@ MODEL_MAPPING = ModelMappingDict(
                     # "pmethod": # use default: backward
                     # "fast_beta": # default(=1) yielded best results
                 },
-                "post_processor": mp.mars_post,
-                "mixed_model": MERF,
-                "mixed_post_processor": mp.expectation_maximation_post,
-                "mixed_name": "EarthEM",
+                "post_processor": mp.EarthRegressor,
+                "add_merf": True
             }
         ),
         "SVR": ModelConfigDict(
@@ -144,10 +136,8 @@ MODEL_MAPPING = ModelMappingDict(
                     # "tol": optuna.distributions.FloatDistribution(1e-4, 10),
                     # "shrinking": default "True" yielded best restults
                 },
-                "post_processor": mp.svr_post,
-                "mixed_model": MERF,
-                "mixed_post_processor": mp.expectation_maximation_post,
-                "mixed_name": "SVREM",
+                "post_processor": mp.SVRModelPostProcessor,
+                "add_merf": True
             }
         ),
     }

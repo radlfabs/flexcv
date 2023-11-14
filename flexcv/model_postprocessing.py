@@ -368,6 +368,14 @@ class LinearRegDiagnostic:
 
 
 class ModelPostProcessor(ABC):
+    """Abstract base class for model postprocessing functions.
+    All postprocessing functions must inherit from this class.
+    Implement your own post processing routing by inheriting from this class and implementing the __call__ method.
+    The class instance is called in the cross validation loop.
+    
+    Methods:
+        __call__ (abstract): method to be implemented by the user. This method is called in the cross validation loop.
+    """
     def __init__(self):
         pass
     
@@ -379,7 +387,22 @@ class ModelPostProcessor(ABC):
         run: Run,
         *args,
         **kwargs
-        ):
+        ) -> dict:
+        """This method is called in the cross validation loop.
+        Implement your own post processing routing by inheriting from this class and implementing the __call__ method.
+        
+        Args:
+            results_all_folds (dict): A dict of results for all folds
+            fold_result (SingleModelFoldResult): A dataclass containing the results for the current fold
+            features (pd.Index | list[str] | np.ndarray[str]): The features used in the model
+            run (Run): neptune run object
+            *args: any additional arguments
+            **kwargs: any additional keyword arguments
+        
+        Returns:
+            results_all_folds (dict): updated results dictionary
+        """
+        
         pass
     
 

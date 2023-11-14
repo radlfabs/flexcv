@@ -310,7 +310,7 @@ class RepeatedCV(CrossValidation):
         return df
 
     def perform(self):
-        """Wrapper method to perform repeated cross-validation.
+        """Wrapper method to perform repeated cross-validation. Overwrites the perform method of CrossValidation.
 
         Returns:
             (RepeatedCV): self

@@ -3,6 +3,7 @@ This module contains the CrossValidation class. This class is the central interf
 """
 import inspect
 import logging
+import warnings
 from dataclasses import dataclass
 from pprint import pformat
 from typing import Iterator
@@ -21,6 +22,7 @@ from .split import CrossValMethod, string_to_crossvalmethod
 from .utilities import add_module_handlers, run_padding
 from .model_mapping import ModelConfigDict, ModelMappingDict
 from .run import Run as DummyRun
+from .model_postprocessing import ModelPostProcessor
 
 logger = logging.getLogger(__name__)
 add_module_handlers(logger)
@@ -99,7 +101,7 @@ class CrossValidation:
             "scale_in": True,
             "metrics": None,
             # models and optimisation
-            "mapping": None,
+            "mapping": ModelMappingDict({}),
             "model_effects": "fixed",
             # optimization related
             "n_trials": 100,
@@ -471,6 +473,107 @@ class CrossValidation:
         self.config["diagnostics"] = diagnostics
         self.config["random_seed"] = random_seed
         return self
+    
+    def add_model(self, model_class: object, requires_inner_cv: bool = False, model_name: str = "", post_processor: ModelPostProcessor = None, params: dict = None, **kwargs):
+        """Add a model to the model mapping dict. 
+        This method is a convenience method to add a model to the model mapping dict without needing the ModelMappingDict and ModelConfigDict classes.
+
+        Args:
+          model_class (object): The model class. Must have a fit() method.
+          requires_inner_cv (bool): Whether or not the model requires inner cross validation. (Default value = False)
+          model_name (str): The name of the model. Used for logging.
+          post_processor (ModelPostProcessor): A post processor to be applied to the model. (Default value = None)
+          **kwargs: Arbitrary keyword arguments. Will be passed to the ModelConfigDict.
+
+        Returns:
+            (CrossValidation): self
+            
+        Example:
+            ```python
+            >>> from flexcv import CrossValidation
+            >>> from flexcv.models import LinearModel
+            >>> cv = CrossValidation()
+            >>> cv.add_model(LinearModel, model_name="LinearModel", skip_inner_cv=True)
+            ```
+            Is equivalent to:
+            ```python
+            >>> from flexcv import CrossValidation
+            >>> from flexcv.models import LinearModel
+            >>> from flexcv.model_mapping import ModelMappingDict, ModelConfigDict
+            >>> cv = CrossValidation()
+            >>> mapping = ModelMappingDict(
+            ...     {
+            ...         "LinearModel": ModelConfigDict(
+            ...             {
+            ...                 "model": LinearModel,
+            ...                 "skip_inner_cv": True,
+            ...             }
+            ...         ),
+            ...     }
+            ... )
+            >>> cv.set_models(mapping)
+            ```
+            As you can see the `add_model()` method is a convenience method to add a model to the model mapping dict without needing the ModelMappingDict and ModelConfigDict classes.
+            In cases of multiple models per run, or if you want to reuse the model mapping dict, you should look into the `ModelMappingDict` and the `set_models()` method.
+        
+        """
+        
+        # check values
+        if not isinstance(model_name, str):
+            raise TypeError("model_name must be a string")
+
+        if not issubclass(model_class, object):
+            raise TypeError("model_class must be a class")
+        
+        if not isinstance(requires_inner_cv, bool):
+            raise TypeError("skip_inner_cv must be a boolean")
+        
+        if params is not None and not isinstance(params, dict):
+            raise TypeError("params must be a dict")
+        
+        if requires_inner_cv and params is None:
+            warnings.warn(f"You did not provide hyperparameters for the model {model_name} but set requires_inner_cv to True.", UserWarning)
+
+        if not requires_inner_cv and params is not None and params != {}:
+            requires_inner_cv = True
+        
+        if not params:
+            params = {}
+
+        if not model_name:
+            model_name = model_class.__name__
+        
+        # check if post_processor is a class that inherits ModelPostProcessor object that is not instantiated
+        if post_processor and not issubclass(post_processor, ModelPostProcessor):
+            raise TypeError("post_processor must be a ModelPostProcessor")
+
+        # params and kwargs may not contain the same keys
+        if kwargs is not None and not isinstance(kwargs, dict):
+            raise TypeError("kwargs must be a dict")
+        
+        if kwargs is not None and (set(params.keys()) & set(kwargs.keys())):
+            raise ValueError("params and additional kwargs may not contain the same keys")
+
+        if kwargs is None:
+            kwargs = {}
+        
+        config_dict = {
+                "model": model_class,
+                "post_processor": post_processor,
+                "requires_inner_cv": requires_inner_cv,
+                "params": params,
+                **kwargs,
+            }
+
+        self.config["mapping"][model_name] = ModelConfigDict(config_dict)
+        return self
+    
+    def _describe_config(self):
+        """This function creates a representation of the config dict for logging purposes. It includes the Model Mapping and a target variable description."""
+        
+        mapping_str = " + ".join(self.config["mapping"].keys())
+        target_str = self.config["target_name"]
+        return f"CrossValidation Summary for Regression of Target {target_str} with Models {mapping_str}"
 
     def _prepare_before_perform(self):
         """Make preparation steps before performing the cross validation.
@@ -591,6 +694,7 @@ class CrossValidation:
             logger.warning(
                 "You have not called perform() yet. No results to log. Call perform() to log the results."
             )
+        self.config["run"]["description"] = self._describe_config()
         self._result_logged_ = True
         return self
 
@@ -622,7 +726,6 @@ class CrossValidation:
                 "You must call perform() before you can get the results."
             )
 
-
     @property
     def results(self) -> CrossValidationResults:
         """Returns a `CrossValidationResults` object. This results object is a wrapper class around the results dict from the `cross_validate` function."""
@@ -632,6 +735,21 @@ class CrossValidation:
             raise RuntimeError(
                 "You must call perform() before you can get the results."
             )
+
+    @property
+    def was_performed(self) -> bool:
+        """Returns True if the cross validation was performed."""
+        return self._was_performed_
+    
+    @property
+    def was_logged(self) -> bool:
+        """Returns True if the cross validation was logged."""
+        return self._was_logged_
+    
+    @property
+    def cv_description(self) -> str:
+        """Returns a string describing the cross validation configuration."""
+        return self._describe_config()
 
 
 if __name__ == "__main__":

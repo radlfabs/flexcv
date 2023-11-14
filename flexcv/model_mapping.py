@@ -93,9 +93,6 @@ class ModelConfigDict(Dict[str, Type]):
         self._check_key_set_default("n_jobs_cv", -1)
         self._check_key_set_default("params", {})
 
-        if self._has_key("mixed_model") and not self._has_key("mixed_name"):
-            self["mixed_name"] = self["mixed_model"].__repr__()
-
     def _has_key(self, key) -> bool:
         """Method to check if a key exists in the dict.
 

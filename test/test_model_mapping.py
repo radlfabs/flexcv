@@ -7,7 +7,6 @@ def test_model_config_dict_init_empty():
     # Test initialization with no arguments
     config = ModelConfigDict()
     assert config["requires_inner_cv"] == False
-    assert config["n_trials"] == 100
     assert config["n_jobs_model"] == -1
     assert config["n_jobs_cv"] == -1
     assert config["params"] == {}
@@ -35,12 +34,6 @@ def test_model_config_dict_check_key_set_default():
     assert config["new_key"] == "new_value"
     config._check_key_set_default("requires_inner_cv", True)
     assert config["requires_inner_cv"] == False  # should not change the existing value
-
-def test_model_config_dict_set_defaults_with_mixed_model():
-    # Test _set_defaults method with mixed_model
-    config = ModelConfigDict({"mixed_model": BaseEstimator()})
-    config._set_defaults()
-    assert config["mixed_name"] == config["mixed_model"].__repr__()
 
 def test_model_mapping_dict_init_empty():
     # Test initialization with no arguments
