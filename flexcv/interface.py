@@ -362,14 +362,14 @@ class CrossValidation:
         self,
         mapping: ModelMappingDict = None,
         yaml_path: str | pathlib.Path = None,
-        yaml_code: str = None,
+        yaml_string: str = None,
     ):
         """Set your models and related parameters. Pass a ModelMappingDict or pass yaml code or a path to a yaml file.
 
         Args:
           mapping (ModelMappingDict[str, ModelConfigDict]): Dict of model names and model configurations. See ModelMappingDict for more information. (Default value = None)
           yaml_path (str | pathlib.Path): Path to a yaml file containing a model mapping. See flexcv.yaml_parser for more information. (Default value = None)
-          yaml_code (str): String containing yaml code. See flexcv.yaml_parser for more information. (Default value = None)
+          yaml_string (str): String containing yaml code. See flexcv.yaml_parser for more information. (Default value = None)
 
         Returns:
           (CrossValidation): self
@@ -395,11 +395,11 @@ class CrossValidation:
             This will automatically read the yaml file and create a ModelMappingDict.
             It even takes care of the imports and instantiates the classes of model, postprocessor and for the optune distributions.
         """
-        if not any((mapping, yaml_path, yaml_code)):
-            raise ValueError("You must provide either mapping, yaml_path, or yaml_code")
+        if not any((mapping, yaml_path, yaml_string)):
+            raise ValueError("You must provide either mapping, yaml_path, or yaml_string")
         
-        if sum(bool(x) for x in (mapping, yaml_path, yaml_code)) > 1:
-            raise ValueError("You must provide either mapping, yaml_path or yaml_code, not multiple")
+        if sum(bool(x) for x in (mapping, yaml_path, yaml_string)) > 1:
+            raise ValueError("You must provide either mapping, yaml_path or yaml_string, not multiple")
         
         if mapping is not None:
             
@@ -415,12 +415,12 @@ class CrossValidation:
             
             self.config["mapping"] = read_mapping_from_yaml_file(yaml_path)
             
-        elif yaml_code is not None:
+        elif yaml_string is not None:
             
-            if not isinstance(yaml_code, str):
-                raise TypeError("yaml_code must be a string")
+            if not isinstance(yaml_string, str):
+                raise TypeError("yaml_string must be a string")
             
-            self.config["mapping"] = read_mapping_from_yaml_string(yaml_code)
+            self.config["mapping"] = read_mapping_from_yaml_string(yaml_string)
         
         return self
 
