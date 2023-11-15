@@ -78,6 +78,11 @@ def parse_yaml_output_to_mapping_dict(yaml_dict) -> ModelMappingDict:
     """This function parses the output of the yaml parser to a ModelMappingDict object.
     Models and post processors are imported automatically.
     
+    Note:
+        Despite of automatically importing the classes, no arbitrary code is executed.
+        The yaml parser uses the safe loader and a custom constructors for the optuna distributions.
+        The imports are done by the importlib module.
+    
     Args:
         yaml_dict (dict): The output of the yaml parser.
         
@@ -110,6 +115,11 @@ def read_mapping_from_yaml_file(yaml_file_path: str) -> ModelMappingDict:
     """This function reads in a yaml file and returns a ModelMappingDict object.
     Use the yaml tags !Int, !Float, !Cat to specify the type of the hyperparameter distributions.
     The parser takes care of importing the classes specified in the yaml file in the fields model and post_processor.
+    
+    Note:
+        Despite of automatically importing the classes, no arbitrary code is executed.
+        The yaml parser uses the safe loader and a custom constructors for the optuna distributions.
+        The imports are done by the importlib module.
     
     Args:
         yaml_code (str): The yaml code.
@@ -144,6 +154,11 @@ def read_mapping_from_yaml_string(yaml_code: str) -> ModelMappingDict:
     """This function reads a yaml string and returns a ModelMappingDict object.
     Use the yaml tags !Int, !Float, !Cat to specify the type of the hyperparameter distributions.
     The parser takes care of importing the classes specified in the yaml file in the fields model and post_processor.
+    
+    Note:
+        Despite of automatically importing the classes, no arbitrary code is executed.
+        The yaml parser uses the safe loader and a custom constructors for the optuna distributions.
+        The imports are done by the importlib module.
     
     Args:
         yaml_code (str): The yaml code.
