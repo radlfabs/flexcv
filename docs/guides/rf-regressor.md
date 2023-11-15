@@ -8,11 +8,14 @@ Also, we use a model post processing function to extract the feature importances
 
 ```python
 import optuna
+import numpy as np
 from sklearn.ensemble import RandomForestRegressor
-from flexcv.model_postprocessing import RandomForestModelPostProcessor
+
+from flexcv import CrossValidation
+from flexcv.synthesizer import generate_regression
 
 # lets start with generating some clustered data
-X, y, group, random_slopes =generate_regression(
+X, y, group, random_slopes = generate_regression(
     10, 100, n_slopes=1 ,noise_level=9.1e-2
 )
 
@@ -32,7 +35,6 @@ results = (
         model_class=RandomForestRegressor,
         requires_inner_cv=True,
         params=params,
-        post_processor=RandomForestModelPostProcessor,
     )
     .set_inner_cv(3)
     .set_splits(n_splits_out=3)
