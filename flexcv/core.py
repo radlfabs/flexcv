@@ -476,7 +476,7 @@ def cross_validate(
                     run=run,
                     features=X_train.columns,
                 )
-            except KeyError:
+            except (KeyError, TypeError):
                 logger.info(f"No postprocessor passed for {model_name}. Moving on...")
 
             if evaluate_merf:
