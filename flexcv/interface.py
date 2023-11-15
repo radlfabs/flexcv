@@ -7,6 +7,7 @@ import warnings
 from dataclasses import dataclass
 from pprint import pformat
 from typing import Iterator
+import pathlib
 
 import pandas as pd
 import numpy as np
@@ -23,6 +24,8 @@ from .utilities import add_module_handlers, run_padding
 from .model_mapping import ModelConfigDict, ModelMappingDict
 from .run import Run as DummyRun
 from .model_postprocessing import ModelPostProcessor
+from .yaml_parser import read_mapping_from_yaml_file, read_mapping_from_yaml_string
+
 
 logger = logging.getLogger(__name__)
 add_module_handlers(logger)
@@ -357,23 +360,68 @@ class CrossValidation:
 
     def set_models(
         self,
-        mapping: ModelMappingDict,
+        mapping: ModelMappingDict = None,
+        yaml_path: str | pathlib.Path = None,
+        yaml_code: str = None,
     ):
-        """Set your models and related parameters.
+        """Set your models and related parameters. Pass a ModelMappingDict or pass yaml code or a path to a yaml file.
 
         Args:
-          mapping (ModelMappingDict[str, ModelConfigDict]): Dict of model names and model configurations. See ModelMappingDict for more information.
+          mapping (ModelMappingDict[str, ModelConfigDict]): Dict of model names and model configurations. See ModelMappingDict for more information. (Default value = None)
+          yaml_path (str | pathlib.Path): Path to a yaml file containing a model mapping. See flexcv.yaml_parser for more information. (Default value = None)
+          yaml_code (str): String containing yaml code. See flexcv.yaml_parser for more information. (Default value = None)
 
         Returns:
           (CrossValidation): self
-
+          
+        Example:
+            In your yaml file:
+            ```yaml
+            RandomForest:
+                model: sklearn.ensemble.RandomForestRegressor
+                post_processor: flexcv.model_postprocessing.MixedEffectsPostProcessor
+                requires_inner_cv: True
+                params:
+                    max_depth: !Int
+                        low: 1
+                        high: 10
+            ```
+            In your code:
+            ```python
+            >>> from flexcv import CrossValidation
+            >>> cv = CrossValidation()
+            >>> cv.set_models(path="path/to/your/yaml/file")          
+            ```
+            This will automatically read the yaml file and create a ModelMappingDict.
+            It even takes care of the imports and instantiates the classes of model, postprocessor and for the optune distributions.
         """
-        # check values
-        if not isinstance(mapping, ModelMappingDict):
-            raise TypeError("mapping must be a ModelMappingDict")
-
-        # assign values
-        self.config["mapping"] = mapping
+        if not any((mapping, yaml_path, yaml_code)):
+            raise ValueError("You must provide either mapping, yaml_path, or yaml_code")
+        
+        if sum(bool(x) for x in (mapping, yaml_path, yaml_code)) > 1:
+            raise ValueError("You must provide either mapping, yaml_path or yaml_code, not multiple")
+        
+        if mapping is not None:
+            
+            if not isinstance(mapping, ModelMappingDict):
+                raise TypeError("mapping must be a ModelMappingDict")
+            
+            self.config["mapping"] = mapping
+            
+        elif yaml_path is not None:
+            
+            if not isinstance(yaml_path, str) and not isinstance(yaml_path, pathlib.Path):
+                raise TypeError("yaml_path must be a string or pathlib.Path")
+            
+            self.config["mapping"] = read_mapping_from_yaml_file(yaml_path)
+            
+        elif yaml_code is not None:
+            
+            if not isinstance(yaml_code, str):
+                raise TypeError("yaml_code must be a string")
+            
+            self.config["mapping"] = read_mapping_from_yaml_string(yaml_code)
+        
         return self
 
     def set_inner_cv(
