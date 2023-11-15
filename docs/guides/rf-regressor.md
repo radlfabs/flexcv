@@ -8,11 +8,14 @@ Also, we use a model post processing function to extract the feature importances
 
 ```python
 import optuna
+import numpy as np
 from sklearn.ensemble import RandomForestRegressor
-from flexcv.model_postprocessing import RandomForestModelPostProcessor
+
+from flexcv import CrossValidation
+from flexcv.synthesizer import generate_regression
 
 # lets start with generating some clustered data
-X, y, group, random_slopes =generate_regression(
+X, y, group, random_slopes = generate_regression(
     10, 100, n_slopes=1 ,noise_level=9.1e-2
 )
 
@@ -29,53 +32,21 @@ cv =CrossValidation()
 results = (
     cv.set_data(X, y)
     .add_model(
-        model=RandomForestRegressor,
+        model_class=RandomForestRegressor,
         requires_inner_cv=True,
         params=params,
-        post_processor=RandomForestModelPostProcessor,
     )
     .set_inner_cv(3)
     .set_splits(n_splits_out=3)
-    .set_run(Run())
     .perform()
     .get_results()
 )
 
 # Print the averaged R²
 n_values =len(results["RandomForestRegressor"]["metrics"])
-r2_values =[results["RandomForestRegressor"]["metrics"][k]["r2"]for k inrange(n_values)]
+r2_values =[results["RandomForestRegressor"]["metrics"][k]["r2"] for k in range(n_values)]
 print(np.mean(r2_values))
 # save the results table to an excel file
 results.summary.to_excel("results.xlsx")
-
-```
-
-Note: If you have a model that does not have the `n_jobs` or `random_state` arguments in it's signature, you can prevent errors by specifying this in the `ModelConfigDict` like so:
-
-```python
-
-model_map =ModelMappingDict({
-
-    "SVR": ModelConfigDict({
-
-    # now we specify, that we do want to evaluate the inner cross validation loop
-
-        "requires_inner_cv": True,
-
-    # If a model can not run in parallel and does not allow a random_state specify
-
-    "allows_seed": False,
-
-    "allows_n_jobs": False,
-
-    # pass the model class
-
-        "model": SupportVectorRegressor,
-
-        "post_processor": mp.svr_post,
-
-    }),
-
-})
 
 ```

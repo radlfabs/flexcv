@@ -1,11 +1,11 @@
 LinearModel:
-    requires_inner_cv: False
-    n_trials: 100
-    n_jobs_model: 1
-    n_jobs_cv: 1
-    model: flexcv.models.LinearModel
-    params: {}
-    post_processor: flexcv.model_postprocessing.LinearModelPostProcessor
+  requires_inner_cv: False
+  n_trials: 100
+  n_jobs_model: 1
+  n_jobs_cv: 1
+  model: flexcv.models.LinearModel
+  params: {}
+  post_processor: flexcv.model_postprocessing.LinearModelPostProcessor
 
 RandomForest:
   requires_inner_cv: true
@@ -37,13 +37,12 @@ RandomForest:
     min_impurity_decrease: !Float
       low: 0.0000000008
       high: 0.02
-      _kwargs:
-        log: true
+      log: true
     min_weight_fraction_leaf: !Float
       low: 0, 
       high: 0.5
     ccp_alpha: !Float
-      low: 1e-08
+      low: 0.00008
       high: 0.01
     n_estimators: !Int
       low: 2

@@ -22,7 +22,7 @@ The `flexcv` package provides the following features:
 3. Customization of objective functions for optimization to select meaningful model parameters.
 4. Fixed and mixed effects modeling (random intercepts and slopes).
 5. Scaling of inner and outer cross-validation folds separately.
-6. Easy usage of the state-of-the-art MLops platform `neptune` to track all of your experiments. Have a look at their [website](https://neptune.ai/) or explore our [neptune project](https://ui.neptune.ai/radlfabs/flexcv-testing) that we used for testing this package.
+6. Easy usage of the state-of-the-art MLops platform `neptune` to track all of your experiments. Have a look at their [website](https://neptune.ai/) or explore our [neptune project](https://ui.neptune.ai/radlfabs/flexcv-testing) that we used for testing this package. Also check out the [neptune integration guide](guides/neptune-integration.md).
 7. Integrates the `merf` package to apply correction for clustered data using the expectation maximization algorithm and supporting any `sklearn` BaseEstimator. Read more about that package [here](https://github.com/manifoldai/merf).
 8. Adaptations for cross validation splits with stratification for continuous target variables.
 9. Easy local summary of all evaluation metrics in a single table.

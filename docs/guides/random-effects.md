@@ -13,7 +13,8 @@ The choice of split method in mixed effects models can have a significant impact
 `flexcv` makes chosing and switching between split methods straight forward. You can simply exchange methods from the method calls.
 
 ```python
-cv = CrossValidation().set_split(split_out="GroupKFold",split_in="GroupKFold")
+from flexcv import CrossValidation
+cv = CrossValidation().set_splits(split_out="GroupKFold",split_in="GroupKFold")
 ```
 
 `flexcv` solves the problems, where different splitting methods would not share signatures, internally, so you can concentrate on the research questions and do not have to jump into implementation.
@@ -94,10 +95,9 @@ params = {
 cv =CrossValidation()
 results = (
     cv.set_data(X, y, group, random_slopes)
-    .set_models(model_map)
     .set_inner_cv(3)
     .set_splits(n_splits_out=3)
-    .add_model(model=RandomForestRegressor, requires_inner_cv=True, params=params, post_processor=RandomForestModelPostProcessor)
+    .add_model(model_class=RandomForestRegressor, requires_inner_cv=True, params=params, post_processor=RandomForestModelPostProcessor)
     .set_merf(True)
     .perform()
     .get_results()
