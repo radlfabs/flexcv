@@ -74,6 +74,7 @@ nav:
     - Tutorial: start/tutorial.md
   - User Guide:
     - user-guide.md
+    - Neptune Integration: guides/neptune-integration.md
     - Fit a Random Forest: guides/rf-regressor.md
     - Model Random Effects: guides/random-effects.md
     - Repeated Cross Validation: guides/repeated-guide.md
