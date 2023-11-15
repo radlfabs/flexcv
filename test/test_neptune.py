@@ -40,7 +40,7 @@ def neptrune_rf_regression(test_run_name):
     results = (
         cv.set_data(X, y, group, random_slopes)
         .set_models(model_map)
-        .set_inner_cv(3)
+        .set_inner_cv(20)
         .set_splits(n_splits_out=3)
         .set_merf(add_merf_global=True, em_max_iterations=5)
         .set_run(run=nep_run)
