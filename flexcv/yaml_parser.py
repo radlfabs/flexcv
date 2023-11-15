@@ -100,9 +100,12 @@ def parse_yaml_output_to_mapping_dict(yaml_dict) -> ModelMappingDict:
             import_list.append("post_processor")
         
         for key in import_list:
-            class_name, path = split_import(raw_dict[key])
-            foo = importlib.import_module(path)
-            imports_dict[key] = getattr(foo, class_name)
+            if isinstance(raw_dict[key], str):
+                class_name, path = split_import(raw_dict[key])
+                foo = importlib.import_module(path)
+                imports_dict[key] = getattr(foo, class_name)
+            else:
+                imports_dict[key] = raw_dict[key]
 
         # replace the strings in raw_dict with the imported classes
         raw_dict.update(imports_dict)
