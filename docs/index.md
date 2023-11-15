@@ -26,10 +26,9 @@ The `flexcv` package provides the following features:
 7. Integrates the `merf` package to apply correction for clustered data using the expectation maximization algorithm and supporting any `sklearn` BaseEstimator. Read more about that package [here](https://github.com/manifoldai/merf).
 8. Adaptations for cross validation splits with stratification for continuous target variables.
 9. Easy local summary of all evaluation metrics in a single table.
-10. Wrapper classes for the R `earth` package to use the powerful regression splines in Python. Read more about the package [here](https://www.rdocumentation.org/packages/earth/versions/5.3.2).
-11. Wrapper classes for the `statsmodels` package to use their mixed effects models inside of a `sklearn` Pipeline. Read more about that package [here](https://github.com/manifoldai/merf).
-12. Inner cross validation implementation that let's you push groups to the inner split, e. g. to apply GroupKFold.
-13. Customizable ObjectiveScorer function for hyperparameter tuning, that let's you make a trade-off between under- and overfitting.
+10. Wrapper classes for the `statsmodels` package to use their mixed effects models inside of a `sklearn` Pipeline. Read more about that package [here](https://github.com/manifoldai/merf).
+11. Inner cross validation implementation that let's you push groups to the inner split, e. g. to apply GroupKFold.
+12. Customizable ObjectiveScorer function for hyperparameter tuning, that let's you make a trade-off between under- and overfitting.
 
 These are the core packages used under the hood in `flexcv`:
 

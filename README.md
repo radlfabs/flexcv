@@ -30,11 +30,10 @@ The `flexcv` package provides the following features:
 6. Easy usage of the state-of-the-art logging dashboard `neptune` to track all of your experiments.
 7. Adaptations for cross validation splits with stratification for continuous target variables.
 8. Easy local summary of all evaluation metrics in a single table.
-9. Wrapper classes for the R `earth` package to use the powerful regression splines in Python. Read more about that package [here](https://www.rdocumentation.org/packages/earth/versions/5.3.2).
-10. Wrapper classes for the `statsmodels` package to use their mixed effects models inside of a `sklearn` Pipeline. Read more about that package [here](https://github.com/manifoldai/merf).
-11. Uses the `merf` package to apply correction for clustered data using the expectation maximization algorithm and supporting any `sklearn` BaseEstimator. Read more about that package [here](https://github.com/manifoldai/merf).
-12. Inner cross validation implementation that let's you push groups to the inner split, e. g. to apply GroupKFold.
-13. Customizable ObjectiveScorer function for hyperparameter tuning, that let's you make a trade-off between under- and overfitting.
+9. Wrapper classes for the `statsmodels` package to use their mixed effects models inside of a `sklearn` Pipeline. Read more about that package [here](https://github.com/manifoldai/merf).
+10. Uses the `merf` package to apply correction for clustered data using the expectation maximization algorithm and supporting any `sklearn` BaseEstimator. Read more about that package [here](https://github.com/manifoldai/merf).
+11. Inner cross validation implementation that let's you push groups to the inner split, e. g. to apply GroupKFold.
+12. Customizable ObjectiveScorer function for hyperparameter tuning, that let's you make a trade-off between under- and overfitting.
 
 These are the core packages used under the hood in `flexcv`:
 
@@ -78,18 +77,6 @@ python -m venv my_env_name
 my_env_name/Scripts/activate
 pip install flexcv/requirements.txt
 ```
-
-#### Additional dependencies of `EarthRegressor`
-
-The model class for the `EarthRegressor` is actually wrapping around `rpy2` code and is using embedded `R` under the hood. If you do not plan to use this type of estimator, you will not need to perform the next steps. 
-To use our `EarthRegressor`, you should have a recent `R` version installed and run our `install_rpackages.py` script:
-
-```bash
-cd flexcv
-python -m install_rpackages
-```
-
-Now you have installed everything you need to perform flexible cross validation and machine learning on your tabular data.
 
 ## Getting Started
 
