@@ -12,7 +12,6 @@ from abc import ABC, abstractmethod
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pandas as pd
-import rpy2.robjects as ro
 import shap
 from neptune.types import File
 from neptune.metadata_containers.run import Run
@@ -566,52 +565,6 @@ class XGBoostModelPostProcessor(ModelPostProcessor):
             log_destination=f"{fold_result.model_name}/SHAP/Test_Fold",
             dependency=False,
         )
-
-        return results_all_folds
-
-
-class EarthModelPostProcessor(ModelPostProcessor):
-    def __init__(self):
-        super().__init__()
-
-    def __call__(self, results_all_folds, fold_result, features, run, *args, **kwargs):
-        """Postprocessing function for the MARS model.
-        Logs the parameters to Neptune.
-        Creates a variable importance table and logs barplots to neptune.
-
-        Args:
-            results_all_folds: A dict of results for all folds
-            fold_result: A dataclass containing the results for the current fold
-            run: neptune run object
-            *args: any additional arguments
-            **kwargs: any additional keyword arguments
-
-        Returns:
-            (dict): updated results dictionary
-        """
-        with plt.style.context("ggplot"):
-            imp_df: pd.DataFrame = fold_result.best_model.get_variable_importance(
-                kwargs["features"]
-            )
-            run["MARS/FeatImportance/Table"].append(File.as_html(imp_df))
-            for col in imp_df.columns:
-                # plot all rows of col where col is not 0
-                fig = plt.figure()
-                tmp = imp_df[col]
-                tmp = tmp[tmp != 0]
-                try:
-                    tmp.plot.barh()
-                    plt.title(f"{col} Variable Importance")
-                    run[f"MARS/FeatImportance/"].append(fig)
-                except Exception as e:
-                    logger.info(f"{e}")
-                    logger.info("Could not plot MARS barplot. Continuing.")
-                del fig
-                plt.close()
-
-            run[f"{fold_result.model_name}/BestParams"].append(
-                pformat(fold_result.best_params)
-            )
 
         return results_all_folds
 

@@ -92,7 +92,7 @@ from xgboost import XGBRegressor
 from . import model_postprocessing as mp
 from .merf importMERF
 from .model_mapping import ModelConfigDict, ModelMappingDict
-from .models import EarthRegressor, LinearMixedEffectsModel, LinearModel
+from .models import LinearMixedEffectsModel, LinearModel
 
 MODEL_MAPPING=ModelMappingDict(
     {
@@ -182,19 +182,6 @@ MODEL_MAPPING=ModelMappingDict(
                     ),
                     "reg_alpha": optuna.distributions.FloatDistribution(0.1,500),
                     "reg_lambda": optuna.distributions.FloatDistribution(0.001,800),
-                },
-            }
-        ),
-        "MARS": ModelConfigDict(
-            {
-                "requires_inner_cv": True,
-                "n_trials": 200,
-                "allows_n_jobs": False
-                "model": EarthRegressor,
-                "params": {
-                    "degree": optuna.distributions.IntDistribution(1,5),
-                    "nprune": optuna.distributions.IntDistribution(1,300),
-                    "newvar_penalty": optuna.distributions.FloatDistribution(0.01,0.2),
                 },
             }
         ),

@@ -73,10 +73,6 @@ def add_module_handlers(logger: logging.Logger) -> None:
     logger = logging.getLogger()  # Get the root logger
     logger.setLevel(logging.INFO)
 
-    # Create a custom logger for the package you want to suppress
-    rpy2_logger = logging.getLogger("rpy2")
-    rpy2_logger.setLevel(logging.ERROR)  # Suppress log messages for this package
-
     c_handler = logging.StreamHandler()
     c_format = logging.Formatter("%(module)s - %(levelname)s - %(message)s")
     c_handler.setFormatter(c_format)
