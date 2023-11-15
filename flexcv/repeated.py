@@ -137,7 +137,7 @@ class RepeatedCV(CrossValidation):
         generator_seed (int): Seed to control generation of a list of seeds. (Default value = 42)
         parent_run (neptune.run): A run to track the repeated meta data. (Default value = None)
         children_runs list[neptune.run]: A list of runs to track the single runs. (Default value = None)
-    
+
     Methods:
         set_n_repeats: method that sets the number of repeated runs
         set_seeds: method that sets the random seeds for the repeated runs
@@ -239,7 +239,7 @@ class RepeatedCV(CrossValidation):
             np.random.seed(generator_seed)
             self.seeds = np.random.randint(42000, size=self.n_repeats).tolist()
             return self
-        
+
         self.seeds = seeds
         return self
 
@@ -266,14 +266,14 @@ class RepeatedCV(CrossValidation):
 
         """
         add_module_handlers(logger)
-        
+
         if hasattr(self, "parent_run") and self.parent_run is not None:
             repeated_run = self.parent_run
         else:
             logger.info("No parent run found. Initializing dummy run.")
             repeated_run = Run()
             self.parent_run = repeated_run
-        
+
         if not hasattr(self, "children_runs") or self.children_runs is None:
             logger.info("No children runs found. Initializing dummy runs.")
             self.children_runs = [Run() for _ in range(self.n_repeats)]
@@ -281,9 +281,11 @@ class RepeatedCV(CrossValidation):
         repeated_id = repeated_run["sys/id"].fetch()
 
         if self.seeds is None:
-            logger.info(f"No seeds found. Initializing seeds with genearator seed {self.generator_seed}.")
+            logger.info(
+                f"No seeds found. Initializing seeds with genearator seed {self.generator_seed}."
+            )
             self.set_seeds()
-        
+
         run_ids = []
         run_results = []
         for seed, inner_run in zip(self.seeds, self.children_runs):

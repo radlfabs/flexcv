@@ -18,6 +18,7 @@ from flexcv.run import Run as DummyRun
 from flexcv import model_postprocessing
 import flexcv
 
+
 def test_cross_validation_init():
     # Test initialization
     cv = CrossValidation()
@@ -302,6 +303,7 @@ def test_set_models_with_mapping():
     cv.set_models(mapping=mapping)
     assert cv.config["mapping"] == mapping
 
+
 def test_set_models_with_path():
     # Test set_models method with valid path
     cv = CrossValidation()
@@ -310,7 +312,10 @@ def test_set_models_with_path():
         mock_mapping = ModelMappingDict(
             {
                 "RandomForestRegressor": ModelConfigDict(
-                    {"model": RandomForestRegressor, "parameters": {"n_estimators": 100}}
+                    {
+                        "model": RandomForestRegressor,
+                        "parameters": {"n_estimators": 100},
+                    }
                 )
             }
         )
@@ -319,11 +324,13 @@ def test_set_models_with_path():
         mock_read.assert_called_once_with(path)
         assert cv.config["mapping"] == mock_mapping
 
+
 def test_set_models_with_none():
     # Test set_models method with None for both mapping and path
     cv = CrossValidation()
     with pytest.raises(ValueError):
         cv.set_models()
+
 
 def test_set_models_with_invalid_mapping():
     # Test set_models method with invalid mapping
@@ -331,7 +338,8 @@ def test_set_models_with_invalid_mapping():
     mapping = "invalid type"
     with pytest.raises(TypeError):
         cv.set_models(mapping=mapping)
-        
+
+
 def test_set_models_with_yaml_code():
     # Test set_models method with YAML code
     cv = CrossValidation()
@@ -358,9 +366,15 @@ def test_set_models_with_yaml_code():
                         "model": flexcv.models.LinearModel,
                         "post_processor": flexcv.model_postprocessing.LinearModelPostProcessor,
                         "params": {
-                            "max_depth": optuna.distributions.IntDistribution(low=5, high=100, log=True),
-                            "min_impurity_decrease": optuna.distributions.FloatDistribution(low=0.00000001, high=0.02),
-                            "features": optuna.distributions.CategoricalDistribution(choices=["a", "b", "c"]),
+                            "max_depth": optuna.distributions.IntDistribution(
+                                low=5, high=100, log=True
+                            ),
+                            "min_impurity_decrease": optuna.distributions.FloatDistribution(
+                                low=0.00000001, high=0.02
+                            ),
+                            "features": optuna.distributions.CategoricalDistribution(
+                                choices=["a", "b", "c"]
+                            ),
                         },
                     }
                 )
@@ -370,12 +384,14 @@ def test_set_models_with_yaml_code():
         cv.set_models(yaml_code=yaml_code)
         mock_read.assert_called_once_with(yaml_code)
         assert cv.config["mapping"] == mock_mapping
-        
+
+
 def test_set_models_with_none():
     # Test set_models method with None for all arguments
     cv = CrossValidation()
     with pytest.raises(ValueError):
         cv.set_models()
+
 
 def test_set_models_with_multiple_arguments():
     # Test set_models method with multiple arguments
@@ -399,6 +415,7 @@ def test_set_models_with_multiple_arguments():
     """
     with pytest.raises(ValueError):
         cv.set_models(mapping=mapping, yaml_code=yaml_code)
+
 
 def test_set_models_with_invalid_yaml_code():
     # Test set_models method with invalid yaml_code

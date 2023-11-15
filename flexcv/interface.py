@@ -373,7 +373,7 @@ class CrossValidation:
 
         Returns:
           (CrossValidation): self
-          
+
         Example:
             In your yaml file:
             ```yaml
@@ -390,38 +390,41 @@ class CrossValidation:
             ```python
             >>> from flexcv import CrossValidation
             >>> cv = CrossValidation()
-            >>> cv.set_models(path="path/to/your/yaml/file")          
+            >>> cv.set_models(path="path/to/your/yaml/file")
             ```
             This will automatically read the yaml file and create a ModelMappingDict.
             It even takes care of the imports and instantiates the classes of model, postprocessor and for the optune distributions.
         """
         if not any((mapping, yaml_path, yaml_string)):
-            raise ValueError("You must provide either mapping, yaml_path, or yaml_string")
-        
+            raise ValueError(
+                "You must provide either mapping, yaml_path, or yaml_string"
+            )
+
         if sum(bool(x) for x in (mapping, yaml_path, yaml_string)) > 1:
-            raise ValueError("You must provide either mapping, yaml_path or yaml_string, not multiple")
-        
+            raise ValueError(
+                "You must provide either mapping, yaml_path or yaml_string, not multiple"
+            )
+
         if mapping is not None:
-            
             if not isinstance(mapping, ModelMappingDict):
                 raise TypeError("mapping must be a ModelMappingDict")
-            
+
             self.config["mapping"] = mapping
-            
+
         elif yaml_path is not None:
-            
-            if not isinstance(yaml_path, str) and not isinstance(yaml_path, pathlib.Path):
+            if not isinstance(yaml_path, str) and not isinstance(
+                yaml_path, pathlib.Path
+            ):
                 raise TypeError("yaml_path must be a string or pathlib.Path")
-            
+
             self.config["mapping"] = read_mapping_from_yaml_file(yaml_path)
-            
+
         elif yaml_string is not None:
-            
             if not isinstance(yaml_string, str):
                 raise TypeError("yaml_string must be a string")
-            
+
             self.config["mapping"] = read_mapping_from_yaml_string(yaml_string)
-        
+
         return self
 
     def set_inner_cv(
