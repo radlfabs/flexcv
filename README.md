@@ -8,13 +8,23 @@
 
 Authors: Fabian Rosenthal, Patrick Blättermann and Siegbert Versümer
 
-## Welcome to `flexcv`
+## Installation
+
+```bash
+pip install flexcv
+```
+
+## Introduction
 This repository contains the code for the python package `flexcv` which implements flexible cross validation and machine learning for tabular data. It's code is used for the machine learning evaluations in Versümer et al. (2023).
 The core functionality has been developed in the course of a research project at Düsseldorf University of Applied Science, Germany.
 
 `flexcv` is a method comparison package for Python that wraps around popular libraries to easily taylor complex cross validation code to your needs.
 
 It provides a range of features for comparing machine learning models on different datasets with different sets of predictors customizing just about everything around cross validations. It supports both fixed and random effects, as well as random slopes.
+
+Install the package and give it a try:
+
+`pip install flexcv`
 
 You can find our documentation [here](https://radlfabs.github.io/flexcv/).
 
@@ -49,33 +59,17 @@ However, there are limitations, e. g. if you want to push the training part of y
 As soon as you want to use a linear mixed effects model, you have to use the `statsmodels` package, which is not compatible with the `sklearn` pipeline.
 `flexcv` solves these problems and provides a lot of useful features for cross validation and machine learning on tabular data, so you can focus on your data and your models.
 
-## Installation
+## Environment
 
-First, clone this repository.
+To use `flexcv` you will need Python 3.10 or 3.11. Some dependencies are not yet compatible with Python version 3.12. As soon as they up
+date their compatibility we will aim to support Python 3.12 as well.
+To separate Python environments on your system, you can use the `venv` package from the standard library.
 
-To use `flexcv` you will need Python 3.10 or 3.11. Some dependencies are not yet compatible with Python version 3.12. As soon as they update their compatibility we can support Python 3.12 as well.
-
-#### Using conda
-
-You can easily install this version of Python using conda (Anaconda or Miniconda). We recommend using a fresh environment for cleanly holding all relevant packages corresponding to this repo. With conda installed you can create a new Python 3.10 environment, activate it and install our requirements by running the following lines from the command line:
-
-```bash
-conda create --name flexcv python=3.10
-conda activate flexcv
-conda install pip
-cd path/to/this/repo
-pip install -r flexcv/requirements.txt
 ```
-
-#### Using `venv`
-
-To separate Python environments on your system, you can also use the `venv` package from the standard library.
-
-```bash
 cd path/to/this/repo
 python -m venv my_env_name
 my_env_name/Scripts/activate
-pip install flexcv/requirements.txt
+pip install flexcv
 ```
 
 ## Getting Started
