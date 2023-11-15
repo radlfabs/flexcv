@@ -12,7 +12,7 @@ from sklearn.ensemble import RandomForestRegressor
 from flexcv import CrossValidation
 from flexcv.models import LinearMixedEffectsModel
 from flexcv.merf import MERF
-from flexcv.model_postprocessing import RandomForestModelPostProcessor, LinearMixedEffectsModelPostProcessor
+from flexcv.model_postprocessing import RandomForestModelPostProcessor, LMERModelPostProcessor
 from flexcv.synthesizer import generate_regression
 
 
@@ -29,16 +29,15 @@ params = {
 cv =CrossValidation()
 results = (
     cv.set_data(X, y, group, random_slopes)
-    .set_models(model_map)
     .set_inner_cv(3)
     .set_splits(n_splits_out=3)
-    .add_model(model=LinearMixedEffectsModel, post_processor=LinearMixedEffectsModelPostProcessor)
-    .add_model(model=RandomForestRegressor, requires_inner_cv=True, params=params, post_processor=RandomForestModelPostProcessor, add_merf=True)
+    .add_model(model_class=LinearMixedEffectsModel, post_processor=LMERModelPostProcessor)
+    .add_model(model_class=RandomForestRegressor, requires_inner_cv=True, params=params, post_processor=RandomForestModelPostProcessor, add_merf=True)
     .perform()
     .get_results()
 )
 ```
-Now when you want to compare a larger number of models it could make sense to pass the mapping directly to the `.set_models` method.
+Now when you want to compare a larger number of models you can assign your customized ModelMappingDict as below and pass the mapping directly to the `.set_models` method.
 
 ```python
 model_map = ModelMappingDict(
@@ -81,133 +80,111 @@ cv.set_models(model_map)
 
 ```
 
-Have a look at this section from `flexcv.model_mapping_template` for how to add multiple models to a `ModelMappingDict`:
+## Configuration using yaml
 
-```python # TODO redo this template
-import optuna
+As another and convenient method to configure multiple models you can pass yaml-code to the interface.
+This is especially useful when you want to reuse the configuration for multiple runs.
+
+As a hidden gem, we implemented a yaml-parser that can take care of imports of model classes and postprocessors.
+It also takes care of instantiating the optuna distributions for hyperparameter optimization.
+
+Just use the following yaml tags:
+
+- `!Int` for `optuna.distributions.IntDistribution`
+- `!Float` for `optuna.distributions.FloatDistribution`
+- `!Categorical` for `optuna.distributions.CategoricalDistribution`
+
+Use the following syntax to define the distribution:
+
+```yaml
+!Int
+  low: 5
+  high: 100
+  step: 1
+  log: true
+```
+Note: You have to provide keys for the distribution parameters. Also you have to provide low and high values. 
+Exceptions are the `step` parameter for `IntDistribution` which defaults to 1 and the `log` parameter which defaults to False.
+
+With our yaml configuration we could define models like this:
+
+```python
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.svm importSVR
 from xgboost import XGBRegressor
 
-from . import model_postprocessing as mp
-from .merf importMERF
-from .model_mapping import ModelConfigDict, ModelMappingDict
-from .models import LinearMixedEffectsModel, LinearModel
+from flexcv import CrossValidation
+from flexcv.merf import MERF
+from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
+from flexcv.models import LinearMixedEffectsModel, LinearModel
 
-MODEL_MAPPING=ModelMappingDict(
-    {
-        "LinearModel": ModelConfigDict(
-            {
-                "requires_inner_cv": False,
-                "n_trials": 100,
-                "n_jobs_model": 1,
-                "n_jobs_cv": 1,
-                "model": LinearModel,
-                "params": {},
-                "post_processor": mp.LinearModelPostProcessor,
-            }
-        ),
-        "LinearMixedEffectsModel": ModelConfigDict(
-            {
-                "requires_inner_cv": False,
-                "n_trials": 100,
-                "n_jobs_model": 1,
-                "n_jobs_cv": 1,
-                "model": LinearMixedEffectsModel,
-                "params": {},
-                "post_processor": mp.LMERPostProcessor,
-            }
-        ),
-        "RandomForest": ModelConfigDict(
-            {
-                "requires_inner_cv": True,
-                "n_trials": 400,
-                "n_jobs_model": 1,
-                "n_jobs_cv": -1,
-                "model": RandomForestRegressor,
-                "params": {
-                    "max_depth": optuna.distributions.IntDistribution(5,100),
-                    "min_samples_split": optuna.distributions.IntDistribution(
-                        2,1000,log=True
-                    ),
-                    "min_samples_leaf": optuna.distributions.IntDistribution(
-                        2,5000,log=True
-                    ),
-                    "max_samples": optuna.distributions.FloatDistribution(0.0021,0.9),
-                    "max_features": optuna.distributions.IntDistribution(1,10),
-                    "max_leaf_nodes": optuna.distributions.IntDistribution(10,40000),
-                    "min_impurity_decrease": optuna.distributions.FloatDistribution(
-                        1e-8,0.02,log=True
-                    ),  # >>>> can be (1e-8, .01, log=True)
-                    "min_weight_fraction_leaf": optuna.distributions.FloatDistribution(
-                        0,0.5
-                   ),  # must be a float in the range [0.0, 0.5]
-                    "ccp_alpha": optuna.distributions.FloatDistribution(1e-8,0.01),
-                    "n_estimators": optuna.distributions.IntDistribution(2,7000),
-                },
-            }
-        ),
-        "XGBoost": ModelConfigDict(
-            {
-                "requires_inner_cv": True,
-                "n_trials": 300,
-                "n_jobs_model": 1,
-                "n_jobs_cv": -1,
-                "model": XGBRegressor,
-                "params": {
-                    "max_depth": optuna.distributions.IntDistribution(2,700),
-                    "learning_rate": optuna.distributions.FloatDistribution(0.01,0.8),
-                    "n_estimators": optuna.distributions.IntDistribution(5,5000),
-                    "min_child_weight": optuna.distributions.IntDistribution(2,100),
-                    # "max_delta_step": optuna.distributions.FloatDistribution(0.1, 10.0),
-                    # "gamma": optuna.distributions.FloatDistribution(0.0, 50),
-                    "subsample": optuna.distributions.FloatDistribution(0.005,0.97),
-                    "colsample_bytree": optuna.distributions.FloatDistribution(
-                        0.1,1,step=0.1
-                    ),
-                    "colsample_bylevel": optuna.distributions.FloatDistribution(
-                        0.1,1,step=0.1
-                    ),
-                    "colsample_bynode": optuna.distributions.FloatDistribution(
-                        0.1,1,step=0.1
-                    ),
-                    "colsample_bytree": optuna.distributions.FloatDistribution(
-                        0.1,1,step=0.1
-                    ),
-                    "colsample_bylevel": optuna.distributions.FloatDistribution(
-                        0.1,1,step=0.1
-                    ),
-                    "colsample_bynode": optuna.distributions.FloatDistribution(
-                        0.1,1,step=0.1
-                    ),
-                    "reg_alpha": optuna.distributions.FloatDistribution(0.1,500),
-                    "reg_lambda": optuna.distributions.FloatDistribution(0.001,800),
-                },
-            }
-        ),
-        "SVR": ModelConfigDict(
-            {
-                "requires_inner_cv": True,
-                "n_trials": 450,
-                "allows_n_jobs": False,
-                "n_jobs_cv": -1,
-                "model": SVR,
-                "params": {
-                    # Most Important: Kernel + C
-                    # "kernel": default "rbf" yielded best results
-                    # "degree": # for poly only
-                    "C": optuna.distributions.FloatDistribution(0.001,50,log=True),
-                    "epsilon": optuna.distributions.FloatDistribution(0.1,1.3),
-                    "gamma": optuna.distributions.FloatDistribution(
-                        1e-5,0.1,log=True
-                    ),  # better than default "scale"
-                    # "tol": optuna.distributions.FloatDistribution(1e-4, 10),
-                    # "shrinking": default "True" yielded best restults
-                },
-            }
-        ),
-    }
-)
+yaml_mapping = """
+LinearModel:
+    requires_inner_cv: False
+    n_jobs_model: 1
+    n_jobs_cv: 1
+    model: flexcv.models.LinearModel
+    post_processor: flexcv.model_postprocessing.LinearModelPostProcessor
 
+LMER:
+    requires_inner_cv: False
+    n_jobs_model: 1
+    n_jobs_cv: 1
+    model: flexcv.models.LinearMixedEffectsModel
+    post_processor: flexcv.model_postprocessing.LMERModelPostProcessor
+
+RandomForest:
+  requires_inner_cv: true
+  n_trials: 400
+  n_jobs_model: -1
+  n_jobs_cv: 1
+  model: sklearn.ensemble.RandomForestRegressor
+  params:
+    max_depth: !Int
+      low: 5
+      high: 100
+    min_samples_split: !Int
+      low: 2
+      high: 1000
+      log: true
+    min_samples_leaf: !Int
+      low: 2
+      high: 5000
+      log: true
+    max_samples: !Float
+      low: 0.0021
+      high: 0.9
+    max_features: !Int
+      low: 1
+      high: 10
+    max_leaf_nodes: !Int
+      low: 10
+      high: 40000
+    min_impurity_decrease: !Float
+      low: 0.0000000008
+      high: 0.02
+      _kwargs:
+        log: true
+    min_weight_fraction_leaf: !Float
+      low: 0, 
+      high: 0.5
+    ccp_alpha: !Float
+      low: 1e-08
+      high: 0.01
+    n_estimators: !Int
+      low: 2
+      high: 7000
+  post_processor: flexcv.model_postprocessing.RandomForestModelPostProcessor
+  add_merf: true
+"""
+
+# and then call .set_models on your CrossValidation instance
+cv = CrossValidation()
+cv.set_models(yaml_string=yaml_mapping)
+
+# if you have your yaml 
 
 ```
+
+
+
