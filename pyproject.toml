@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "flexcv"
-version = "0.1.0"
+version = "0.0.0"
 description = "An easy to use and flexible package to perform cross validation in python."
 readme = "README.md"
 authors = [{ name = "Fabian Rosenthal" }]
