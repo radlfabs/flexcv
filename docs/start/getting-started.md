@@ -17,4 +17,3 @@ pip install flexcv
 ```
 
 Now you have installed everything you need to perform flexible cross validation and machine learning on your tabular data.
-
