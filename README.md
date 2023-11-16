@@ -8,12 +8,6 @@
 
 Authors: Fabian Rosenthal, Patrick Blättermann and Siegbert Versümer
 
-## Installation
-
-```bash
-pip install flexcv
-```
-
 ## Introduction
 This repository contains the code for the python package `flexcv` which implements flexible cross validation and machine learning for tabular data. It's code is used for the machine learning evaluations in Versümer et al. (2023).
 The core functionality has been developed in the course of a research project at Düsseldorf University of Applied Science, Germany.
@@ -58,19 +52,6 @@ Working with cross validation in Python usually starts with creating a sklearn p
 However, there are limitations, e. g. if you want to push the training part of your clustering variable to the inner cross validation split. For some of the features, you would have to write a lot of boilerplate code to get it working, and you end up with a lot of code duplication.
 As soon as you want to use a linear mixed effects model, you have to use the `statsmodels` package, which is not compatible with the `sklearn` pipeline.
 `flexcv` solves these problems and provides a lot of useful features for cross validation and machine learning on tabular data, so you can focus on your data and your models.
-
-## Environment
-
-To use `flexcv` you will need Python 3.10 or 3.11. Some dependencies are not yet compatible with Python version 3.12. As soon as they up
-date their compatibility we will aim to support Python 3.12 as well.
-To separate Python environments on your system, you can use the `venv` package from the standard library.
-
-```
-cd path/to/this/repo
-python -m venv my_env_name
-my_env_name/Scripts/activate
-pip install flexcv
-```
 
 ## Getting Started
 
@@ -132,4 +113,4 @@ We would like to thank the developers of `sklearn`, `optuna`, `neptune` and `mer
 
 ## About
 
-`flexcv` was developed at the [Institute of Sound and Vibration Engineering](https://isave.hs-duesseldorf.de/) at the University of Applied Science Düsseldorf, Germany.
+`flexcv`'s core functionality was originally developed at the [Institute of Sound and Vibration Engineering](https://isave.hs-duesseldorf.de/) at the University of Applied Science Düsseldorf, Germany.
