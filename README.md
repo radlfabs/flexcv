@@ -6,6 +6,11 @@
   </tr>
 </table>
 
+[![tests](https://github.com/radlfabs/flexcv/actions/workflows/test.yml/badge.svg)](https://github.com/radlfabs/flexcv/actions/workflows/test.yml)
+
+<!-- Pytest Coverage Comment:Begin -->
+<!-- Pytest Coverage Comment:End -->
+
 Authors: Fabian Rosenthal, Patrick Blättermann and Siegbert Versümer
 
 ## Welcome to `flexcv`
