@@ -4,10 +4,11 @@ on:
 jobs:
   update-coverage-on-readme:
     runs-on: ubuntu-latest
+    environment: Update-Readme
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.KEY }}
+          token: ${{ secrets.PUSH }}
       # - uses: actions/checkout@v3
       #   with:
       #     persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
