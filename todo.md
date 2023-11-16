@@ -1,4 +1,0 @@
-- remove file.log
-- get_results, run.py usw checken und removen
-- place hyperlinks zu wichtigsten packages und acknowledge diese
-- rm RMSE everywhere :D
