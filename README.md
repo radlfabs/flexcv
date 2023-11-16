@@ -97,7 +97,7 @@ Additional info on how to get started working with this package will be added he
 
 ## Documentation
 
-Have a look at our [documentation](https://radlfabs.github.io/flexcv/). We currently add lots of additional guides and tutorials to help you get started with `flexcv`.
+Have a look at our [documentation](https://radlfabs.github.io/flexcv/). We currently add lots of additional guides and tutorials to help you get started with `flexcv`. If you are interested in writing a guide or tutorial, feel free to contact us. It would be great to have some community contributions here.
 
 ## Conclusion
 

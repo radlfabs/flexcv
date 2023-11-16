@@ -1,6 +1,5 @@
 include README.md
 include LICENSE
-include docs/*.md
 include requirements.txt
-include mkdocs.yml
 include imgs/logo_colored.png
+include *.toml
