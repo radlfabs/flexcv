@@ -67,13 +67,14 @@ from flexcv.synthesizer import generate_regression
 
 
 X, y, _, _ =generate_regression(
-    10, 100, n_slopes=1, noise_level=9.1e-2
+    3, 25, n_slopes=1, noise_level=9.1e-2
 )
 
 yaml_config = """
 RandomForest:
   model: sklearn.ensemble.RandomForestRegressor
   post_processor: flexcv.model_postprocessing.RandomForestModelPostProcessor
+  requires_inner_cv: false
 """
 
 # create neptune run object and pass your project name
@@ -85,6 +86,7 @@ results = (
     cv.set_data(X, y)
     # pass the run object to the CrossValidation instance and set flag for additional plots
     .set_run(run, diagnostics=True)
+    .set_splits(n_splits_out=3)
     #... do some configuration
     .set_models(yaml_string=yaml_config)
     .perform()
