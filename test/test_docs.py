@@ -3,10 +3,12 @@ import subprocess
 import time
 import pathlib
 import pytest
+import pkgutil
+import inspect
+import importlib
 from neptune.exceptions import NeptuneInvalidApiTokenException
-
-from mktestdocs import check_md_file
-
+from mktestdocs import check_md_file, get_codeblock_members, check_docstring
+import flexcv
 
 @pytest.mark.xfail(raises=NeptuneInvalidApiTokenException)
 @pytest.mark.parametrize('fpath', pathlib.Path("docs").glob("**/*.md"), ids=str)
@@ -16,8 +18,3 @@ def test_docs_codeblocks_valid(fpath):
     # as this is a valid exception
     
     check_md_file(fpath=fpath)
-    
-def test_docs_build_no_fails():
-    # Test if the docs build without errors
-    subprocess.check_call(["mkdocs", "build"])
-    

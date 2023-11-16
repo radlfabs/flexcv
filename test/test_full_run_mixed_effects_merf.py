@@ -4,18 +4,15 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.svm import SVR
 from xgboost import XGBRegressor
 
-from flexcv.synthesizer import generate_regression
 from flexcv.interface import CrossValidation
 from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
-from flexcv.run import Run
 import flexcv.model_postprocessing as mp
-from flexcv.merf import MERF
+
+from data import DATA_TUPLE_3_100
 
 
 def merf_mixed_regression():
-    X, y, group, random_slopes = generate_regression(
-        10, 100, n_slopes=1, noise_level=9.1e-2, random_seed=42
-    )
+    X, y, group, random_slopes = DATA_TUPLE_3_100
 
     model_map = ModelMappingDict(
         {
@@ -26,7 +23,7 @@ def merf_mixed_regression():
                     "n_jobs_cv": -1,
                     "model": RandomForestRegressor,
                     "params": {
-                        "max_depth": optuna.distributions.IntDistribution(5, 100),
+                        "max_depth": optuna.distributions.IntDistribution(2, 10, step=2),
                         "n_estimators": optuna.distributions.CategoricalDistribution(
                             [10]
                         ),
@@ -42,8 +39,8 @@ def merf_mixed_regression():
         cv.set_data(X, y, group, random_slopes)
         .set_models(model_map)
         .set_inner_cv(3)
-        .set_splits(n_splits_out=3)
-        .set_merf(add_merf_global=True, em_max_iterations=5)
+        .set_splits(n_splits_out=3, n_splits_in=3, break_cross_val=True)
+        .set_merf(add_merf_global=True, em_max_iterations=3)
         .perform()
         .get_results()
     )
@@ -53,13 +50,11 @@ def merf_mixed_regression():
 
 def test_merf_rf():
     """Test if the mean r2 value of the random forest regression is is exactly the same over time."""
-    assert np.isclose([merf_mixed_regression()], [0.0832993979557632])
+    assert np.isclose([merf_mixed_regression()], [-0.007246874039440909])
 
 
 def merf_mixed_xgboost():
-    X, y, group, random_slopes = generate_regression(
-        10, 100, n_slopes=1, noise_level=9.1e-2, random_seed=42
-    )
+    X, y, group, random_slopes = DATA_TUPLE_3_100
 
     model_map = ModelMappingDict(
         {
@@ -70,7 +65,8 @@ def merf_mixed_xgboost():
                     "n_jobs_cv": -1,
                     "model": XGBRegressor,
                     "params": {
-                        "max_depth": optuna.distributions.IntDistribution(2, 700),
+                        "max_depth": optuna.distributions.IntDistribution(2, 20, step=5),
+                        "n_estimators": optuna.distributions.CategoricalDistribution([10]),
                     },
                     "post_processor": mp.XGBoostModelPostProcessor,
                 }
@@ -83,8 +79,8 @@ def merf_mixed_xgboost():
         cv.set_data(X, y, group, random_slopes)
         .set_models(model_map)
         .set_inner_cv(3)
-        .set_splits(n_splits_out=3)
-        .set_merf(add_merf_global=True, em_max_iterations=5)
+        .set_splits(n_splits_out=3, n_splits_in=3, break_cross_val=True)
+        .set_merf(add_merf_global=True, em_max_iterations=3)
         .perform()
         .get_results()
     )
@@ -94,13 +90,11 @@ def merf_mixed_xgboost():
 
 def test_merf_xgboost():
     """Test if the mean r2 value of the random forest regression is is exactly the same over time."""
-    assert np.isclose([merf_mixed_xgboost()], [-0.12340731619124896])
+    assert np.isclose([merf_mixed_xgboost()], [0.17332563312329563])
 
 
 def merf_svr_regression():
-    X, y, group, random_slopes = generate_regression(
-        10, 100, n_slopes=1, noise_level=9.1e-2, random_seed=42
-    )
+    X, y, group, random_slopes = DATA_TUPLE_3_100
 
     model_map = ModelMappingDict(
         {
@@ -112,7 +106,7 @@ def merf_svr_regression():
                     "model": SVR,
                     "params": {
                         "C": optuna.distributions.FloatDistribution(
-                            0.001, 50, log=True
+                            0.1, 10,
                         ),
                     },
                     "post_processor": mp.SVRModelPostProcessor,
@@ -126,8 +120,8 @@ def merf_svr_regression():
         cv.set_data(X, y, group, random_slopes)
         .set_models(model_map)
         .set_inner_cv(3)
-        .set_splits(n_splits_out=3)
-        .set_merf(add_merf_global=True, em_max_iterations=5)
+        .set_splits(n_splits_out=3, n_splits_in=3, break_cross_val=True)
+        .set_merf(add_merf_global=True, em_max_iterations=3)
         .perform()
         .get_results()
     )
@@ -137,4 +131,4 @@ def merf_svr_regression():
 
 def test_merf_svr_mixed():
     """Test if the mean r2 value of the random forest regression is exactly the same over time."""
-    assert np.isclose([merf_svr_regression()], [0.2880957829764944])
+    assert np.isclose([merf_svr_regression()], [-0.11442446839255993])

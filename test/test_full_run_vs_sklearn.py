@@ -9,6 +9,7 @@ from flexcv.interface import ModelConfigDict
 from flexcv.interface import ModelMappingDict
 from flexcv.run import Run
 
+from data import DATA_TUPLE_3_100
 
 ##### Test kfold #####
 
@@ -31,12 +32,16 @@ def flexcv_lm_kfold(X, y):
 
     cv = CrossValidation()
     results = (
-        cv.set_data(X, y).set_models(model_map).set_run(Run()).perform().get_results()
+        cv.set_data(X, y)
+        .set_splits(n_splits_out=3, break_cross_val=True)
+        .set_models(model_map)
+        .perform()
+        .get_results()
     )
 
     n_values = len(results["LinearModel"]["metrics"])
     r2_values = [results["LinearModel"]["metrics"][k]["mse"] for k in range(n_values)]
-    return np.mean(r2_values)
+    return r2_values
 
 
 def sklearn_lm_kfold(X, y):
@@ -46,7 +51,7 @@ def sklearn_lm_kfold(X, y):
     from sklearn.linear_model import LinearRegression
     from sklearn.model_selection import KFold
 
-    kf = KFold(n_splits=5, shuffle=True, random_state=42)
+    kf = KFold(n_splits=3, shuffle=True, random_state=42)
     sklearn_cv_results = sklearn_score(
         LinearRegression(),
         X,
@@ -55,7 +60,7 @@ def sklearn_lm_kfold(X, y):
         n_jobs=-1,
         scoring="neg_mean_squared_error",
     )
-    return sklearn_cv_results.mean()
+    return sklearn_cv_results
 
 
 def test_kfold_flexcv_roughly_equals_sklearn():
@@ -64,9 +69,8 @@ def test_kfold_flexcv_roughly_equals_sklearn():
     - flexcv: LinearRegression() -> CrossValidation() with "kFold"-> perform() -> get_results()
     assert MAE on the MSE of the two pipelines is less than machine epsilon
     """
-    X, y, group, random_slopes = generate_regression(
-        10, 100, n_slopes=1, noise_level=9.1e-2, random_seed=42
-    )
+    X, y, _, _ = DATA_TUPLE_3_100
+    
     flexcv_val = flexcv_lm_kfold(X, y)
     sklearn_val = -sklearn_lm_kfold(X, y)
     assert np.isclose(np.array([flexcv_val]), np.array([sklearn_val]))
@@ -96,7 +100,7 @@ def flexcv_lm_groupkfold(X, y, group):
     results = (
         cv.set_data(X, y, group)
         .set_models(model_map)
-        .set_splits(split_out="GroupKFold")
+        .set_splits(split_out="GroupKFold", n_splits_out=3)
         .set_run(Run())
         .perform()
         .get_results()
@@ -114,7 +118,7 @@ def sklearn_lm_groupkfold(X, y, group):
     from sklearn.linear_model import LinearRegression
     from sklearn.model_selection import GroupKFold
 
-    gkf = GroupKFold(n_splits=5)
+    gkf = GroupKFold(n_splits=3)
     sklearn_cv_results = sklearn_score(
         LinearRegression(),
         X,
@@ -133,9 +137,8 @@ def test_groupkfold_flexcv_roughly_equals_sklearn():
     - flexcv: LinearRegression() -> CrossValidation() with "GroupKFold"-> perform() -> get_results()
     assert MAE on the MSE of the two pipelines is less than precision
     """
-    X, y, group, random_slopes = generate_regression(
-        10, 100, n_slopes=1, noise_level=9.1e-2, random_seed=42
-    )
+    X, y, group, _ = DATA_TUPLE_3_100
+    
     flexcv_val = flexcv_lm_groupkfold(X, y, group)
     sklearn_val = -sklearn_lm_groupkfold(X, y, group)
     assert np.isclose(np.array([flexcv_val]), np.array([sklearn_val]))
@@ -162,7 +165,7 @@ def flexcv_lm_kfold(X, y):
 
     cv = CrossValidation()
     results = (
-        cv.set_data(X, y).set_models(model_map).set_run(Run()).perform().get_results()
+        cv.set_data(X, y).set_splits(n_splits_out=3).set_models(model_map).set_run(Run()).perform().get_results()
     )
 
     n_values = len(results["LinearModel"]["metrics"])
@@ -177,7 +180,7 @@ def sklearn_lm_kfold(X, y):
     from sklearn.linear_model import LinearRegression
     from sklearn.model_selection import KFold
 
-    kf = KFold(n_splits=5, shuffle=True, random_state=42)
+    kf = KFold(n_splits=3, shuffle=True, random_state=42)
     sklearn_cv_results = sklearn_score(
         LinearRegression(),
         X,
@@ -195,9 +198,7 @@ def test_linearmodels_flexcv_roughly_equals_sklearn():
     - flexcv: LinearRegression() -> CrossValidation() with "kFold"-> perform() -> get_results()
     assert MAE on the MSE of the two pipelines is less than machine epsilon
     """
-    X, y, group, random_slopes = generate_regression(
-        10, 100, n_slopes=1, noise_level=9.1e-2, random_seed=42
-    )
+    X, y, _, _ = DATA_TUPLE_3_100
     flexcv_val = flexcv_lm_kfold(X, y)
     sklearn_val = -sklearn_lm_kfold(X, y)
     assert np.isclose(np.array([flexcv_val]), np.array([sklearn_val]))

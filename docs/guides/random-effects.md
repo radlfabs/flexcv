@@ -56,7 +56,7 @@ from flexcv.models import LinearModel, LinearMixedEffectsModel
 from flexcv.synthesizer import generate_regression
 
 X, y, group, random_slopes =generate_regression(
-    10,100,n_slopes=1,noise_level=9.1e-2
+    3,100,n_slopes=1,noise_level=9.1e-2
 )
 
 cv =CrossValidation()
@@ -84,11 +84,11 @@ from flexcv.synthesizer import generate_regression
 
 # lets start with generating some clustered data
 X, y, group, random_slopes =generate_regression(
-    10,100,n_slopes=1,noise_level=9.1e-2
+    3, 50, n_slopes=1, noise_level=9.1e-2
 )
 # define our hyperparameters
 params = {
-    "max_depth": optuna.distributions.IntDistribution(5,100),
+    "max_depth": optuna.distributions.IntDistribution(5, 100),
     "n_estimators": optuna.distributions.CategoricalDistribution([10]),
 }
 
@@ -98,7 +98,7 @@ results = (
     .set_inner_cv(3)
     .set_splits(n_splits_out=3)
     .add_model(model_class=RandomForestRegressor, requires_inner_cv=True, params=params, post_processor=RandomForestModelPostProcessor)
-    .set_merf(True)
+    .set_merf(True, em_max_iterations=5)
     .perform()
     .get_results()
 )

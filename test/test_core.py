@@ -10,12 +10,52 @@ from flexcv.run import Run
 from flexcv.core import preprocess_slopes, preprocess_features
 from flexcv.core import cross_validate, ModelMappingDict
 from flexcv.metrics import MetricsDict, mse_wrapper
+    
 
+def test_preprocess_slopes_allows_series():
+    Z_train_slope = pd.Series(np.random.rand(5))
+    Z_test_slope = pd.Series(np.random.rand(5))
+    preprocess_slopes(Z_train_slope.copy(), Z_test_slope.copy(), must_scale=True)
+    
+def test_preprocess_slopes_returns_values():
+    # Test preprocess_slopes function returns a tuple
+    Z_train_slope = pd.DataFrame(np.random.rand(5, 3))
+    Z_test_slope = pd.DataFrame(np.random.rand(5, 3))
+    val = preprocess_slopes(
+        Z_train_slope.copy(),
+        Z_test_slope.copy(),
+        must_scale=True
+        )
+    assert isinstance(val, tuple)
+    assert len(val) == 2
+    assert isinstance(val[0], np.ndarray)
+    assert isinstance(val[1], np.ndarray)
+    # test if Intercept column is added
+    assert val[0].shape[1] == Z_train_slope.shape[1] + 1
+    assert val[1].shape[1] == Z_test_slope.shape[1] + 1
+    
+def test_preprocess_slopes_raises():
+    Z_train_slope = pd.DataFrame(np.random.rand(5, 3))
+    Z_test_slope = pd.DataFrame(np.random.rand(5, 3))
+    with pytest.raises(TypeError):
+        preprocess_slopes("123", Z_test_slope, must_scale=True)
+    
+    with pytest.raises(TypeError):
+        preprocess_slopes(Z_train_slope, "123", must_scale=True)
+    
+    with pytest.raises(TypeError):
+        preprocess_slopes(Z_train_slope, Z_test_slope, must_scale="123")
+        
+    # wrong shapes
+    Z_test_slope = pd.DataFrame(np.random.rand(5, 4))
+    with pytest.raises(ValueError):
+        preprocess_slopes(Z_train_slope, Z_test_slope, must_scale=True)
+    
 
 def test_preprocess_slopes_no_scaling():
     # Test preprocess_slopes function with no scaling
-    Z_train_slope = pd.DataFrame(np.random.rand(10, 5))
-    Z_test_slope = pd.DataFrame(np.random.rand(10, 5))
+    Z_train_slope = pd.DataFrame(np.random.rand(5, 3))
+    Z_test_slope = pd.DataFrame(np.random.rand(5, 3))
     Z_train, Z_test = preprocess_slopes(
         Z_train_slope.copy(), Z_test_slope.copy(), must_scale=False
     )
@@ -27,8 +67,8 @@ def test_preprocess_slopes_no_scaling():
 
 def test_preprocess_slopes_with_scaling():
     # Test preprocess_slopes function with scaling
-    Z_train_slope = pd.DataFrame(np.random.rand(10, 5))
-    Z_test_slope = pd.DataFrame(np.random.rand(10, 5))
+    Z_train_slope = pd.DataFrame(np.random.rand(5, 3))
+    Z_test_slope = pd.DataFrame(np.random.rand(5, 3))
     Z_train, Z_test = preprocess_slopes(
         Z_train_slope.copy(), Z_test_slope.copy(), must_scale=True
     )
@@ -44,14 +84,14 @@ def test_preprocess_slopes_with_scaling():
 def test_preprocess_slopes_invalid_Z_train_slope():
     # Test preprocess_slopes function with invalid Z_train_slope
     Z_train_slope = "invalid type"
-    Z_test_slope = pd.DataFrame(np.random.rand(10, 5))
+    Z_test_slope = pd.DataFrame(np.random.rand(5, 3))
     with pytest.raises(TypeError):
         preprocess_slopes(Z_train_slope, Z_test_slope, must_scale=False)
 
 
 def test_preprocess_slopes_invalid_Z_test_slope():
     # Test preprocess_slopes function with invalid Z_test_slope
-    Z_train_slope = pd.DataFrame(np.random.rand(10, 5))
+    Z_train_slope = pd.DataFrame(np.random.rand(5, 3))
     Z_test_slope = "invalid type"
     with pytest.raises(TypeError):
         preprocess_slopes(Z_train_slope, Z_test_slope, must_scale=False)
@@ -59,15 +99,15 @@ def test_preprocess_slopes_invalid_Z_test_slope():
 
 def test_preprocess_slopes_invalid_must_scale():
     # Test preprocess_slopes function with invalid must_scale
-    Z_train_slope = pd.DataFrame(np.random.rand(10, 5))
-    Z_test_slope = pd.DataFrame(np.random.rand(10, 5))
+    Z_train_slope = pd.DataFrame(np.random.rand(5, 3))
+    Z_test_slope = pd.DataFrame(np.random.rand(5, 3))
     with pytest.raises(TypeError):
         preprocess_slopes(Z_train_slope, Z_test_slope, must_scale="invalid type")
 
 
 def test_preprocess_slopes_diff_dims():
     # Test preprocess_slopes function with different dimensions for Z_train_slope and Z_test_slope
-    Z_train_slope = pd.DataFrame(np.random.rand(10, 5))
+    Z_train_slope = pd.DataFrame(np.random.rand(5, 3))
     Z_test_slope = pd.DataFrame(np.random.rand(10, 4))  # different number of columns
     with pytest.raises(ValueError):
         preprocess_slopes(Z_train_slope, Z_test_slope, must_scale=False)
@@ -75,8 +115,8 @@ def test_preprocess_slopes_diff_dims():
 
 def test_preprocess_features():
     # Test preprocess_features function
-    X_train = pd.DataFrame(np.random.rand(10, 5), columns=list("abcde"))
-    X_test = pd.DataFrame(np.random.rand(10, 5), columns=list("abcde"))
+    X_train = pd.DataFrame(np.random.rand(5, 3), columns=list("abc"))
+    X_test = pd.DataFrame(np.random.rand(5, 3), columns=list("abc"))
     X_train_scaled, X_test_scaled = preprocess_features(X_train.copy(), X_test.copy())
     scaler = StandardScaler()
     X_train_scaled_expected = scaler.fit_transform(X_train)
@@ -92,27 +132,38 @@ def test_preprocess_features():
 def test_preprocess_features_invalid_X_train():
     # Test preprocess_features function with invalid X_train
     X_train = "invalid type"
-    X_test = pd.DataFrame(np.random.rand(10, 5), columns=list("abcde"))
+    X_test = pd.DataFrame(np.random.rand(5, 3), columns=list("abc"))
     with pytest.raises(TypeError):
         preprocess_features(X_train, X_test)
 
 
 def test_preprocess_features_invalid_X_test():
     # Test preprocess_features function with invalid X_test
-    X_train = pd.DataFrame(np.random.rand(10, 5), columns=list("abcde"))
+    X_train = pd.DataFrame(np.random.rand(5, 3), columns=list("abc"))
     X_test = "invalid type"
     with pytest.raises(TypeError):
         preprocess_features(X_train, X_test)
 
 
+def test_preprocess_features_diff_dims():
+    # must fail for different number of cols
+    X_train = pd.DataFrame(np.random.rand(5, 3), columns=list("abc"))
+    X_test = pd.DataFrame(np.random.rand(5, 4), columns=list("abcd"))
+    with pytest.raises(ValueError):
+        preprocess_features(X_train, X_test)
+    # must allow different number of rows
+    X_train = pd.DataFrame(np.random.rand(5, 3), columns=list("abc"))
+    X_test = pd.DataFrame(np.random.rand(10, 3), columns=list("abc"))
+    preprocess_features(X_train, X_test)
+
 def test_cross_validate():
     # Test cross_validate function
-    X = pd.DataFrame(np.random.rand(100, 5), columns=list("abcde"))
-    y = pd.Series(np.random.rand(100), name="target")
+    X = pd.DataFrame(np.random.rand(25, 3), columns=list("abc"))
+    y = pd.Series(np.random.rand(25), name="target")
     target_name = "target"
     run = Run()
-    groups = pd.Series(np.random.choice(["group1", "group2"], 100))
-    slopes = pd.Series(np.random.rand(100), name="slopes")
+    groups = pd.Series(np.random.choice(["group1", "group2"], 25))
+    slopes = pd.Series(np.random.rand(25), name="slopes")
     split_out = KFold(n_splits=3)
     split_in = KFold(n_splits=3)
     break_cross_val = False
@@ -127,7 +178,7 @@ def test_cross_validate():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100)
+                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100, step=10)
                 },
                 "requires_inner_cv": True,
                 "add_merf": False,
@@ -214,11 +265,11 @@ def test_cross_validate():
 def test_cross_validate_invalid_X():
     # Test cross_validate function with invalid X
     X = "invalid type"
-    y = pd.Series(np.random.rand(100))
+    y = pd.Series(np.random.rand(25))
     target_name = "target"
     run = Run()
-    groups = pd.Series(np.random.choice(["group1", "group2"], 100))
-    slopes = pd.Series(np.random.rand(100))
+    groups = pd.Series(np.random.choice(["group1", "group2"], 25))
+    slopes = pd.Series(np.random.rand(25))
     split_out = KFold(n_splits=3)
     split_in = KFold(n_splits=3)
     break_cross_val = False
@@ -233,7 +284,7 @@ def test_cross_validate_invalid_X():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100)
+                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100, step=10)
                 },
                 "requires_inner_cv": True,
                 "n_trials": 3,
@@ -267,19 +318,19 @@ def test_cross_validate_invalid_X():
 
 def test_cross_validate_invalid_y():
     # Test cross_validate function with invalid y
-    X = pd.DataFrame(np.random.rand(100, 5))
+    X = pd.DataFrame(np.random.rand(25, 3))
     y = "invalid type"
     target_name = "target"
     run = Run()
-    groups = pd.Series(np.random.choice(["group1", "group2"], 100))
-    slopes = pd.Series(np.random.rand(100))
+    groups = pd.Series(np.random.choice(["group1", "group2"], 25))
+    slopes = pd.Series(np.random.rand(25))
     split_out = KFold(n_splits=3)
     split_in = KFold(n_splits=3)
     break_cross_val = False
     scale_in = True
     scale_out = True
-    n_splits_out = 5
-    n_splits_in = 5
+    n_splits_out = 3
+    n_splits_in = 3
     random_seed = 42
     model_effects = "fixed"
     mapping = ModelMappingDict(
@@ -287,7 +338,7 @@ def test_cross_validate_invalid_y():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100)
+                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100, step=10)
                 },
                 "model_kwargs": {"n_jobs": -1, "random_state": 42},
                 "requires_inner_cv": True,
@@ -321,19 +372,19 @@ def test_cross_validate_invalid_y():
 
 def test_cross_validate_invalid_target_name():
     # Test cross_validate function with invalid target_name
-    X = pd.DataFrame(np.random.rand(100, 5))
-    y = pd.Series(np.random.rand(100))
+    X = pd.DataFrame(np.random.rand(25, 3))
+    y = pd.Series(np.random.rand(25))
     target_name = 123  # should be a string
     run = Run()
-    groups = pd.Series(np.random.choice(["group1", "group2"], 100))
-    slopes = pd.Series(np.random.rand(100))
+    groups = pd.Series(np.random.choice(["group1", "group2"], 25))
+    slopes = pd.Series(np.random.rand(25))
     split_out = KFold(n_splits=3)
     split_in = KFold(n_splits=3)
     break_cross_val = False
     scale_in = True
     scale_out = True
-    n_splits_out = 5
-    n_splits_in = 5
+    n_splits_out = 3
+    n_splits_in = 3
     random_seed = 42
     model_effects = "fixed"
     mapping = ModelMappingDict(
@@ -341,7 +392,7 @@ def test_cross_validate_invalid_target_name():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100)
+                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100, step=10)
                 },
                 "requires_inner_cv": True,
                 "add_merf": False,
@@ -378,19 +429,19 @@ def test_cross_validate_invalid_target_name():
 
 def test_cross_validate_invalid_run():
     # Test cross_validate function with invalid run
-    X = pd.DataFrame(np.random.rand(100, 5))
-    y = pd.Series(np.random.rand(100))
+    X = pd.DataFrame(np.random.rand(25, 3))
+    y = pd.Series(np.random.rand(25))
     target_name = "target"
     run = "invalid type"  # should be an instance of Run
-    groups = pd.Series(np.random.choice(["group1", "group2"], 100))
-    slopes = pd.Series(np.random.rand(100))
+    groups = pd.Series(np.random.choice(["group1", "group2"], 25))
+    slopes = pd.Series(np.random.rand(25))
     split_out = KFold(n_splits=3)
     split_in = KFold(n_splits=3)
     break_cross_val = False
     scale_in = True
     scale_out = True
-    n_splits_out = 5
-    n_splits_in = 5
+    n_splits_out = 3
+    n_splits_in = 3
     random_seed = 42
     model_effects = "fixed"
     mapping = ModelMappingDict(
@@ -398,7 +449,7 @@ def test_cross_validate_invalid_run():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100)
+                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100, step=10)
                 },
                 "requires_inner_cv": True,
                 "add_merf": False,
@@ -435,19 +486,19 @@ def test_cross_validate_invalid_run():
 
 def test_cross_validate_invalid_groups():
     # Test cross_validate function with invalid groups
-    X = pd.DataFrame(np.random.rand(100, 5))
-    y = pd.Series(np.random.rand(100))
+    X = pd.DataFrame(np.random.rand(25, 3))
+    y = pd.Series(np.random.rand(25))
     target_name = "target"
     run = Run()
     groups = "invalid type"  # should be a pandas Series
-    slopes = pd.Series(np.random.rand(100))
+    slopes = pd.Series(np.random.rand(25))
     split_out = KFold(n_splits=3)
     split_in = KFold(n_splits=3)
     break_cross_val = False
     scale_in = True
     scale_out = True
-    n_splits_out = 5
-    n_splits_in = 5
+    n_splits_out = 3
+    n_splits_in = 3
     random_seed = 42
     model_effects = "fixed"
     mapping = ModelMappingDict(
@@ -455,7 +506,7 @@ def test_cross_validate_invalid_groups():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100)
+                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100, step=10)
                 },
                 "requires_inner_cv": True,
                 "add_merf": False,
@@ -492,19 +543,19 @@ def test_cross_validate_invalid_groups():
 
 def test_cross_validate_invalid_slopes():
     # Test cross_validate function with invalid slopes
-    X = pd.DataFrame(np.random.rand(100, 5))
-    y = pd.Series(np.random.rand(100))
+    X = pd.DataFrame(np.random.rand(25, 3))
+    y = pd.Series(np.random.rand(25))
     target_name = "target"
     run = Run()
-    groups = pd.Series(np.random.choice(["group1", "group2"], 100))
+    groups = pd.Series(np.random.choice(["group1", "group2"], 25))
     slopes = "invalid type"  # should be a pandas Series
     split_out = KFold(n_splits=3)
     split_in = KFold(n_splits=3)
     break_cross_val = False
     scale_in = True
     scale_out = True
-    n_splits_out = 5
-    n_splits_in = 5
+    n_splits_out = 3
+    n_splits_in = 3
     random_seed = 42
     model_effects = "fixed"
     mapping = ModelMappingDict(
@@ -512,7 +563,7 @@ def test_cross_validate_invalid_slopes():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100)
+                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100, step=10)
                 },
                 "requires_inner_cv": True,
                 "add_merf": False,
@@ -549,19 +600,19 @@ def test_cross_validate_invalid_slopes():
 
 def test_cross_validate_invalid_split_out():
     # Test cross_validate function with invalid split_out
-    X = pd.DataFrame(np.random.rand(100, 5))
-    y = pd.Series(np.random.rand(100))
+    X = pd.DataFrame(np.random.rand(25, 3))
+    y = pd.Series(np.random.rand(25))
     target_name = "target"
     run = Run()
-    groups = pd.Series(np.random.choice(["group1", "group2"], 100))
-    slopes = pd.Series(np.random.rand(100))
+    groups = pd.Series(np.random.choice(["group1", "group2"], 25))
+    slopes = pd.Series(np.random.rand(25))
     split_out = "invalid type"  # should be an instance of KFold
     split_in = KFold(n_splits=3)
     break_cross_val = False
     scale_in = True
     scale_out = True
-    n_splits_out = 5
-    n_splits_in = 5
+    n_splits_out = 3
+    n_splits_in = 3
     random_seed = 42
     model_effects = "fixed"
     n_trials = 3
@@ -570,13 +621,8 @@ def test_cross_validate_invalid_split_out():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100)
+                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100, step=10)
                 },
-                "requires_inner_cv": True,
-                "add_merf": False,
-                "model_kwargs": {"n_jobs": -1, "random_state": 42},
-                "n_trials": 10,
-                "n_jobs_cv": -1,
                 "consumes_clusters": False,
                 "requires_formula": False,
             }
@@ -607,19 +653,19 @@ def test_cross_validate_invalid_split_out():
 
 def test_cross_validate_invalid_split_in():
     # Test cross_validate function with invalid split_in
-    X = pd.DataFrame(np.random.rand(100, 5))
-    y = pd.Series(np.random.rand(100))
+    X = pd.DataFrame(np.random.rand(25, 3))
+    y = pd.Series(np.random.rand(25))
     target_name = "target"
     run = Run()
-    groups = pd.Series(np.random.choice(["group1", "group2"], 100))
-    slopes = pd.Series(np.random.rand(100))
+    groups = pd.Series(np.random.choice(["group1", "group2"], 25))
+    slopes = pd.Series(np.random.rand(25))
     split_out = KFold(n_splits=3)
     split_in = "invalid type"  # should be an instance of KFold
     break_cross_val = False
     scale_in = True
     scale_out = True
-    n_splits_out = 5
-    n_splits_in = 5
+    n_splits_out = 3
+    n_splits_in = 3
     random_seed = 42
     model_effects = "fixed"
     mapping = ModelMappingDict(
@@ -627,7 +673,7 @@ def test_cross_validate_invalid_split_in():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100)
+                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100, step=10)
                 },
                 "requires_inner_cv": True,
                 "add_merf": False,
@@ -664,19 +710,19 @@ def test_cross_validate_invalid_split_in():
 
 def test_cross_validate_invalid_groups_but_groupkfold():
     # Test cross_validate function with invalid groups but GroupKFold
-    X = pd.DataFrame(np.random.rand(100, 5))
-    y = pd.Series(np.random.rand(100))
+    X = pd.DataFrame(np.random.rand(25, 3))
+    y = pd.Series(np.random.rand(25))
     target_name = "target"
     run = Run()
-    groups = pd.Series(np.random.choice(["group1", "group2"], 100))
-    slopes = pd.Series(np.random.rand(100))
+    groups = pd.Series(np.random.choice(["group1", "group2"], 25))
+    slopes = pd.Series(np.random.rand(25))
     split_out = KFold(n_splits=3)
     split_in = GroupKFold(n_splits=3)
     break_cross_val = False
     scale_in = True
     scale_out = True
-    n_splits_out = 5
-    n_splits_in = 5
+    n_splits_out = 3
+    n_splits_in = 3
     random_seed = None
     model_effects = "fixed"
     mapping = ModelMappingDict(
@@ -684,7 +730,7 @@ def test_cross_validate_invalid_groups_but_groupkfold():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100)
+                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100, step=10)
                 },
                 "requires_inner_cv": True,
                 "add_merf": False,

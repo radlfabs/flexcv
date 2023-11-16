@@ -18,7 +18,7 @@ from flexcv.synthesizer import generate_regression
 
 # lets start with generating some clustered data
 X, y, group, random_slopes =generate_regression(
-    10,100,n_slopes=1,noise_level=9.1e-2
+    3,100,n_slopes=1,noise_level=9.1e-2
 )
 # define our hyperparameters for the random forest
 params = {
@@ -206,8 +206,6 @@ model_map = ModelMappingDict(
                     ),
                 "post_processor": mp.RandomForestModelPostProcessor,
                 "requires_inner_cv": True,
-                "add_merf": True,
-
                 },
             }
         )

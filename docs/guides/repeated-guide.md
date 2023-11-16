@@ -19,12 +19,13 @@ from flexcv.model_postprocessing import LinearModelPostProcessor
 from flexcv.repeated import RepeatedCV
 
 # make sample data
-X, y, group, random_slopes = generate_regression(10,100,n_slopes=1,noise_level=9.1e-2, random_seed=42)
+X, y, _, _ = generate_regression(3,25,n_slopes=1,noise_level=9.1e-2, random_seed=42)
 
 rcv = (
     RepeatedCV()
     .add_model(model_class=LinearModel, post_processor=LinearModelPostProcessor)
-    .set_data(X, y, group, dataset_name="ExampleData")
+    .set_data(X, y, dataset_name="ExampleData")
+    .set_splits(n_splits_out=3)
     .set_n_repeats(3)
     .perform()
     .get_results()

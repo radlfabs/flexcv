@@ -367,7 +367,7 @@ def test_set_models_with_yaml_code():
             }
         )
         mock_read.return_value = mock_mapping
-        cv.set_models(yaml_code=yaml_code)
+        cv.set_models(yaml_string=yaml_code)
         mock_read.assert_called_once_with(yaml_code)
         assert cv.config["mapping"] == mock_mapping
         
@@ -398,7 +398,7 @@ def test_set_models_with_multiple_arguments():
                 high: 10
     """
     with pytest.raises(ValueError):
-        cv.set_models(mapping=mapping, yaml_code=yaml_code)
+        cv.set_models(mapping=mapping, yaml_string=yaml_code)
 
 def test_set_models_with_invalid_yaml_code():
     # Test set_models method with invalid yaml_code
@@ -866,7 +866,6 @@ def test_add_model_multiple_model_calls():
     )
 
     assert cv.config["mapping"][model_class_lm.__name__]["model"] == model_class_lm
-    # TODO assert requires_cv depending on params not None??
     with pytest.raises(KeyError):
         cv.config["mapping"][model_class_lm.__name__]["params"]["n_estimators"]
 

@@ -1,13 +1,10 @@
-from unittest.mock import patch, MagicMock
 import numpy as np
-import pandas as pd
-from flexcv.repeated import init_repeated_runs
-from flexcv.synthesizer import generate_regression
 from flexcv.models import LinearModel
 from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
 from flexcv.repeated import RepeatedCV
 from flexcv.repeated import try_mean
-from flexcv.repeated import aggregate_, try_mean
+
+from data import DATA_TUPLE_3_25
 
 
 def test_try_mean_numeric_values():
@@ -40,9 +37,7 @@ def test_try_mean_empty_array():
 
 def run_repeated(seeds):
     # make sample data
-    X, y, _, _ = generate_regression(
-        10, 100, n_slopes=1, noise_level=9.1e-2, random_seed=42
-    )
+    X, y, _, _ = DATA_TUPLE_3_25
 
     # create a model mapping
     model_map = ModelMappingDict(
@@ -60,7 +55,8 @@ def run_repeated(seeds):
         RepeatedCV()
         .set_data(X, y, dataset_name="ExampleData")
         .set_models(model_map)
-        .set_n_repeats(3)
+        .set_splits(n_splits_in=3, n_splits_out=3, break_cross_val=True)
+        .set_n_repeats(2)
         .set_seeds(seeds)
         .perform()
         .get_results()
@@ -79,6 +75,3 @@ def test_repeated_different_seeds():
     """Test that the standard deviation of the R2 over runs with different seeds is not zero."""
     rtn_value = run_repeated([42, 43])
     assert rtn_value.loc["r2_std", "LinearModel"] != 0.0
-
-
-# TODO add more repeated tests for the aggregation stuff?

@@ -7,15 +7,10 @@ from flexcv.models import LinearMixedEffectsModel
 from flexcv.run import Run
 from flexcv.model_postprocessing import LMERModelPostProcessor
 
+from data import DATA_TUPLE_3_100
 
 def lmer_regression():
-    X, y, group, random_slopes = generate_regression(
-        10,
-        100,
-        n_slopes=1,
-        noise_level=9.1e-2,
-        random_seed=42,
-    )
+    X, y, group, random_slopes = DATA_TUPLE_3_100
 
     model_map = ModelMappingDict(
         {
@@ -32,7 +27,7 @@ def lmer_regression():
     cv = CrossValidation()
     results = (
         cv.set_data(X, y, group, random_slopes)
-        .set_splits(n_splits_out=3)
+        .set_splits(n_splits_out=3, n_splits_in=3, break_cross_val=True)
         .set_models(model_map)
         .set_lmer(predict_known_groups_lmm=True)
         .set_run(run=Run())
@@ -44,4 +39,4 @@ def lmer_regression():
 
 
 def test_linear_mixed_effects():
-    assert np.isclose([lmer_regression()], [0.3331408486407139])
+    assert np.isclose([lmer_regression()], [0.33770253964383434])

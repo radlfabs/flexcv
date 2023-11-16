@@ -75,6 +75,10 @@ exclude = '''
   | buck-out
   | build
   | dist
-  | test
+
 )/
 '''
+[tool.pytest.ini_options]
+testpaths = ["test"]
+adopts = ["--cov=flexcv", "--cov-report=term-missing"]
+filterwarnings = "ignore:jsonschema.RefResolver is deprecated:DeprecationWarning"
