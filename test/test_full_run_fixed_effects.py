@@ -2,8 +2,6 @@ import numpy as np
 import optuna
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import KFold
-import flexcv.model_postprocessing as mp
-from flexcv.synthesizer import generate_regression
 from flexcv.interface import CrossValidation
 from flexcv.interface import ModelConfigDict
 from flexcv.interface import ModelMappingDict
@@ -11,38 +9,15 @@ from flexcv.run import Run
 from flexcv.models import LinearModel
 from flexcv.model_postprocessing import (
     LinearModelPostProcessor,
-    LMERModelPostProcessor,
     RandomForestModelPostProcessor,
 )
 
-
-def simple_regression():
-    X, y, _, _ = generate_regression(
-        10, 100, n_slopes=1, noise_level=9.1e-2, random_seed=42
-    )
-    model_map = ModelMappingDict(
-        {
-            "LinearModel": ModelConfigDict(
-                {
-                    "model": LinearModel,
-                    "requires_formula": True,
-                }
-            ),
-        }
-    )
-
-    cv = CrossValidation()
-    results = (
-        cv.set_data(X, y).set_models(model_map).set_run(Run()).perform().get_results()
-    )
-
-    return np.mean(results["LinearModel"]["folds_by_metrics"]["r2"])
+from data import DATA_TUPLE_3_25
 
 
 def set_splits_input_kfold_with_linear_model():
-    X, y, _, _ = generate_regression(
-        10, 100, n_slopes=1, noise_level=9.1e-2, random_seed=42
-    )
+    X, y, _, _ = DATA_TUPLE_3_25
+    
     kfold = KFold(n_splits=5, random_state=42, shuffle=True)
     model_map = ModelMappingDict(
         {
@@ -60,7 +35,7 @@ def set_splits_input_kfold_with_linear_model():
     results = (
         cv.set_data(X, y)
         .set_models(model_map)
-        .set_splits(kfold)
+        .set_splits(kfold, n_splits_out=3)
         .set_run(Run())
         .perform()
         .get_results()
@@ -71,14 +46,12 @@ def set_splits_input_kfold_with_linear_model():
 
 def test_set_splits_input_kfold_with_linear_model():
     assert np.isclose(
-        [set_splits_input_kfold_with_linear_model()], [0.4265339487499462]
+        [set_splits_input_kfold_with_linear_model()], [-0.7596695802234839]
     )
 
 
 def random_forest_regression():
-    X, y, _, _ = generate_regression(
-        10, 100, n_slopes=1, noise_level=9.1e-2, random_seed=42
-    )
+    X, y, _, _ = DATA_TUPLE_3_25
 
     model_map = ModelMappingDict(
         {
@@ -115,4 +88,4 @@ def random_forest_regression():
 
 def test_randomforest_regression_fixed():
     """Test if the mean r2 value of the random forest regression is exactly the same over time."""
-    assert np.isclose([random_forest_regression()], [0.07334709720199191])
+    assert np.isclose([random_forest_regression()], [-0.9180001202904604])
