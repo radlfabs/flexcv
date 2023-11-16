@@ -7,7 +7,7 @@ Install the package using `pip` from the command line:
 pip install flexcv
 ```
 `flexcv` was tested with Python 3.10 and 3.11. 
-To separate Python environments on your system, you can use the `venv` package from the standard library.
+To separate Python environments on your system, you can use the `venv` package from the standard library to create the environment "my_env_name" as an example.
 
 ```bash
 cd path/to/this/repo
