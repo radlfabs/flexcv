@@ -13,7 +13,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-
+    environment: testing
+    
     steps:
     - uses: actions/checkout@v3
 
@@ -32,9 +33,12 @@ jobs:
       run: |
         pip install -e ".[dev]"
 
-    - name: Test and build coverage file
+    - name: Set env variable
+      run: echo "NEPTUNE_API_TOKEN=${{ secrets.NEPTUNE_API_TOKEN }}" >> $GITHUB_ENV
+      
+    - name: Run PyTest 
       run: |
-        pytest .. --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=flexcv tests/ | tee pytest-coverage.txt
+        pytest .. -B tests/ | tee pytest-coverage.txt
 
     - name: Pytest coverage comment
       uses: MishaKav/pytest-coverage-comment@main
