@@ -3,4 +3,4 @@ include LICENSE
 include docs/*.md
 include requirements.txt
 include mkdocs.yml
-include install_rpackages.py
+include imgs/logo_colored.png
