@@ -93,6 +93,7 @@ def test_single_model_fold_result_make_results_sklearn_compatible():
     y_train = pd.Series(np.random.rand(10))
     y_pred_train = pd.Series(np.random.rand(10))
     X_train = pd.DataFrame(np.random.rand(10, 5))
+    best_model.fit(X_train, y_train)
     fit_result = None
     single_model_fold_result = SingleModelFoldResult(
         k,
