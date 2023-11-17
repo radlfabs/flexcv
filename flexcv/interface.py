@@ -671,8 +671,8 @@ class CrossValidation:
             "requires_inner_cv": requires_inner_cv,
             "params": params,
             "callbacks": callbacks_dict,
-            **{"fit_kwargs": fit_kwargs},
-            **{"model_kwargs": model_kwargs},
+            "fit_kwargs": fit_kwargs,
+            "model_kwargs": model_kwargs,
             **kwargs,
         }
 
