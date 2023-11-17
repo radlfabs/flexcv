@@ -74,5 +74,5 @@ def test_neptune_xgboost_callback():
     cv.add_model(model, callbacks=[callback])
     cv.set_run(run)
     cv.perform()
-    run["XGBRegressor/RegressionSummary/0"].fetch()
+    run["XGB-Callback"].fetch()
     run.stop()
