@@ -429,7 +429,14 @@ def cross_validate(
             best_model = model_class(
                 **handle_duplicate_kwargs(model_kwargs, best_params)
             )
-
+            
+            if "callbacks" not in mapping[model_name]:
+                logger.info(f"No callbacks passed for {model_name}. Moving on...")
+            elif hasattr(best_model, "callbacks") and hasattr(best_model, "set_params"):
+                best_model.set_params(**mapping[model_name]["callbacks"])
+            else:
+                logger.info(f"Callbacks not supported by {model_name}. Moving on...")
+            
             # Fit the best model on the outer fold
             fit_result = best_model.fit(
                 X=X_train_scaled, y=y_train, **handle_duplicate_kwargs(fit_kwargs)
@@ -444,7 +451,7 @@ def cross_validate(
                 X=X_train_scaled,
                 **handle_duplicate_kwargs(pred_kwargs, train_pred_kwargs),
             )
-
+            
             # store the results of the outer fold of the current model in a dataclass
             # this makes passing to the postprocessor easier
             model_data = SingleModelFoldResult(
