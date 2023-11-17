@@ -865,10 +865,7 @@ def test_add_mode_valid_callback():
     model_class = RandomForestRegressor
     callbacks = [MagicMock()]
     cv.add_model(model_class, callbacks=callbacks)
-    assert (
-        cv.config["mapping"][model_class.__name__]["fit_kwargs"]["callbacks"]
-        == callbacks
-    )
+    assert cv.config["mapping"][model_class.__name__]["callbacks"] == {"callbacks": callbacks}
 
 
 def test_add_model_invalid_callbacks():
