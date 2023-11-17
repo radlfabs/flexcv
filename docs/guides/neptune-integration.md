@@ -117,12 +117,17 @@ from flexcv.synthesizer import generate_regression
 
 X, y, _, _ = generate_regression(3, 25)
 
+# init a neptune run in our project
 run = neptune.init_run(project="radlfabs/flexcv-testing")
 
+# instantiate our xgboost model
 model = XGBRegressor
+
+# initialize the callback with the neptune run and a base namespace
+# plots, metrics and parameters that are logged by the callback will be organized in this namespace
 callback = XGBNeptuneCallback(
     run=run, 
-    base_namespace=f"{XGBRegressor}/Callback", 
+    base_namespace=f"XGBRegressor/Callback", 
 )
 
 _ = (
@@ -130,7 +135,9 @@ _ = (
     .set_run(run, diagnostics=True)
     .set_data(X, y)
     .set_splits(n_splits_out=3, break_cross_val=True)
-    .add_model(model, callbacks=[callback])
+    # add the callback to the model, remember, that callbacks expects a list of callbacks
+    # that way you can easily add multiple callbacks to the model (e.g. for early stopping)
+    .add_model(model, callbacks=[callback])  
     .perform()
 )
 

@@ -5,6 +5,7 @@ from mktestdocs import check_md_file
 from neptune.exceptions import NeptuneInvalidApiTokenException
 
 
+# @pytest.mark.xfail(raises=OSError)
 @pytest.mark.xfail(raises=NeptuneInvalidApiTokenException)
 @pytest.mark.parametrize("fpath", pathlib.Path("docs").glob("**/*.md"), ids=str)
 def test_docs_codeblocks_valid(fpath):
