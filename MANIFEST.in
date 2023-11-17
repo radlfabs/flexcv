@@ -1,5 +1,12 @@
 include README.md
 include LICENSE
+include docs/*.md
 include requirements.txt
-include imgs/logo_colored.png
-include *.toml
+include mkdocs.yml
+include install_rpackages.py
+recursive-include docs *.jpg
+recursive-include docs *.md
+recursive-include docs *.png
+recursive-include flexcv *.yaml
+recursive-include imgs *.png
+recursive-include test *.py
