@@ -10,22 +10,19 @@ from flexcv.run import Run
 from flexcv.core import preprocess_slopes, preprocess_features
 from flexcv.core import cross_validate, ModelMappingDict
 from flexcv.metrics import MetricsDict, mse_wrapper
-    
+
 
 def test_preprocess_slopes_allows_series():
     Z_train_slope = pd.Series(np.random.rand(5))
     Z_test_slope = pd.Series(np.random.rand(5))
     preprocess_slopes(Z_train_slope.copy(), Z_test_slope.copy(), must_scale=True)
-    
+
+
 def test_preprocess_slopes_returns_values():
     # Test preprocess_slopes function returns a tuple
     Z_train_slope = pd.DataFrame(np.random.rand(5, 3))
     Z_test_slope = pd.DataFrame(np.random.rand(5, 3))
-    val = preprocess_slopes(
-        Z_train_slope.copy(),
-        Z_test_slope.copy(),
-        must_scale=True
-        )
+    val = preprocess_slopes(Z_train_slope.copy(), Z_test_slope.copy(), must_scale=True)
     assert isinstance(val, tuple)
     assert len(val) == 2
     assert isinstance(val[0], np.ndarray)
@@ -33,24 +30,25 @@ def test_preprocess_slopes_returns_values():
     # test if Intercept column is added
     assert val[0].shape[1] == Z_train_slope.shape[1] + 1
     assert val[1].shape[1] == Z_test_slope.shape[1] + 1
-    
+
+
 def test_preprocess_slopes_raises():
     Z_train_slope = pd.DataFrame(np.random.rand(5, 3))
     Z_test_slope = pd.DataFrame(np.random.rand(5, 3))
     with pytest.raises(TypeError):
         preprocess_slopes("123", Z_test_slope, must_scale=True)
-    
+
     with pytest.raises(TypeError):
         preprocess_slopes(Z_train_slope, "123", must_scale=True)
-    
+
     with pytest.raises(TypeError):
         preprocess_slopes(Z_train_slope, Z_test_slope, must_scale="123")
-        
+
     # wrong shapes
     Z_test_slope = pd.DataFrame(np.random.rand(5, 4))
     with pytest.raises(ValueError):
         preprocess_slopes(Z_train_slope, Z_test_slope, must_scale=True)
-    
+
 
 def test_preprocess_slopes_no_scaling():
     # Test preprocess_slopes function with no scaling
@@ -156,6 +154,7 @@ def test_preprocess_features_diff_dims():
     X_test = pd.DataFrame(np.random.rand(10, 3), columns=list("abc"))
     preprocess_features(X_train, X_test)
 
+
 def test_cross_validate():
     # Test cross_validate function
     X = pd.DataFrame(np.random.rand(25, 3), columns=list("abc"))
@@ -178,11 +177,14 @@ def test_cross_validate():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100, step=10)
+                    "n_estimators": optuna.distributions.IntUniformDistribution(
+                        10, 100, step=10
+                    )
                 },
                 "requires_inner_cv": True,
                 "add_merf": False,
                 "model_kwargs": {"random_state": 42, "n_jobs": -1},
+                "fit_kwargs": {},
                 "n_trials": 3,
                 "n_jobs_cv": -1,
                 "consumes_clusters": False,
@@ -284,7 +286,9 @@ def test_cross_validate_invalid_X():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100, step=10)
+                    "n_estimators": optuna.distributions.IntUniformDistribution(
+                        10, 100, step=10
+                    )
                 },
                 "requires_inner_cv": True,
                 "n_trials": 3,
@@ -338,7 +342,9 @@ def test_cross_validate_invalid_y():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100, step=10)
+                    "n_estimators": optuna.distributions.IntUniformDistribution(
+                        10, 100, step=10
+                    )
                 },
                 "model_kwargs": {"n_jobs": -1, "random_state": 42},
                 "requires_inner_cv": True,
@@ -392,7 +398,9 @@ def test_cross_validate_invalid_target_name():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100, step=10)
+                    "n_estimators": optuna.distributions.IntUniformDistribution(
+                        10, 100, step=10
+                    )
                 },
                 "requires_inner_cv": True,
                 "add_merf": False,
@@ -449,7 +457,9 @@ def test_cross_validate_invalid_run():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100, step=10)
+                    "n_estimators": optuna.distributions.IntUniformDistribution(
+                        10, 100, step=10
+                    )
                 },
                 "requires_inner_cv": True,
                 "add_merf": False,
@@ -506,7 +516,9 @@ def test_cross_validate_invalid_groups():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100, step=10)
+                    "n_estimators": optuna.distributions.IntUniformDistribution(
+                        10, 100, step=10
+                    )
                 },
                 "requires_inner_cv": True,
                 "add_merf": False,
@@ -563,7 +575,9 @@ def test_cross_validate_invalid_slopes():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100, step=10)
+                    "n_estimators": optuna.distributions.IntUniformDistribution(
+                        10, 100, step=10
+                    )
                 },
                 "requires_inner_cv": True,
                 "add_merf": False,
@@ -621,7 +635,9 @@ def test_cross_validate_invalid_split_out():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100, step=10)
+                    "n_estimators": optuna.distributions.IntUniformDistribution(
+                        10, 100, step=10
+                    )
                 },
                 "consumes_clusters": False,
                 "requires_formula": False,
@@ -673,7 +689,9 @@ def test_cross_validate_invalid_split_in():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100, step=10)
+                    "n_estimators": optuna.distributions.IntUniformDistribution(
+                        10, 100, step=10
+                    )
                 },
                 "requires_inner_cv": True,
                 "add_merf": False,
@@ -730,7 +748,9 @@ def test_cross_validate_invalid_groups_but_groupkfold():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(10, 100, step=10)
+                    "n_estimators": optuna.distributions.IntUniformDistribution(
+                        10, 100, step=10
+                    )
                 },
                 "requires_inner_cv": True,
                 "add_merf": False,
@@ -744,6 +764,64 @@ def test_cross_validate_invalid_groups_but_groupkfold():
     )
     with pytest.raises(TypeError):
         cross_validate(
+            X=X,
+            y=y,
+            target_name=target_name,
+            run=run,
+            groups=groups,
+            slopes=slopes,
+            split_out=split_out,
+            split_in=split_in,
+            break_cross_val=break_cross_val,
+            scale_in=scale_in,
+            scale_out=scale_out,
+            n_splits_out=n_splits_out,
+            n_splits_in=n_splits_in,
+            random_seed=random_seed,
+            model_effects=model_effects,
+            mapping=mapping,
+            metrics=MetricsDict(),
+            objective_scorer=mse_wrapper,
+        )
+
+def test_cross_validate_missing_fit_kwargs():
+    # Test cross_validate function
+    X = pd.DataFrame(np.random.rand(25, 3), columns=list("abc"))
+    y = pd.Series(np.random.rand(25), name="target")
+    target_name = "target"
+    run = Run()
+    groups = pd.Series(np.random.choice(["group1", "group2"], 25))
+    slopes = pd.Series(np.random.rand(25), name="slopes")
+    split_out = KFold(n_splits=3)
+    split_in = KFold(n_splits=3)
+    break_cross_val = False
+    scale_in = True
+    scale_out = True
+    n_splits_out = 3
+    n_splits_in = 3
+    random_seed = 42
+    model_effects = "fixed"
+    mapping = ModelMappingDict(
+        {
+            "RandomForestRegressor": {
+                "model": RandomForestRegressor,
+                "params": {
+                    "n_estimators": optuna.distributions.IntUniformDistribution(
+                        10, 100, step=10
+                    )
+                },
+                "requires_inner_cv": True,
+                "add_merf": False,
+                "model_kwargs": {"random_state": 42, "n_jobs": -1},
+                "n_trials": 3,
+                "n_jobs_cv": -1,
+                "consumes_clusters": False,
+                "requires_formula": False,
+            }
+        }
+    )
+    with pytest.raises(KeyError):
+        results = cross_validate(
             X=X,
             y=y,
             target_name=target_name,

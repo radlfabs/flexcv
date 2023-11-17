@@ -315,18 +315,20 @@ def cross_validate(
         for model_name in mapping.keys():
             logger.info(f"Evaluating {model_name}...")
 
-            skip_inner_cv = not mapping[model_name][
-                "requires_inner_cv"
-            ]  # get bool in mapping[model_name]["requires_inner_cv"] and negate it
-            evaluate_merf = mapping[model_name]["add_merf"]
+            skip_inner_cv = not mapping[model_name]["requires_inner_cv"]
 
             model_class = mapping[model_name]["model"]
+            
+            try:
+                model_kwargs = mapping[model_name]["model_kwargs"]
+            except KeyError as e:
+                raise KeyError(f"No model_kwargs passed for {model_name}. Check your configuration.") from e
+                    
+            fit_kwargs = mapping[model_name]["fit_kwargs"]
+            evaluate_merf = mapping[model_name]["add_merf"]
             param_grid = mapping[model_name]["params"]
-            model_kwargs = mapping[model_name]["model_kwargs"]
             n_trials = mapping[model_name]["n_trials"]
-
             requires_formula = mapping[model_name]["requires_formula"]
-            fit_kwargs = {}
 
             if requires_formula:
                 fit_kwargs["formula"] = formula
@@ -459,6 +461,7 @@ def cross_validate(
                 y_train=y_train,
                 X_train=X_train_scaled,
                 fit_result=fit_result,
+                fit_kwargs=fit_kwargs,
             )
             all_models_dict = model_data.make_results(
                 run=run,

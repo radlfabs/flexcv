@@ -8,8 +8,9 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import KFold
 import numpy as np
 from xgboost import XGBRegressor
+from xgboost.callback import TrainingCallback
 
-from flexcv.models import LinearModel, LinearMixedEffectsModel
+from flexcv.models import LinearModel
 from flexcv.interface import CrossValidationResults, CrossValidation
 from flexcv.split import CrossValMethod
 from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
@@ -17,6 +18,9 @@ from flexcv.run import NeptuneRun
 from flexcv.run import Run as DummyRun
 from flexcv import model_postprocessing
 import flexcv
+
+from data import DATA_TUPLE_3_25
+
 
 def test_cross_validation_init():
     # Test initialization
@@ -302,6 +306,7 @@ def test_set_models_with_mapping():
     cv.set_models(mapping=mapping)
     assert cv.config["mapping"] == mapping
 
+
 def test_set_models_with_path():
     # Test set_models method with valid path
     cv = CrossValidation()
@@ -310,7 +315,10 @@ def test_set_models_with_path():
         mock_mapping = ModelMappingDict(
             {
                 "RandomForestRegressor": ModelConfigDict(
-                    {"model": RandomForestRegressor, "parameters": {"n_estimators": 100}}
+                    {
+                        "model": RandomForestRegressor,
+                        "parameters": {"n_estimators": 100},
+                    }
                 )
             }
         )
@@ -319,11 +327,13 @@ def test_set_models_with_path():
         mock_read.assert_called_once_with(path)
         assert cv.config["mapping"] == mock_mapping
 
+
 def test_set_models_with_none():
     # Test set_models method with None for both mapping and path
     cv = CrossValidation()
     with pytest.raises(ValueError):
         cv.set_models()
+
 
 def test_set_models_with_invalid_mapping():
     # Test set_models method with invalid mapping
@@ -331,7 +341,8 @@ def test_set_models_with_invalid_mapping():
     mapping = "invalid type"
     with pytest.raises(TypeError):
         cv.set_models(mapping=mapping)
-        
+
+
 def test_set_models_with_yaml_code():
     # Test set_models method with YAML code
     cv = CrossValidation()
@@ -358,9 +369,15 @@ def test_set_models_with_yaml_code():
                         "model": flexcv.models.LinearModel,
                         "post_processor": flexcv.model_postprocessing.LinearModelPostProcessor,
                         "params": {
-                            "max_depth": optuna.distributions.IntDistribution(low=5, high=100, log=True),
-                            "min_impurity_decrease": optuna.distributions.FloatDistribution(low=0.00000001, high=0.02),
-                            "features": optuna.distributions.CategoricalDistribution(choices=["a", "b", "c"]),
+                            "max_depth": optuna.distributions.IntDistribution(
+                                low=5, high=100, log=True
+                            ),
+                            "min_impurity_decrease": optuna.distributions.FloatDistribution(
+                                low=0.00000001, high=0.02
+                            ),
+                            "features": optuna.distributions.CategoricalDistribution(
+                                choices=["a", "b", "c"]
+                            ),
                         },
                     }
                 )
@@ -370,12 +387,14 @@ def test_set_models_with_yaml_code():
         cv.set_models(yaml_string=yaml_code)
         mock_read.assert_called_once_with(yaml_code)
         assert cv.config["mapping"] == mock_mapping
-        
+
+
 def test_set_models_with_none():
     # Test set_models method with None for all arguments
     cv = CrossValidation()
     with pytest.raises(ValueError):
         cv.set_models()
+
 
 def test_set_models_with_multiple_arguments():
     # Test set_models method with multiple arguments
@@ -399,6 +418,7 @@ def test_set_models_with_multiple_arguments():
     """
     with pytest.raises(ValueError):
         cv.set_models(mapping=mapping, yaml_string=yaml_code)
+
 
 def test_set_models_with_invalid_yaml_code():
     # Test set_models method with invalid yaml_code
@@ -661,6 +681,7 @@ def test_prepare_before_perform():
         cv.config["mapping"]["RandomForestRegressor"]["model_kwargs"]["random_state"]
         == cv.config["random_seed"]
     )
+    assert cv.config["mapping"]["RandomForestRegressor"]["fit_kwargs"] == {}
 
 
 def test_prepare_before_perform_n_trials_added_to_mapping():
@@ -749,7 +770,8 @@ def test_add_model_valid():
     model_name = "RandomForestRegressor"
     post_processor = model_postprocessing.ModelPostProcessor
     params = {"n_estimators": 100}
-    cv.add_model(model_class, False, model_name, post_processor, params)
+    callbacks = [MagicMock()]
+    cv.add_model(model_class, False, model_name, post_processor, params, callbacks)
     assert model_name in cv.config["mapping"]
     assert isinstance(cv.config["mapping"][model_name], ModelConfigDict)
     assert cv.config["mapping"][model_name]["model"] == model_class
@@ -839,6 +861,25 @@ def test_add_model_requires_inner_cv_with_params_adds():
     assert cv.config["mapping"][model_class.__name__]["requires_inner_cv"] == True
 
 
+def test_add_mode_valid_callback():
+    # Test add_model method with valid callbacks
+    cv = CrossValidation()
+    model_class = RandomForestRegressor
+    callbacks = [MagicMock()]
+    cv.add_model(model_class, callbacks=callbacks)
+    assert (
+        cv.config["mapping"][model_class.__name__]["fit_kwargs"]["callbacks"]
+        == callbacks
+    )
+
+
+def test_add_model_invalid_callbacks():
+    # Test add_model method with invalid callbacks
+    cv = CrossValidation()
+    with pytest.raises(TypeError):
+        cv.add_model(LinearModel, model_name="LinearModel", callbacks=123)
+
+
 def test_add_model_multiple_model_calls():
     # Test add_model with multiple calls
     cv = CrossValidation()
@@ -874,3 +915,16 @@ def test_add_model_multiple_model_calls():
         cv.config["mapping"][model_class_xgb.__name__]["params"]["n_estimators"]
         == params_xgb["n_estimators"]
     )
+
+
+def test_perform_fit_callbacks():
+    X, y, _, _ = DATA_TUPLE_3_25
+    cv = CrossValidation()
+    # make magic mock an instance of type TrainingCallback
+    xgb_callback = MagicMock(spec=TrainingCallback)
+    cv.add_model(XGBRegressor, callbacks=[xgb_callback])
+    cv.set_data(X, y)
+    cv.set_splits(n_splits_out=3, break_cross_val=True)
+    # test if the callback fails in XGBoost with AssertionError with specific desc "before_training should return the model"
+    with pytest.raises(AssertionError, match="before_training should return the model"):
+        cv.perform()

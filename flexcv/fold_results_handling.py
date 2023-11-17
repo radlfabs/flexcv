@@ -7,6 +7,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from neptune.types import File
+import neptune.integrations.sklearn as npt_utils
+from neptune.utils import stringify_unsupported
 from optuna.study import Study
 
 from .metrics import METRICS, MetricsDict
@@ -29,7 +31,8 @@ class SingleModelFoldResult:
         y_pred_train (pd.Series): The predictions of the model.
         X_train (pd.DataFrame): The train data.
         fit_result (Any): The result of the fit method of the model.
-
+        fit_kwargs (dict): Additional keyword arguments to pass to the fit method. (default: None)
+        
     """
 
     k: int
@@ -43,6 +46,7 @@ class SingleModelFoldResult:
     y_pred_train: pd.Series
     X_train: pd.DataFrame
     fit_result: Any
+    fit_kwargs: dict = None
 
     def make_results(
         self,
@@ -127,10 +131,27 @@ class SingleModelFoldResult:
             run[f"{self.model_name}/{key}"].append(value)
 
         run[f"{self.model_name}/ObjectiveValue"].append(of)
+        
         run[f"{self.model_name}/Model/{self.k}"].upload(File.as_pickle(self.best_model))
-        run[f"{self.model_name}/Parameters/"].append(pformat(self.best_params))
-        run[f"{self.model_name}/ResPlot/"].append(
+        
+        try:
+            run[f"{self.model_name}/Parameters/"] = stringify_unsupported(
+                npt_utils.get_estimator_params(self.best_model)
+            )
+        except (RuntimeError, TypeError):  
+            # is raised when model is not a scikit-learn model
+            run[f"{self.model_name}/Parameters/"].append(pformat(self.best_params))
+        
+        run[f"{self.model_name}/ResidualPlot/"].append(
             res_vs_fitted_plot(self.y_test, self.y_pred)
         )
+        
+        if self.fit_kwargs is not None and "clusters" not in self.fit_kwargs:
+            run[
+                f"{self.model_name}/RegressionSummary/{self.k}"
+            ] = npt_utils.create_regressor_summary(
+                self.best_model, self.X_train, self.X_test, self.y_train, self.y_test
+            )
+
         plt.close()
         return results_all_folds
