@@ -662,7 +662,7 @@ class CrossValidation:
             kwargs = {}
 
         if callbacks is not None:
-            fit_kwargs["callbacks"] = callbacks
+            model_kwargs["callbacks"] = callbacks
 
         config_dict = {
             "model": model_class,

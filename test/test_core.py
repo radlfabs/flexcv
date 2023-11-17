@@ -181,7 +181,7 @@ def test_cross_validate():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(
+                    "n_estimators": optuna.distributions.IntDistribution(
                         10, 100, step=10
                     )
                 },
@@ -290,7 +290,7 @@ def test_cross_validate_invalid_X():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(
+                    "n_estimators": optuna.distributions.IntDistribution(
                         10, 100, step=10
                     )
                 },
@@ -346,7 +346,7 @@ def test_cross_validate_invalid_y():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(
+                    "n_estimators": optuna.distributions.IntDistribution(
                         10, 100, step=10
                     )
                 },
@@ -402,7 +402,7 @@ def test_cross_validate_invalid_target_name():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(
+                    "n_estimators": optuna.distributions.IntDistribution(
                         10, 100, step=10
                     )
                 },
@@ -461,7 +461,7 @@ def test_cross_validate_invalid_run():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(
+                    "n_estimators": optuna.distributions.IntDistribution(
                         10, 100, step=10
                     )
                 },
@@ -520,7 +520,7 @@ def test_cross_validate_invalid_groups():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(
+                    "n_estimators": optuna.distributions.IntDistribution(
                         10, 100, step=10
                     )
                 },
@@ -579,7 +579,7 @@ def test_cross_validate_invalid_slopes():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(
+                    "n_estimators": optuna.distributions.IntDistribution(
                         10, 100, step=10
                     )
                 },
@@ -639,7 +639,7 @@ def test_cross_validate_invalid_split_out():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(
+                    "n_estimators": optuna.distributions.IntDistribution(
                         10, 100, step=10
                     )
                 },
@@ -693,7 +693,7 @@ def test_cross_validate_invalid_split_in():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(
+                    "n_estimators": optuna.distributions.IntDistribution(
                         10, 100, step=10
                     )
                 },
@@ -752,7 +752,7 @@ def test_cross_validate_invalid_groups_but_groupkfold():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(
+                    "n_estimators": optuna.distributions.IntDistribution(
                         10, 100, step=10
                     )
                 },
@@ -811,7 +811,7 @@ def test_cross_validate_missing_fit_kwargs():
             "RandomForestRegressor": {
                 "model": RandomForestRegressor,
                 "params": {
-                    "n_estimators": optuna.distributions.IntUniformDistribution(
+                    "n_estimators": optuna.distributions.IntDistribution(
                         10, 100, step=10
                     )
                 },

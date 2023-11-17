@@ -4,6 +4,7 @@ import neptune
 import numpy as np
 import pandas as pd
 from neptune.types import File
+import matplotlib.pyplot as plt
 
 from .interface import CrossValidation
 from .run import Run
@@ -318,6 +319,7 @@ class RepeatedCV(CrossValidation):
             run_ids.append(inner_id)
             run_results.append(results)
             inner_run.stop()
+            plt.close()
         # run_dfs have the same column and index names and we
         df = aggregate_(run_results)
 
