@@ -67,8 +67,8 @@ profile = "black"
 known_first_party = "flexcv"
 
 [black]
-line-length = 89
-target-version = ['py38']
+line-length = 79
+target-version = ['py311']
 include = '\.pyi?$'
 exclude = '''
 /(
