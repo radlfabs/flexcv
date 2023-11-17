@@ -661,14 +661,16 @@ class CrossValidation:
         if kwargs is None:
             kwargs = {}
 
+        callbacks_dict = {}
         if callbacks is not None:
-            fit_kwargs["callbacks"] = callbacks
+            callbacks_dict = {"callbacks": callbacks}
 
         config_dict = {
             "model": model_class,
             "post_processor": post_processor,
             "requires_inner_cv": requires_inner_cv,
             "params": params,
+            "callbacks": callbacks_dict,
             **{"fit_kwargs": fit_kwargs},
             **{"model_kwargs": model_kwargs},
             **kwargs,
