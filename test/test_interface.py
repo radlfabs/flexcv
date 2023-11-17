@@ -1,25 +1,23 @@
+from unittest.mock import MagicMock, patch
+
+import numpy as np
+import optuna
 import pandas as pd
 import pytest
-from unittest.mock import patch
-from unittest.mock import MagicMock
-
-import optuna
+from data import DATA_TUPLE_3_25
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import KFold
-import numpy as np
 from xgboost import XGBRegressor
 from xgboost.callback import TrainingCallback
 
-from flexcv.models import LinearModel
-from flexcv.interface import CrossValidationResults, CrossValidation
-from flexcv.split import CrossValMethod
+import flexcv
+from flexcv import model_postprocessing
+from flexcv.interface import CrossValidation, CrossValidationResults
 from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
+from flexcv.models import LinearModel
 from flexcv.run import NeptuneRun
 from flexcv.run import Run as DummyRun
-from flexcv import model_postprocessing
-import flexcv
-
-from data import DATA_TUPLE_3_25
+from flexcv.split import CrossValMethod
 
 
 def test_cross_validation_init():

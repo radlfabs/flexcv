@@ -1,15 +1,19 @@
-import pytest
 import numpy as np
-import pandas as pd
 import optuna
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import KFold, GroupKFold
+import pandas as pd
+import pytest
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import GroupKFold, KFold
+from sklearn.preprocessing import StandardScaler
 
-from flexcv.run import Run
-from flexcv.core import preprocess_slopes, preprocess_features
-from flexcv.core import cross_validate, ModelMappingDict
+from flexcv.core import (
+    ModelMappingDict,
+    cross_validate,
+    preprocess_features,
+    preprocess_slopes,
+)
 from flexcv.metrics import MetricsDict, mse_wrapper
+from flexcv.run import Run
 
 
 def test_preprocess_slopes_allows_series():
@@ -783,6 +787,7 @@ def test_cross_validate_invalid_groups_but_groupkfold():
             metrics=MetricsDict(),
             objective_scorer=mse_wrapper,
         )
+
 
 def test_cross_validate_missing_fit_kwargs():
     # Test cross_validate function

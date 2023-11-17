@@ -1,23 +1,21 @@
 import numpy as np
 import optuna
+from data import DATA_TUPLE_3_25
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import KFold
-from flexcv.interface import CrossValidation
-from flexcv.interface import ModelConfigDict
-from flexcv.interface import ModelMappingDict
-from flexcv.run import Run
-from flexcv.models import LinearModel
+
+from flexcv.interface import CrossValidation, ModelConfigDict, ModelMappingDict
 from flexcv.model_postprocessing import (
     LinearModelPostProcessor,
     RandomForestModelPostProcessor,
 )
-
-from data import DATA_TUPLE_3_25
+from flexcv.models import LinearModel
+from flexcv.run import Run
 
 
 def set_splits_input_kfold_with_linear_model():
     X, y, _, _ = DATA_TUPLE_3_25
-    
+
     kfold = KFold(n_splits=5, random_state=42, shuffle=True)
     model_map = ModelMappingDict(
         {

@@ -10,21 +10,18 @@ from typing import Callable, Iterator
 
 import pandas as pd
 from numpy import ndarray
-from sklearn.model_selection._split import (
-    BaseCrossValidator,
-    GroupsConsumerMixin,
-)
 from sklearn.model_selection import (
     GroupKFold,
     KFold,
     StratifiedGroupKFold,
     StratifiedKFold,
 )
+from sklearn.model_selection._split import BaseCrossValidator, GroupsConsumerMixin
 
 from .stratification import (
-    ContinuousStratifiedKFold,
-    ContinuousStratifiedGroupKFold,
     ConcatenatedStratifiedKFold,
+    ContinuousStratifiedGroupKFold,
+    ContinuousStratifiedKFold,
 )
 
 

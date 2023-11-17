@@ -5,27 +5,26 @@ The functions are called by the `cross_validate` function in the `flexcv.core` m
 
 
 import logging
+from abc import ABC, abstractmethod
 from pprint import pformat
 from typing import Type
-from abc import ABC, abstractmethod
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import pandas as pd
-import shap
-from neptune.types import File
-from neptune.metadata_containers.run import Run
 import numpy as np
+import pandas as pd
 import seaborn as sns
+import shap
 import statsmodels
+from neptune.metadata_containers.run import Run
+from neptune.types import File
 from statsmodels.graphics.gofplots import ProbPlot
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from statsmodels.tools.tools import maybe_unwrap_results
 
 from . import plot
-from .plot import permutation_importance
 from .fold_results_handling import SingleModelFoldResult
-
+from .plot import permutation_importance
 
 logger = logging.getLogger(__name__)
 mpl.use("Agg")

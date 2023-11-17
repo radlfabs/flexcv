@@ -92,7 +92,54 @@ results = (
     .perform()
     .get_results()
 )
+run.stop()
 
 # it's good practice to stop the run after you are done
 run.stop()
 ```
+
+## Fitting an XGBoost Regressor with Neptune Integration
+
+This example shows how to fit an XGBoost Regressor and visualize the training and evaluation with the Neptune-XGBoost integration.
+We are using the `generate_regression` function from the `flexcv.synthesizer` module to generate a regression dataset with 3 features and 1000 samples.
+We are fitting a `XGBRegressor` using the `XGBNeptuneCallback` callback from the Neptune integration.
+The callback is initialized with the Neptune run and a base namespace which is used to organize the Neptune channels.
+We pass everything to the `CrossValidation` class and call the `perform` method to start the cross validation.
+For additional logging we still use a custom PostProcessor which is passed to the `CrossValidation` class.
+In it we generate some nice-looking beeswarm shap-plots that help us further undestand the model. 
+
+```python
+from xgboost import XGBRegressor
+import neptune
+from neptune.integrations.xgboost import NeptuneCallback as XGBNeptuneCallback
+from flexcv import CrossValidation
+from flexcv.synthesizer import generate_regression
+
+X, y, _, _ = generate_regression(3, 25)
+
+run = neptune.init_run(project="radlfabs/flexcv-testing")
+
+model = XGBRegressor
+callback = XGBNeptuneCallback(
+    run=run, 
+    base_namespace=f"{XGBRegressor}/Callback", 
+)
+
+_ = (
+    CrossValidation()
+    .set_run(run, diagnostics=True)
+    .set_data(X, y)
+    .set_splits(n_splits_out=3, break_cross_val=True)
+    .add_model(model, callbacks=[callback])
+    .perform()
+)
+
+run.stop()
+```
+Now let's take a look at the Neptune dashboard. In just a couple of lines of code we have logged a lot of information.
+
+Here is the plot for the shap values:
+![neptune experiment](../images/neptune_xgb_shap.png)
+
+The regression summary from the neptune-sklearn integration is doing a great job at offering plots for model fit:
+![neptune experiment](../images/xgboost_regr_error.png)

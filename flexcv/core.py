@@ -7,32 +7,28 @@ import optuna
 import pandas as pd
 from neptune.integrations.python_logger import NeptuneHandler
 from neptune.metadata_containers.run import Run as NeptuneRun
+from sklearn.model_selection._split import BaseCrossValidator
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.utils.validation import check_random_state
 from statsmodels.tools.sm_exceptions import ConvergenceWarning
-from sklearn.model_selection._split import BaseCrossValidator
 from tqdm import tqdm
 
-from .fold_logging import (
-    CustomNeptuneCallback,
-    log_diagnostics,
-)
+from .fold_logging import CustomNeptuneCallback, log_diagnostics
 from .fold_results_handling import SingleModelFoldResult
+from .merf import MERF
 from .metrics import MetricsDict, mse_wrapper
+from .model_mapping import ModelMappingDict
+from .model_postprocessing import MERFModelPostProcessor
 from .model_selection import ObjectiveScorer, objective_cv
 from .split import CrossValMethod, make_cross_val_split
 from .utilities import (
+    add_model_to_keys,
     get_fixed_effects_formula,
     get_re_formula,
-    add_model_to_keys,
+    handle_duplicate_kwargs,
     rm_model_from_keys,
 )
-from .model_mapping import ModelMappingDict
-from .merf import MERF
-from .model_postprocessing import MERFModelPostProcessor
-from .utilities import handle_duplicate_kwargs
-
 
 warnings.filterwarnings("ignore", module=r"matplotlib\..*")
 warnings.filterwarnings("ignore", module=r"xgboost\..*")
@@ -318,12 +314,14 @@ def cross_validate(
             skip_inner_cv = not mapping[model_name]["requires_inner_cv"]
 
             model_class = mapping[model_name]["model"]
-            
+
             try:
                 model_kwargs = mapping[model_name]["model_kwargs"]
             except KeyError as e:
-                raise KeyError(f"No model_kwargs passed for {model_name}. Check your configuration.") from e
-                    
+                raise KeyError(
+                    f"No model_kwargs passed for {model_name}. Check your configuration."
+                ) from e
+
             fit_kwargs = mapping[model_name]["fit_kwargs"]
             evaluate_merf = mapping[model_name]["add_merf"]
             param_grid = mapping[model_name]["params"]

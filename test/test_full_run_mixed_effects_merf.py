@@ -1,14 +1,13 @@
 import numpy as np
 import optuna
+from data import DATA_TUPLE_3_100
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.svm import SVR
 from xgboost import XGBRegressor
 
+import flexcv.model_postprocessing as mp
 from flexcv.interface import CrossValidation
 from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
-import flexcv.model_postprocessing as mp
-
-from data import DATA_TUPLE_3_100
 
 
 def merf_mixed_regression():
@@ -23,7 +22,9 @@ def merf_mixed_regression():
                     "n_jobs_cv": -1,
                     "model": RandomForestRegressor,
                     "params": {
-                        "max_depth": optuna.distributions.IntDistribution(2, 10, step=2),
+                        "max_depth": optuna.distributions.IntDistribution(
+                            2, 10, step=2
+                        ),
                         "n_estimators": optuna.distributions.CategoricalDistribution(
                             [10]
                         ),
@@ -65,8 +66,12 @@ def merf_mixed_xgboost():
                     "n_jobs_cv": -1,
                     "model": XGBRegressor,
                     "params": {
-                        "max_depth": optuna.distributions.IntDistribution(2, 20, step=5),
-                        "n_estimators": optuna.distributions.CategoricalDistribution([10]),
+                        "max_depth": optuna.distributions.IntDistribution(
+                            2, 20, step=5
+                        ),
+                        "n_estimators": optuna.distributions.CategoricalDistribution(
+                            [10]
+                        ),
                     },
                     "post_processor": mp.XGBoostModelPostProcessor,
                 }
@@ -106,7 +111,8 @@ def merf_svr_regression():
                     "model": SVR,
                     "params": {
                         "C": optuna.distributions.FloatDistribution(
-                            0.1, 10,
+                            0.1,
+                            10,
                         ),
                     },
                     "post_processor": mp.SVRModelPostProcessor,

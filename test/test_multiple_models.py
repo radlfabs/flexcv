@@ -1,17 +1,14 @@
 import pandas as pd
-
-from flexcv.interface import CrossValidation
-from flexcv.interface import ModelConfigDict
-from flexcv.interface import ModelMappingDict
-from flexcv.run import Run
-from flexcv.models import LinearModel, LinearMixedEffectsModel
-
 from data import DATA_TUPLE_3_25
+
+from flexcv.interface import CrossValidation, ModelConfigDict, ModelMappingDict
+from flexcv.models import LinearMixedEffectsModel, LinearModel
+from flexcv.run import Run
 
 
 def two_models_regression():
     X, y, group, random_slopes = DATA_TUPLE_3_25
-    
+
     model_map = ModelMappingDict(
         {
             "LinearModel": ModelConfigDict(
@@ -38,6 +35,7 @@ def two_models_regression():
         .get_results()
     )
     return result
+
 
 def test_two_models():
     """Checks that the two models (Linear and Random Forest) are performing as expected."""

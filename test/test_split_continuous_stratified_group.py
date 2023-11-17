@@ -1,7 +1,8 @@
-from flexcv.stratification import ContinuousStratifiedGroupKFold
-from sklearn.datasets import make_regression
 import numpy as np
 import pandas as pd
+from sklearn.datasets import make_regression
+
+from flexcv.stratification import ContinuousStratifiedGroupKFold
 
 
 def test_continuous_stratified_group_kfold_init():

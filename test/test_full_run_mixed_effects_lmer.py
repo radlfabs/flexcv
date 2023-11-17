@@ -1,13 +1,13 @@
 import numpy as np
+from data import DATA_TUPLE_3_100
 
-from flexcv.synthesizer import generate_regression
 from flexcv.interface import CrossValidation
 from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
+from flexcv.model_postprocessing import LMERModelPostProcessor
 from flexcv.models import LinearMixedEffectsModel
 from flexcv.run import Run
-from flexcv.model_postprocessing import LMERModelPostProcessor
+from flexcv.synthesizer import generate_regression
 
-from data import DATA_TUPLE_3_100
 
 def lmer_regression():
     X, y, group, random_slopes = DATA_TUPLE_3_100

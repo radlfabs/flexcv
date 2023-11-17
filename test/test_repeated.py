@@ -1,10 +1,9 @@
 import numpy as np
-from flexcv.models import LinearModel
-from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
-from flexcv.repeated import RepeatedCV
-from flexcv.repeated import try_mean
-
 from data import DATA_TUPLE_3_25
+
+from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
+from flexcv.models import LinearModel
+from flexcv.repeated import RepeatedCV, try_mean
 
 
 def test_try_mean_numeric_values():

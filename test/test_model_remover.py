@@ -1,4 +1,5 @@
 import pytest
+
 from flexcv.utilities import rm_model_from_keys
 
 

@@ -1,10 +1,10 @@
 import numpy as np
+from data import DATA_TUPLE_3_25
 
-from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
 from flexcv.interface import CrossValidation
+from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
 from flexcv.models import LinearModel
 
-from data import DATA_TUPLE_3_25
 
 def regression_with_summary():
     X, y, group, random_slopes = DATA_TUPLE_3_25

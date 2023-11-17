@@ -1,8 +1,9 @@
-from flexcv.split import make_cross_val_split, CrossValMethod
-from sklearn.model_selection import KFold, GroupKFold
-from sklearn.datasets import make_classification
-import pandas as pd
 import numpy as np
+import pandas as pd
+from sklearn.datasets import make_classification
+from sklearn.model_selection import GroupKFold, KFold
+
+from flexcv.split import CrossValMethod, make_cross_val_split
 
 
 def test_make_cross_val_split_kfold():
@@ -121,12 +122,13 @@ def test_make_cross_val_split_invalid_method():
         assert False, "Expected TypeError"
 
 
-from flexcv.split import make_cross_val_split, CrossValMethod
-from sklearn.model_selection import KFold, StratifiedKFold, GroupKFold
-from sklearn.datasets import make_classification
-import pandas as pd
 import numpy as np
+import pandas as pd
 import pytest
+from sklearn.datasets import make_classification
+from sklearn.model_selection import GroupKFold, KFold, StratifiedKFold
+
+from flexcv.split import CrossValMethod, make_cross_val_split
 
 
 def test_make_cross_val_split_group_is_callable():

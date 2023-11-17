@@ -3,14 +3,14 @@ This module contains the CrossValidation class. This class is the central interf
 """
 import inspect
 import logging
+import pathlib
 import warnings
 from dataclasses import dataclass
 from pprint import pformat
 from typing import Iterator, Optional, Sequence
-import pathlib
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 from neptune.metadata_containers.run import Run as NeptuneRun
 from neptune.types import File
 from sklearn.model_selection import BaseCrossValidator
@@ -18,15 +18,14 @@ from xgboost.callback import TrainingCallback
 
 from .core import cross_validate
 from .metrics import MetricsDict
+from .model_mapping import ModelConfigDict, ModelMappingDict
+from .model_postprocessing import ModelPostProcessor
 from .model_selection import ObjectiveScorer
 from .results_handling import CrossValidationResults
+from .run import Run as DummyRun
 from .split import CrossValMethod, string_to_crossvalmethod
 from .utilities import add_module_handlers, run_padding
-from .model_mapping import ModelConfigDict, ModelMappingDict
-from .run import Run as DummyRun
-from .model_postprocessing import ModelPostProcessor
 from .yaml_parser import read_mapping_from_yaml_file, read_mapping_from_yaml_string
-
 
 logger = logging.getLogger(__name__)
 add_module_handlers(logger)
@@ -658,7 +657,7 @@ class CrossValidation:
 
         if fit_kwargs is None:
             fit_kwargs = {}
-            
+
         if kwargs is None:
             kwargs = {}
 
@@ -721,7 +720,7 @@ class CrossValidation:
         for model_key, inner_dict in self.config["mapping"].items():
             if "fit_kwargs" not in inner_dict:
                 self.config["mapping"][model_key]["fit_kwargs"] = {}
-                
+
             if "n_trials" not in inner_dict:
                 self.config["mapping"][model_key]["n_trials"] = self.config["n_trials"]
 
@@ -895,6 +894,7 @@ class CrossValidation:
 
 if __name__ == "__main__":
     import numpy as np
+
     from .models import LinearModel
     from .synthesizer import generate_regression
 

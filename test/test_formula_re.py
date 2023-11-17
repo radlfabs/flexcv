@@ -1,5 +1,6 @@
 import pandas as pd
 import pytest
+
 from flexcv.utilities import get_re_formula
 
 
