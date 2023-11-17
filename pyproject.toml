@@ -15,33 +15,40 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 keywords = ["machine learning", "cross validation"]
+
 dependencies = [
-  "matplotlib == 3.8.0",
-  "neptune == 1.8.2",
-  "numpy == 1.23.4",
-  "openpyxl == 3.1.2",
-  "optuna == 3.4.0",
-  "pandas == 1.5.1",
-  "scikit_learn == 1.3.2",
-  "seaborn == 0.13.0",
-  "shap == 0.43.0",
-  "statsmodels == 0.14.0",
-  "tqdm == 4.66.1",
-  "xgboost == 2.0.1",
-  "mkdocs",
-  "mkdocs-material",
+  "matplotlib >= 3.8.0",
+  "numpy >= 1.23.4",
+  "openpyxl >= 3.1.2",
+  "optuna >= 3.4.0",
+  "pandas >= 1.5.1",
+  "scikit_learn >= 1.3.2",
+  "seaborn >= 0.13.0",
+  "shap >= 0.43.0",
+  "statsmodels >= 0.14.0",
+  "tqdm >= 4.66.1",
+  "xgboost >= 2.0.1",
+  "neptune >= 1.8.2",
+  "neptune-optuna >= 1.1.0",
+  "neptune-xgboost >= 1.1.1",
+  "neptune-sklearn >= 2.1.0",
   "pyyaml",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.12"
 
 [project.optional-dependencies]
 dev = [
-"pytest",
-"pytest-cov",
-"mkdocs",
-"mkdocstrings",
-"mktestdocs",
-"mkdocs-material",
+  "pytest",
+  "pytest-cov",
+  "mkdocs",
+  "mkdocstrings",
+  "mktestdocs",
+  "mkdocs-material",
+  "check-manifest",
+  "pip-tools",
+  "twine",
+  "black",
+  "isort",
 ]
 
 [project.urls]
@@ -80,5 +87,5 @@ exclude = '''
 '''
 [tool.pytest.ini_options]
 testpaths = ["test"]
-adopts = ["--cov=flexcv", "--cov-report=term-missing"]
+
 filterwarnings = "ignore:jsonschema.RefResolver is deprecated:DeprecationWarning"
