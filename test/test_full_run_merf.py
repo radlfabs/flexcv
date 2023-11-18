@@ -19,7 +19,7 @@ def merf_mixed_regression():
                 {
                     "requires_inner_cv": True,
                     "n_jobs_model": -1,
-                    "n_jobs_cv": -1,
+                    "n_jobs_cv": 1,
                     "model": RandomForestRegressor,
                     "params": {
                         "max_depth": optuna.distributions.IntDistribution(
@@ -63,7 +63,7 @@ def merf_mixed_xgboost():
                 {
                     "requires_inner_cv": True,
                     "n_jobs_model": -1,
-                    "n_jobs_cv": -1,
+                    "n_jobs_cv": 1,
                     "model": XGBRegressor,
                     "params": {
                         "max_depth": optuna.distributions.IntDistribution(
