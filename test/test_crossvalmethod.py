@@ -1,4 +1,5 @@
 import pytest
+
 from flexcv.split import CrossValMethod, string_to_crossvalmethod
 
 

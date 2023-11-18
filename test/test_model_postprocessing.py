@@ -1,13 +1,13 @@
-from flexcv.model_postprocessing import LinearModelPostProcessor, LMERModelPostProcessor
-from flexcv.run import Run
-from flexcv.fold_results_handling import SingleModelFoldResult
-from flexcv.models import LinearModel, LinearMixedEffectsModel
 from unittest.mock import MagicMock, patch
-import pandas as pd
-import numpy as np
 
+import numpy as np
+import pandas as pd
 from sklearn.linear_model import LinearRegression
-from unittest.mock import MagicMock, patch
+
+from flexcv.fold_results_handling import SingleModelFoldResult
+from flexcv.model_postprocessing import LinearModelPostProcessor, LMERModelPostProcessor
+from flexcv.models import LinearMixedEffectsModel, LinearModel
+from flexcv.run import Run
 
 
 def test_linear_model_postprocessor_init():

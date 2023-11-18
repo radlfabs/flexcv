@@ -7,32 +7,28 @@ import optuna
 import pandas as pd
 from neptune.integrations.python_logger import NeptuneHandler
 from neptune.metadata_containers.run import Run as NeptuneRun
+from sklearn.model_selection._split import BaseCrossValidator
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.utils.validation import check_random_state
 from statsmodels.tools.sm_exceptions import ConvergenceWarning
-from sklearn.model_selection._split import BaseCrossValidator
 from tqdm import tqdm
 
-from .fold_logging import (
-    CustomNeptuneCallback,
-    log_diagnostics,
-)
+from .fold_logging import CustomNeptuneCallback, log_diagnostics
 from .fold_results_handling import SingleModelFoldResult
+from .merf import MERF
 from .metrics import MetricsDict, mse_wrapper
+from .model_mapping import ModelMappingDict
+from .model_postprocessing import MERFModelPostProcessor
 from .model_selection import ObjectiveScorer, objective_cv
 from .split import CrossValMethod, make_cross_val_split
 from .utilities import (
+    add_model_to_keys,
     get_fixed_effects_formula,
     get_re_formula,
-    add_model_to_keys,
+    handle_duplicate_kwargs,
     rm_model_from_keys,
 )
-from .model_mapping import ModelMappingDict
-from .merf import MERF
-from .model_postprocessing import MERFModelPostProcessor
-from .utilities import handle_duplicate_kwargs
-
 
 warnings.filterwarnings("ignore", module=r"matplotlib\..*")
 warnings.filterwarnings("ignore", module=r"xgboost\..*")
@@ -315,18 +311,22 @@ def cross_validate(
         for model_name in mapping.keys():
             logger.info(f"Evaluating {model_name}...")
 
-            skip_inner_cv = not mapping[model_name][
-                "requires_inner_cv"
-            ]  # get bool in mapping[model_name]["requires_inner_cv"] and negate it
-            evaluate_merf = mapping[model_name]["add_merf"]
+            skip_inner_cv = not mapping[model_name]["requires_inner_cv"]
 
             model_class = mapping[model_name]["model"]
-            param_grid = mapping[model_name]["params"]
-            model_kwargs = mapping[model_name]["model_kwargs"]
-            n_trials = mapping[model_name]["n_trials"]
 
+            try:
+                model_kwargs = mapping[model_name]["model_kwargs"]
+            except KeyError as e:
+                raise KeyError(
+                    f"No model_kwargs passed for {model_name}. Check your configuration."
+                ) from e
+
+            fit_kwargs = mapping[model_name]["fit_kwargs"]
+            evaluate_merf = mapping[model_name]["add_merf"]
+            param_grid = mapping[model_name]["params"]
+            n_trials = mapping[model_name]["n_trials"]
             requires_formula = mapping[model_name]["requires_formula"]
-            fit_kwargs = {}
 
             if requires_formula:
                 fit_kwargs["formula"] = formula
@@ -429,7 +429,14 @@ def cross_validate(
             best_model = model_class(
                 **handle_duplicate_kwargs(model_kwargs, best_params)
             )
-
+            
+            if "callbacks" not in mapping[model_name]:
+                logger.info(f"No callbacks passed for {model_name}. Moving on...")
+            elif hasattr(best_model, "callbacks") and hasattr(best_model, "set_params"):
+                best_model.set_params(**mapping[model_name]["callbacks"])
+            else:
+                logger.info(f"Callbacks not supported by {model_name}. Moving on...")
+            
             # Fit the best model on the outer fold
             fit_result = best_model.fit(
                 X=X_train_scaled, y=y_train, **handle_duplicate_kwargs(fit_kwargs)
@@ -444,7 +451,7 @@ def cross_validate(
                 X=X_train_scaled,
                 **handle_duplicate_kwargs(pred_kwargs, train_pred_kwargs),
             )
-
+            
             # store the results of the outer fold of the current model in a dataclass
             # this makes passing to the postprocessor easier
             model_data = SingleModelFoldResult(
@@ -459,6 +466,7 @@ def cross_validate(
                 y_train=y_train,
                 X_train=X_train_scaled,
                 fit_result=fit_result,
+                fit_kwargs=fit_kwargs,
             )
             all_models_dict = model_data.make_results(
                 run=run,

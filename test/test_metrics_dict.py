@@ -1,5 +1,6 @@
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
 from flexcv.metrics import MetricsDict
-from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 
 
 def test_metrics_dict_init():

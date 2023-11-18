@@ -1,7 +1,8 @@
-from flexcv.stratification import ConcatenatedStratifiedKFold
-from sklearn.datasets import make_regression
 import numpy as np
 import pandas as pd
+from sklearn.datasets import make_regression
+
+from flexcv.stratification import ConcatenatedStratifiedKFold
 
 
 def test_concatenated_stratified_kfold_init():

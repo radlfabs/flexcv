@@ -1,15 +1,14 @@
-import pandas as pd
-import numpy as np
 import neptune
 import optuna
+from data import DATA_TUPLE_3_25
+from neptune.integrations.xgboost import NeptuneCallback as XGBNeptuneCallback
 from sklearn.ensemble import RandomForestRegressor
+from xgboost import XGBRegressor
 
 from flexcv.interface import CrossValidation
-from flexcv.synthesizer import generate_regression
-from flexcv.model_mapping import ModelMappingDict, ModelConfigDict
+from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
 from flexcv.model_postprocessing import RandomForestModelPostProcessor
 
-from data import DATA_TUPLE_10_100, DATA_TUPLE_3_25, DATA_TUPLE_3_100
 
 def neptrune_rf_regression(test_run_name):
     X, y, group, random_slopes = DATA_TUPLE_3_25
@@ -60,4 +59,20 @@ def test_neptune_logging():
         project="radlfabs/flexcv-testing",
         mode="read-only",
     )
+    run.stop()
+
+
+def test_neptune_xgboost_callback():
+    X, y, _, _ = DATA_TUPLE_3_25
+    model = XGBRegressor
+    run = neptune.init_run(project="radlfabs/flexcv-testing")
+    callback = XGBNeptuneCallback(
+        run=run, base_namespace="XGB-Callback", log_model=False
+    )
+    cv = CrossValidation()
+    cv.set_data(X, y).set_splits(n_splits_out=3, break_cross_val=True)
+    cv.add_model(model, callbacks=[callback])
+    cv.set_run(run)
+    cv.perform()
+    run["XGB-Callback"].fetch()
     run.stop()

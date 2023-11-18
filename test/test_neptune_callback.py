@@ -1,5 +1,6 @@
 import unittest
 from unittest.mock import MagicMock
+
 from flexcv.fold_logging import CustomNeptuneCallback
 from flexcv.run import Run
 

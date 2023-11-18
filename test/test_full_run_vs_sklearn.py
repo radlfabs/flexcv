@@ -1,15 +1,12 @@
 import numpy as np
 import optuna
+from data import DATA_TUPLE_3_100
 from sklearn.ensemble import RandomForestRegressor
 
 import flexcv.model_postprocessing as mp
-from flexcv.synthesizer import generate_regression
-from flexcv.interface import CrossValidation
-from flexcv.interface import ModelConfigDict
-from flexcv.interface import ModelMappingDict
+from flexcv.interface import CrossValidation, ModelConfigDict, ModelMappingDict
 from flexcv.run import Run
-
-from data import DATA_TUPLE_3_100
+from flexcv.synthesizer import generate_regression
 
 ##### Test kfold #####
 
@@ -47,9 +44,9 @@ def flexcv_lm_kfold(X, y):
 def sklearn_lm_kfold(X, y):
     """Compute sklearn cross validation score for linear model on random data."""
     # import cross_validation from sklearn
-    from sklearn.model_selection import cross_val_score as sklearn_score
     from sklearn.linear_model import LinearRegression
     from sklearn.model_selection import KFold
+    from sklearn.model_selection import cross_val_score as sklearn_score
 
     kf = KFold(n_splits=3, shuffle=True, random_state=42)
     sklearn_cv_results = sklearn_score(
@@ -70,7 +67,7 @@ def test_kfold_flexcv_roughly_equals_sklearn():
     assert MAE on the MSE of the two pipelines is less than machine epsilon
     """
     X, y, _, _ = DATA_TUPLE_3_100
-    
+
     flexcv_val = flexcv_lm_kfold(X, y)
     sklearn_val = -sklearn_lm_kfold(X, y)
     assert np.isclose(np.array([flexcv_val]), np.array([sklearn_val]))
@@ -114,9 +111,9 @@ def flexcv_lm_groupkfold(X, y, group):
 def sklearn_lm_groupkfold(X, y, group):
     """Compute sklearn cross validation score for linear model and groupkfold on random data."""
     # import cross_validation from sklearn
-    from sklearn.model_selection import cross_val_score as sklearn_score
     from sklearn.linear_model import LinearRegression
     from sklearn.model_selection import GroupKFold
+    from sklearn.model_selection import cross_val_score as sklearn_score
 
     gkf = GroupKFold(n_splits=3)
     sklearn_cv_results = sklearn_score(
@@ -138,7 +135,7 @@ def test_groupkfold_flexcv_roughly_equals_sklearn():
     assert MAE on the MSE of the two pipelines is less than precision
     """
     X, y, group, _ = DATA_TUPLE_3_100
-    
+
     flexcv_val = flexcv_lm_groupkfold(X, y, group)
     sklearn_val = -sklearn_lm_groupkfold(X, y, group)
     assert np.isclose(np.array([flexcv_val]), np.array([sklearn_val]))
@@ -165,7 +162,12 @@ def flexcv_lm_kfold(X, y):
 
     cv = CrossValidation()
     results = (
-        cv.set_data(X, y).set_splits(n_splits_out=3).set_models(model_map).set_run(Run()).perform().get_results()
+        cv.set_data(X, y)
+        .set_splits(n_splits_out=3)
+        .set_models(model_map)
+        .set_run(Run())
+        .perform()
+        .get_results()
     )
 
     n_values = len(results["LinearModel"]["metrics"])
@@ -176,9 +178,9 @@ def flexcv_lm_kfold(X, y):
 def sklearn_lm_kfold(X, y):
     """Compute sklearn cross validation score for linear model on random data."""
     # import cross_validation from sklearn
-    from sklearn.model_selection import cross_val_score as sklearn_score
     from sklearn.linear_model import LinearRegression
     from sklearn.model_selection import KFold
+    from sklearn.model_selection import cross_val_score as sklearn_score
 
     kf = KFold(n_splits=3, shuffle=True, random_state=42)
     sklearn_cv_results = sklearn_score(

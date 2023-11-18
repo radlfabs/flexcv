@@ -1,4 +1,5 @@
 import pytest
+
 from flexcv.utilities import handle_duplicate_kwargs
 
 

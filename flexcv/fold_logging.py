@@ -44,8 +44,8 @@ class CustomNeptuneCallback(npt_utils.NeptuneCallback):
         self._log_plots(study, trial)
 
 
-import pandas as pd
 import matplotlib.pyplot as plt
+import pandas as pd
 import seaborn as sns
 
 

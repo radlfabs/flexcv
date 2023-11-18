@@ -1,7 +1,7 @@
-import pandas as pd
 import numpy as np
-from flexcv.results_handling import add_summary_stats
-from flexcv.results_handling import CrossValidationResults
+import pandas as pd
+
+from flexcv.results_handling import CrossValidationResults, add_summary_stats
 
 
 def test_add_summary_stats():

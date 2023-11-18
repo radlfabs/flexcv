@@ -1,27 +1,20 @@
-import numpy as np
-import pytest
-from sklearn.metrics import mean_squared_error
-from flexcv.model_selection import ObjectiveScorer
-from flexcv.model_selection import custom_scorer
-from flexcv.model_selection import objective, ObjectiveScorer
-from sklearn.pipeline import Pipeline
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error
-import numpy as np
-import pandas as pd
-from flexcv.model_selection import parallel_objective, ObjectiveScorer
-from sklearn.pipeline import Pipeline
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error
-import numpy as np
-import pandas as pd
-from flexcv.model_selection import objective_cv, ObjectiveScorer
-from sklearn.pipeline import Pipeline
-from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import KFold
 from unittest.mock import MagicMock
+
 import numpy as np
 import pandas as pd
+import pytest
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import KFold
+from sklearn.pipeline import Pipeline
+
+from flexcv.model_selection import (
+    ObjectiveScorer,
+    custom_scorer,
+    objective,
+    objective_cv,
+    parallel_objective,
+)
 
 
 def test_objective_scorer_init_valid_scorer():
