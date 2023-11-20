@@ -5,11 +5,9 @@ To get started with `flexcv`, we take you through a couple of quick and basic co
 First we will use a LinearModel on a randomly generated regression dataset. Because Linear Models do not have any hyperparameters, we naturally don't need an inner cross validation loop.
 
 ```py
-# import the class interface
+# import the class interface, data generator and model
 from flexcv import CrossValidation
-# import the function for data generation
 from flexcv.synthesizer import generate_regression
-# import the model class
 from flexcv.models import LinearModel
   
 # make sample data
@@ -22,8 +20,9 @@ cv = CrossValidation()
 results = (
     cv
     .set_data(X, y, group, dataset_name="ExampleData")
-    .set_splits(method_outer_split=flexcv.CrossValMethod.GROUP, method_inner_split=flexcv.CrossValMethod.KFOLD)
+    .set_splits(method_outer_split="GroupKFold", method_inner_split="KFold")
     .add_model(LinearModel)
+    .set_splits(break_cross_val=True)
     .perform()
     .get_results()
 )

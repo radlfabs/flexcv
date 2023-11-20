@@ -72,6 +72,9 @@ results = (
 ### MERF
 
 The MERF class can be used to optimize any base estimator for mixed effects utilizing the expectation maximization (EM) algorithm. In the cross validation process, the base estimator is passed to MERF after hyperparameter tuning. There, a new instantance is created and fit to the data using the EM algorithm.
+MERF is added to every estimator (i.e. model) in the model mapping of the `CrossValidation` class where `add_merf` is set to `True`. This is can be done globally for every model that is passed to the `CrossValidation` class instance by setting it to True in the `set_merf()` method. You can also set `add_merf` for every model in the model mapping individually.
+In the following example we will use a random forest regressor as base estimator for MERF and use the global setting to add MERF to every model in the model mapping.
+In the `CrossValidationResults` object that is returned by `get_results()` the MERF instance is always named with the scheme _"MERF(BaseEstimatorName)"_. In this case, the MERF instance is named "MERF(RandomForestRegressor)".
 
 ```python
 import optuna
@@ -103,3 +106,8 @@ results = (
     .get_results()
 )
 ```
+Our neptune integration automatically logs training statistics and plots for every MERF model you fit to the data. Learn more about the neptune integration [here](guides/neptune-integration.md).
+
+![neptune experiment](../images/neptune_merf.png)
+
+Neptune makes it easy to keep track of the training process and observe convergence of the expectation maximization algorithm that is used in MERF.
