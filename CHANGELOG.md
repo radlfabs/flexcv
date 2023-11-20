@@ -1,3 +1,17 @@
+# flexcv v23.0.1-beta
+
+## Fixing Stuff in Beta
+
+And here we go again...
+It turned out that my GitHub Actions workflow files was bugged and the workflow did not fail with PyTest discovery errors as it was supposed to.
+Therefore, the early fix was absolutely necessary to make it all work.
+
+### Bug Fixes
+
+- Fix: NameError in yaml_parser.py
+- Moves a data set geneartor template file to the package for easier testing
+
+
 # flexcv v23.0-beta
 
 ## Initial Beta Release
