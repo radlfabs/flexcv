@@ -4,10 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "flexcv"
-version = "0.1.0"
-description = "An easy to use and flexible package to perform cross validation in python."
+version = "23.0.0"
+description = "Easy and flexible nested cross validation for tabular data in python."
 readme = "README.md"
-authors = [{ name = "Fabian Rosenthal" }]
+authors = [
+    { name = "Fabian Rosenthal" },
+    { name = "Patrick Blättermann" },
+    { name = "Siegbert Versümer" }
+]
 license = { file = "LICENSE" }
 classifiers = [
     "License :: OSI Approved :: MIT License",
@@ -17,6 +21,18 @@ classifiers = [
 keywords = ["machine learning", "cross validation"]
 
 dependencies = [
+  "matplotlib >= 3.8.0",
+  "neptune >= 1.8.2",
+  "numpy >= 1.23.4",
+  "openpyxl >= 3.1.2",
+  "optuna >= 3.4.0",
+  "pandas >= 1.5.1",
+  "scikit_learn >= 1.3.2",
+  "seaborn >= 0.13.0",
+  "shap >= 0.43.0",
+  "statsmodels >= 0.14.0",
+  "tqdm >= 4.66.1",
+  "xgboost >= 2.0.1",
   "matplotlib >= 3.8.0",
   "numpy >= 1.23.4",
   "openpyxl >= 3.1.2",
@@ -37,6 +53,11 @@ dependencies = [
 requires-python = ">=3.10,<3.12"
 
 [project.optional-dependencies]
+docs = [
+  "mkdocs",
+  "mkdocstrings",
+  "mkdocs-material",
+]
 dev = [
   "pytest",
   "pytest-cov",
@@ -60,12 +81,13 @@ dev = [
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["flexcv*"]
-exclude = ["dev_env*"]  # empty by default
-namespaces = false  # true by default
+exclude = ["dev_env*"]
+namespaces = false
 
 [isort]
 profile = "black"
-known_first_party = "flexcv"
+src_paths = ["flexcv", "test"]
+
 
 [black]
 line-length = 79
@@ -86,7 +108,37 @@ exclude = '''
 
 )/
 '''
+
 [tool.pytest.ini_options]
-testpaths = ["test"]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = ["-rf", "--import-mode=importlib"]
+filterwarnings = ["ignore:jsonschema.RefResolver is deprecated:DeprecationWarning"]
+
+
+[tool.bumpver]
+current_version = "23.0.0-alpha"
+version_pattern = "YY.MINOR.MICRO[-TAG]"
+commit_message = "bump version {old_version} -> {new_version}"
+tag_message = "{new_version}"
+tag_scope = "default"
+pre_commit_hook = ""
+post_commit_hook = ""
+commit = true
+tag = true
+push = true
+
+[tool.bumpver.file_patterns]
+"pyproject.toml" = [
+    'current_version = "{version}"',
+    'version = "{version}"'
+]
+
+"setup.cfg" = [
+    'version = "{version}"',
+    'current_version = "{version}"',
+]
+"flexcv/__init__.py" = ["{version}"]
+
 
 filterwarnings = "ignore:jsonschema.RefResolver is deprecated:DeprecationWarning"

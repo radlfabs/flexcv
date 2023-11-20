@@ -20,6 +20,7 @@ from flexcv.run import Run as DummyRun
 from flexcv.split import CrossValMethod
 
 
+
 def test_cross_validation_init():
     # Test initialization
     cv = CrossValidation()
@@ -416,6 +417,7 @@ def test_set_models_with_multiple_arguments():
     """
     with pytest.raises(ValueError):
         cv.set_models(mapping=mapping, yaml_string=yaml_code)
+
 
 
 def test_set_models_with_invalid_yaml_code():

@@ -1,12 +1,9 @@
 import importlib
-
-import yaml
 from optuna.distributions import (
-    CategoricalDistribution,
-    FloatDistribution,
     IntDistribution,
+    FloatDistribution,
+    CategoricalDistribution,
 )
-
 from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
 
 

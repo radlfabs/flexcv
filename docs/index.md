@@ -42,6 +42,10 @@ However, there are limitations, e. g. if you want to push the training part of y
 As soon as you want to use a linear mixed effects model, you have to use the `statsmodels` package, which is not compatible with the `sklearn` pipeline.
 `flexcv` solves these problems and provides a lot of useful features for cross validation and machine learning on tabular data, so you can focus on your data and your models.
 
+## Earth Extension
+
+An wrapper implementation of the Earth Regression package for R exists which you can use with flexcv. It is called [flexcv-earth](https:github.com/radlfabs/flexcv-earth). It is not yet available on PyPI, but you can install it from GitHub with the command `pip install git+https://github.com/radlfabs/flexcv-earth.git`. You can then use the `EarthModel` class in your `flexcv` configuration by importing it from `flexcv_earth`. Further information is available in the [documentation](https://radlfabs.github.io/flexcv-earth/).
+
 ## Contributions
 
 We welcome contributions to this repository. If you have any questions, please don't hesitate to get in contact by reaching out or filing a [github issue](https://github.com/radlfabs/flexcv/issues).

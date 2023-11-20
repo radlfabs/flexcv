@@ -12,7 +12,7 @@ In addition, an interactive visualisation app was [released](https://github.com/
 
 ## Creators
 
-__Fabian Rosenthal__ developed the overall structure of the package, designed the interface, implemented the core functionality and modules and is author of the documentation. As a novel addition to the methods for cross validation splits, he contributed a stratified split method for continuous target variables to ensure target distribution across folds. Fabian is no longer affiliated with Hochschule Düsseldorf and maintains the package as a personal project.
+__Fabian Rosenthal__ developed the overall structure of the package, designed the interface, implemented the core functionality and modules and is author of the documentation. As a novel addition to the methods for cross validation splits, he contributed a stratified split method for continuous target variables to ensure target distribution across folds. Fabian continues to lead the project as the sole maintainer without pay.
 
 __Patrick Blättermann__ implemented the evaluation based on random slopes for the linear mixed effects model and wrote the inner cross validation loop in order to allow customization of the objective function. Patrick served as a consultant on any statistical and machine learning related questions arising.
 

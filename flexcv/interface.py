@@ -395,7 +395,7 @@ class CrossValidation:
             ```python
             >>> from flexcv import CrossValidation
             >>> cv = CrossValidation()
-            >>> cv.set_models(path="path/to/your/yaml/file")
+            >>> cv.set_models(yaml_path="path/to/your/yaml/file")
             ```
             This will automatically read the yaml file and create a ModelMappingDict.
             It even takes care of the imports and instantiates the classes of model, postprocessor and for the optune distributions.
@@ -413,7 +413,6 @@ class CrossValidation:
         if mapping is not None:
             if not isinstance(mapping, ModelMappingDict):
                 raise TypeError("mapping must be a ModelMappingDict")
-
             self.config["mapping"].update(mapping)
 
         elif yaml_path is not None:
@@ -421,13 +420,11 @@ class CrossValidation:
                 yaml_path, pathlib.Path
             ):
                 raise TypeError("yaml_path must be a string or pathlib.Path")
-            
             self.config["mapping"].update(read_mapping_from_yaml_file(yaml_path))
 
         elif yaml_string is not None:
             if not isinstance(yaml_string, str):
                 raise TypeError("yaml_string must be a string")
-
             self.config["mapping"].update(read_mapping_from_yaml_string(yaml_string))
 
         return self

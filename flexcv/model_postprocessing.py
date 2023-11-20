@@ -494,7 +494,6 @@ class RandomForestModelPostProcessor(ModelPostProcessor):
         )
         explainer = shap.TreeExplainer(fold_result.best_model)
         shap_values = explainer.shap_values(fold_result.X_train)
-        shap_explainer = explainer(fold_result.X_train)
         plot.plot_shap(
             shap_values=shap_values,
             X=fold_result.X_train,
@@ -599,8 +598,8 @@ class SVRModelPostProcessor(ModelPostProcessor):
                 fold_result.y_test,
                 fold_result.X_test.columns,
             )
-            run["SVR/PermFeatImportance/Figures"].append(fig)
-            run["SVR/PermFeatImportance/Table"].append(File.as_html(tmp_df))
+            run[f"{fold_result.model_name}/PermFeatImportance/Figures"].append(fig)
+            run[f"{fold_result.model_name}/PermFeatImportance/Table"].append(File.as_html(tmp_df))
 
         return results_all_folds
 
