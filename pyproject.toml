@@ -37,6 +37,11 @@ dependencies = [
 requires-python = ">=3.10"
 
 [project.optional-dependencies]
+docs = [
+  "mkdocs",
+  "mkdocstrings",
+  "mkdocs-material",
+]
 dev = [
   "pytest",
   "pytest-cov",
