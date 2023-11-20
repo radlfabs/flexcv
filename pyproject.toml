@@ -21,7 +21,7 @@ classifiers = [
 keywords = ["machine learning", "cross validation"]
 
 dependencies = [
-  "matplotlib >= 3.8.0",
+  "matplotlib >= 3.5.0",
   "neptune >= 1.8.2",
   "numpy >= 1.23.4",
   "openpyxl >= 3.1.2",
