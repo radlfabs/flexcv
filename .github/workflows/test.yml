@@ -39,12 +39,4 @@ jobs:
       
     - name: Run PyTest 
       run: |
-        pytest .. --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=flexcv test/ | tee pytest-coverage.txt
-
-    - name: Pytest coverage comment
-      uses: MishaKav/pytest-coverage-comment@main
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        pytest-coverage-path: ./pytest-coverage.txt
-        junitxml-path: ./pytest.xml
-          
+        pytest .. --junitxml=pytest.xml --cov=flexcv test/
