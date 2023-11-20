@@ -124,8 +124,4 @@ push = true
     'version = "{version}"'
 ]
 
-"setup.cfg" = [
-    'current_version = {version}',
-    'version = {version}',
-]
 "flexcv/__init__.py" = ["{version}"]
