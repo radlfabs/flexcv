@@ -143,4 +143,4 @@ We would like to thank the developers of `sklearn`, `optuna`, `neptune` and `mer
 
 ## About
 
-`flexcv` was developed at the [Institute of Sound and Vibration Engineering](https://isave.hs-duesseldorf.de/) at the University of Applied Science Düsseldorf, Germany.
+`flexcv` was developed at the [Institute of Sound and Vibration Engineering](https://isave.hs-duesseldorf.de/) at the University of Applied Science Düsseldorf, Germany and is now published and maintained by Fabian Rosenthal as an personal project.
