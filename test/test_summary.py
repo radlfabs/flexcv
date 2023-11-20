@@ -1,5 +1,5 @@
 import numpy as np
-from data import DATA_TUPLE_3_25
+from flexcv._data import DATA_TUPLE_3_25
 
 from flexcv.interface import CrossValidation
 from flexcv.model_mapping import ModelConfigDict, ModelMappingDict

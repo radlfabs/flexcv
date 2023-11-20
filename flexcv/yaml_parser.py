@@ -1,10 +1,11 @@
 import importlib
+import yaml
 from optuna.distributions import (
     IntDistribution,
     FloatDistribution,
     CategoricalDistribution,
 )
-from flexcv.model_mapping import ModelConfigDict, ModelMappingDict
+from .model_mapping import ModelConfigDict, ModelMappingDict
 
 
 def int_constructor(

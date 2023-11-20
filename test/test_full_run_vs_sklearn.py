@@ -1,6 +1,6 @@
 import numpy as np
 import optuna
-from data import DATA_TUPLE_3_100
+from flexcv._data import DATA_TUPLE_3_100
 from sklearn.ensemble import RandomForestRegressor
 
 import flexcv.model_postprocessing as mp

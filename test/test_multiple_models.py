@@ -1,5 +1,5 @@
 import pandas as pd
-from data import DATA_TUPLE_3_25
+from flexcv._data import DATA_TUPLE_3_25
 
 from flexcv.interface import CrossValidation, ModelConfigDict, ModelMappingDict
 from flexcv.models import LinearMixedEffectsModel, LinearModel

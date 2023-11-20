@@ -1,6 +1,6 @@
 import neptune
 import optuna
-from data import DATA_TUPLE_3_25
+from flexcv._data import DATA_TUPLE_3_25
 from neptune.integrations.xgboost import NeptuneCallback as XGBNeptuneCallback
 from sklearn.ensemble import RandomForestRegressor
 from xgboost import XGBRegressor
