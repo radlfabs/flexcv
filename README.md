@@ -6,8 +6,7 @@
   </tr>
 </table>
 
-[![tests](https://github.com/radlfabs/flexcv/actions/workflows/test.yml/badge.svg)](https://github.com/radlfabs/flexcv/actions/workflows/test.yml)
-
+[![tests](https://github.com/radlfabs/flexcv/actions/workflows/test.yml/badge.svg)](https://github.com/radlfabs/flexcv/actions/workflows/test.yml) [![DOI](https://zenodo.org/badge/708442681.svg)](https://zenodo.org/doi/10.5281/zenodo.10160846)
 
 Authors: Fabian Rosenthal, Patrick Blättermann and Siegbert Versümer
 
