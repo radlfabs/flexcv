@@ -1,8 +1,8 @@
 import logging
 from functools import wraps
-import pandas as pd
-import neptune
 
+import neptune
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 

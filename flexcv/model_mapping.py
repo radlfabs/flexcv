@@ -102,11 +102,7 @@ class ModelConfigDict(Dict[str, Type]):
         Returns:
           (bool): True if the key exists, False otherwise.
         """
-        try:
-            self[key]
-            return True
-        except KeyError:
-            return False
+        return key in self.keys()
 
     def _check_key_set_default(self, key, default) -> None:
         """Checks if a key exists in the dict and sets a default value if it doesn't.

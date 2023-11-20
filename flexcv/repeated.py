@@ -1,13 +1,14 @@
 import logging
 
+import neptune
 import numpy as np
 import pandas as pd
 from neptune.types import File
-import neptune
+import matplotlib.pyplot as plt
 
 from .interface import CrossValidation
-from .utilities import add_module_handlers
 from .run import Run
+from .utilities import add_module_handlers
 
 logger = logging.getLogger(__name__)
 
@@ -318,6 +319,7 @@ class RepeatedCV(CrossValidation):
             run_ids.append(inner_id)
             run_results.append(results)
             inner_run.stop()
+            plt.close()
         # run_dfs have the same column and index names and we
         df = aggregate_(run_results)
 

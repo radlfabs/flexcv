@@ -56,7 +56,7 @@ from flexcv.models import LinearModel, LinearMixedEffectsModel
 from flexcv.synthesizer import generate_regression
 
 X, y, group, random_slopes =generate_regression(
-    10,100,n_slopes=1,noise_level=9.1e-2
+    3,100,n_slopes=1,noise_level=9.1e-2
 )
 
 cv =CrossValidation()
@@ -72,6 +72,9 @@ results = (
 ### MERF
 
 The MERF class can be used to optimize any base estimator for mixed effects utilizing the expectation maximization (EM) algorithm. In the cross validation process, the base estimator is passed to MERF after hyperparameter tuning. There, a new instantance is created and fit to the data using the EM algorithm.
+MERF is added to every estimator (i.e. model) in the model mapping of the `CrossValidation` class where `add_merf` is set to `True`. This is can be done globally for every model that is passed to the `CrossValidation` class instance by setting it to True in the `set_merf()` method. You can also set `add_merf` for every model in the model mapping individually.
+In the following example we will use a random forest regressor as base estimator for MERF and use the global setting to add MERF to every model in the model mapping.
+In the `CrossValidationResults` object that is returned by `get_results()` the MERF instance is always named with the scheme _"MERF(BaseEstimatorName)"_. In this case, the MERF instance is named "MERF(RandomForestRegressor)".
 
 ```python
 import optuna
@@ -84,11 +87,11 @@ from flexcv.synthesizer import generate_regression
 
 # lets start with generating some clustered data
 X, y, group, random_slopes =generate_regression(
-    10,100,n_slopes=1,noise_level=9.1e-2
+    3, 50, n_slopes=1, noise_level=9.1e-2
 )
 # define our hyperparameters
 params = {
-    "max_depth": optuna.distributions.IntDistribution(5,100),
+    "max_depth": optuna.distributions.IntDistribution(5, 100),
     "n_estimators": optuna.distributions.CategoricalDistribution([10]),
 }
 
@@ -98,8 +101,13 @@ results = (
     .set_inner_cv(3)
     .set_splits(n_splits_out=3)
     .add_model(model_class=RandomForestRegressor, requires_inner_cv=True, params=params, post_processor=RandomForestModelPostProcessor)
-    .set_merf(True)
+    .set_merf(True, em_max_iterations=5)
     .perform()
     .get_results()
 )
 ```
+Our neptune integration automatically logs training statistics and plots for every MERF model you fit to the data. Learn more about the neptune integration [here](guides/neptune-integration.md).
+
+![neptune experiment](../images/neptune_merf.png)
+
+Neptune makes it easy to keep track of the training process and observe convergence of the expectation maximization algorithm that is used in MERF.

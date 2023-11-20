@@ -1,16 +1,19 @@
 from dataclasses import dataclass
 from pprint import pformat
 from typing import Any
-
+from pathlib import Path
+import logging
+import matplotlib.pyplot as plt
+import neptune.integrations.sklearn as npt_utils
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-
 from neptune.types import File
+from neptune.utils import stringify_unsupported
 from optuna.study import Study
 
 from .metrics import METRICS, MetricsDict
 
+logger = logging.getLogger(__name__)
 
 @dataclass
 class SingleModelFoldResult:
@@ -29,6 +32,7 @@ class SingleModelFoldResult:
         y_pred_train (pd.Series): The predictions of the model.
         X_train (pd.DataFrame): The train data.
         fit_result (Any): The result of the fit method of the model.
+        fit_kwargs (dict): Additional keyword arguments to pass to the fit method. (default: None)
 
     """
 
@@ -43,6 +47,7 @@ class SingleModelFoldResult:
     y_pred_train: pd.Series
     X_train: pd.DataFrame
     fit_result: Any
+    fit_kwargs: dict = None
 
     def make_results(
         self,
@@ -127,10 +132,42 @@ class SingleModelFoldResult:
             run[f"{self.model_name}/{key}"].append(value)
 
         run[f"{self.model_name}/ObjectiveValue"].append(of)
-        run[f"{self.model_name}/Model/{self.k}"].upload(File.as_pickle(self.best_model))
-        run[f"{self.model_name}/Parameters/"].append(pformat(self.best_params))
-        run[f"{self.model_name}/ResPlot/"].append(
+        
+        # saving the model
+        # check if model has method save_raw -> important for xgboost
+        
+        try:
+            self.best_model.save_model(f"{self.model_name}_{self.k}.json")
+            run[f"{self.model_name}/Model/{self.k}"].upload(f"{self.model_name}_{self.k}.json")
+            Path(f"{self.model_name}_{self.k}.json").unlink()
+        except (AttributeError, KeyError):
+            # AttributeError is raised when model has no method save_raw
+            # KeyError is raised when model has method save_raw but no raw_format='json'
+            run[f"{self.model_name}/Model/{self.k}"].upload(File.as_pickle(self.best_model))
+
+        try:
+            run[f"{self.model_name}/Parameters/"] = stringify_unsupported(
+                npt_utils.get_estimator_params(self.best_model)
+            )
+        except (RuntimeError, TypeError):
+            # is raised when model is not a scikit-learn model
+            run[f"{self.model_name}/Parameters/"].append(pformat(self.best_params))
+
+        run[f"{self.model_name}/ResidualPlot/"].append(
             res_vs_fitted_plot(self.y_test, self.y_pred)
         )
+
+        try:
+            run[
+                f"{self.model_name}/RegressionSummary/{self.k}"
+            ] = npt_utils.create_regressor_summary(
+                self.best_model, self.X_train, self.X_test, self.y_train, self.y_test
+            )
+        except (KeyError, TypeError, RuntimeError, AssertionError) as e:
+            # is raised when model is not a scikit-learn model
+            logger.info(
+                f"Regression summary not available for model {self.model_name}. Skipping.\n{e}")
+            run[f"{self.model_name}/RegressionSummary/{self.k}"] = f"Not available: {e}"
+
         plt.close()
         return results_all_folds

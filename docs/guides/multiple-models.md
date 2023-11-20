@@ -1,7 +1,13 @@
 ## Evaluating multiple models
 
-`flexcv` offers two ways of passing multiple models in set-up to our CrossValidation interface class. You either can call `.add_model` multiple times on the class instance or you can pass a `ModelMappingDict` to the class instance. The latter may be the preferred way of doing it when the number of models gets larger and you want to reuse the configuration. We will discuss both ways in this guide.
-For both ways of interacting with the `CrossValidation` class instance, a `ModelMappingDict` is created internally and stored to the instance's `config` attribute. The core function `cross_validate` then just iterates over the `ModelMappingDict` and fits every model to the data. As additional benefit, this provides extensive logging, results summaries and useful information such as progress bars for all layers of processes.
+`flexcv` offers two ways of passing multiple models in set-up to our CrossValidation interface class. You either can call `add_model()` multiple times on the class instance or you can pass multiple models to `set_models()` to set a configuration for multiple models at once. The latter may be the preferred way of doing it when the number of models gets larger and you want to reuse the configuration. We will discuss both ways in this guide.
+
+For both ways of interacting with the `CrossValidation` class instance, a `ModelMappingDict` is created internally and stored to the instance's `config` attribute. 
+Since both `add_model()` and `set_models()` are updating the same attribute of the class instance, you can use both ways in combination. This is especially useful when you want to add a model to a configuration that you already set up using `set_models()`.
+
+In `CrossValidation.perform` the core function `cross_validate` is called and iterates over the keys in `ModelMappingDict` and fits every model to the data. As additional benefit, this provides extensive logging, results summaries and useful information such as progress bars for all layers of processes.
+
+### Using add_model()
 
 So let's start with the way of adding two models the way we learned before. Say, we want to compare a LinearModel to a RandomForestRegressor.
 Thats as simple as this:
@@ -18,7 +24,7 @@ from flexcv.synthesizer import generate_regression
 
 # lets start with generating some clustered data
 X, y, group, random_slopes =generate_regression(
-    10,100,n_slopes=1,noise_level=9.1e-2
+    3,100,n_slopes=1,noise_level=9.1e-2
 )
 # define our hyperparameters for the random forest
 params = {
@@ -35,7 +41,7 @@ cv =CrossValidation()
 )
 ```
 
-## Configuration using yaml
+### Configuration using yaml
 
 A great and convenient method to configure multiple models at once is passing yaml-code to the interface.
 This is especially useful when you want to reuse the configuration for multiple runs and save it to a file.
@@ -163,8 +169,7 @@ cv.set_models(yaml_path="my_yaml.yaml")
 
 ```
 
-
-## Configuration using a ModelMappingDict
+### Configuration using a ModelMappingDict
 
 Of course, when you want to compare a larger number of models you can assign them to a customized ModelMappingDict directly and pass the mapping directly to the `.set_models` method.
 
@@ -206,8 +211,6 @@ model_map = ModelMappingDict(
                     ),
                 "post_processor": mp.RandomForestModelPostProcessor,
                 "requires_inner_cv": True,
-                "add_merf": True,
-
                 },
             }
         )
@@ -219,3 +222,6 @@ cv = CrossValidation()
 cv.set_models(model_map)
 
 ```
+
+In this guide you learned several ways to set up your models for cases where you want to compare multiple models in the same run. You have seen how to use the `add_model()` method, how to use yaml configuration and how to use a `ModelMappingDict` to set up your models. You can use all of these methods in combination to set up your models and to fully customize your cross validation setup.
+This makes it easy to compare multiple models on your data and to find the best model for your use case. A big help is the neptune integration that we provide. You can find a more detailled guide on how to use it [here](neptune-integration.md).

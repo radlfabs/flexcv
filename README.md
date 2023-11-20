@@ -6,6 +6,11 @@
   </tr>
 </table>
 
+[![tests](https://github.com/radlfabs/flexcv/actions/workflows/test.yml/badge.svg)](https://github.com/radlfabs/flexcv/actions/workflows/test.yml)
+
+<!-- Pytest Coverage Comment:Begin -->
+<!-- Pytest Coverage Comment:End -->
+
 Authors: Fabian Rosenthal, Patrick Blättermann and Siegbert Versümer
 
 ## Introduction
@@ -117,4 +122,4 @@ We welcome contributions to this repository. Feel free to open an issue or pull 
 
 ## About
 
-`flexcv` was developed at the [Institute of Sound and Vibration Engineering](https://isave.hs-duesseldorf.de/) at the University of Applied Science Düsseldorf, Germany. However, it's maintainers are not affiliated with the university anymore. The package is maintained by Fabian Rosenthal.
+`flexcv` was developed at the [Institute of Sound and Vibration Engineering](https://isave.hs-duesseldorf.de/) at the University of Applied Science Düsseldorf, Germany and is now published and maintained by Fabian Rosenthal as a personal project.

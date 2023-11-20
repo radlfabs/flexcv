@@ -1,6 +1,6 @@
 ## Neptune Integration
 
-Neptune is a cutting edge MLOps framework that allows you to track your experiments and models in a reproducible way. `flexcv`` deeply integrates neptune in order to track experiments all along the nested cross validation pipelines. You can find more information about Neptune [here](https://neptune.ai/). We highly recommend registering for a free account and trying it out.
+Neptune is a cutting edge MLOps framework that allows you to track your experiments and models in a reproducible way. `flexcv`` deeply integrates neptune in order to track experiments all along the nested cross validation pipelines. You can find more information about Neptune [here](https://neptune.ai/). We highly recommend registering for a free account and trying it out. You can find our neptune project that we use for testing [here](https://ui.neptune.ai/radlfabs/flexcv-testing).
 
 
 ### What you get
@@ -41,6 +41,8 @@ And here is an example of a plot of the training statistics for the MERF class:
 
 ![neptune experiment](../images/neptune_merf.png)
 
+Learn more about working with [MERF models](random_effects.md#MERF).
+
 ##### Optuna Hyperparameter Tuning
 
 Thanks to the integration of optuna, you can also inspect the hyperparameter tuning process.
@@ -67,13 +69,14 @@ from flexcv.synthesizer import generate_regression
 
 
 X, y, _, _ =generate_regression(
-    10, 100, n_slopes=1, noise_level=9.1e-2
+    3, 25, n_slopes=1, noise_level=9.1e-2
 )
 
 yaml_config = """
 RandomForest:
   model: sklearn.ensemble.RandomForestRegressor
   post_processor: flexcv.model_postprocessing.RandomForestModelPostProcessor
+  requires_inner_cv: false
 """
 
 # create neptune run object and pass your project name
@@ -85,12 +88,70 @@ results = (
     cv.set_data(X, y)
     # pass the run object to the CrossValidation instance and set flag for additional plots
     .set_run(run, diagnostics=True)
+    .set_splits(n_splits_out=3)
     #... do some configuration
     .set_models(yaml_string=yaml_config)
     .perform()
     .get_results()
 )
+run.stop()
 
 # it's good practice to stop the run after you are done
 run.stop()
 ```
+
+## Fitting an XGBoost Regressor with Neptune Integration
+
+This example shows how to fit an XGBoost Regressor and visualize the training and evaluation with the Neptune-XGBoost integration.
+We are using the `generate_regression` function from the `flexcv.synthesizer` module to generate a regression dataset with 3 features and 1000 samples.
+We are fitting a `XGBRegressor` using the `XGBNeptuneCallback` callback from the Neptune integration.
+The callback is initialized with the Neptune run and a base namespace which is used to organize the Neptune channels.
+We pass everything to the `CrossValidation` class and call the `perform` method to start the cross validation.
+For additional logging we still use a custom PostProcessor which is passed to the `CrossValidation` class.
+In it we generate some nice-looking beeswarm shap-plots that help us further undestand the model. 
+
+```python
+from xgboost import XGBRegressor
+import neptune
+from neptune.integrations.xgboost import NeptuneCallback as XGBNeptuneCallback
+from flexcv import CrossValidation
+from flexcv.synthesizer import generate_regression
+
+X, y, _, _ = generate_regression(3, 25)
+
+# init a neptune run in our project
+run = neptune.init_run(project="radlfabs/flexcv-testing")
+
+# instantiate our xgboost model
+model = XGBRegressor
+
+# initialize the callback with the neptune run and a base namespace
+# plots, metrics and parameters that are logged by the callback will be organized in this namespace
+callback = XGBNeptuneCallback(
+    run=run, 
+    base_namespace=f"XGBRegressor/Callback", 
+)
+
+_ = (
+    CrossValidation()
+    .set_run(run, diagnostics=True)
+    .set_data(X, y)
+    .set_splits(n_splits_out=3, break_cross_val=True)
+    # add the callback to the model, remember, that callbacks expects a list of callbacks
+    # that way you can easily add multiple callbacks to the model (e.g. for early stopping)
+    .add_model(model, callbacks=[callback])  
+    .perform()
+)
+
+run.stop()
+```
+Now let's take a look at the Neptune dashboard. In just a couple of lines of code we have logged a lot of information.
+
+Here is the plot for the shap values:
+![neptune experiment](../images/neptune_xgb_shap.png)
+
+The regression summary from the neptune-sklearn integration is doing a great job at offering plots for model fit:
+![neptune experiment](../images/xgboost_regr_error.png)
+
+
+In this guide you learned how to leverage the Neptune integration to log your experiments and models in a reproducible way. The `flexcv` integration with neptune is a great way to benefit from experiment tracking, especially when configuration gets more complex, you are dealing with multiple models of different types or you are using nested cross validation. Then it is very easy to lose track of your experiments and models. Neptune helps you to keep track of everything and offers a great dashboard to explore your results.

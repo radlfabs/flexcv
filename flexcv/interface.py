@@ -3,29 +3,29 @@ This module contains the CrossValidation class. This class is the central interf
 """
 import inspect
 import logging
+import pathlib
 import warnings
 from dataclasses import dataclass
 from pprint import pformat
-from typing import Iterator
-import pathlib
+from typing import Iterator, Optional, Sequence
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 from neptune.metadata_containers.run import Run as NeptuneRun
 from neptune.types import File
 from sklearn.model_selection import BaseCrossValidator
+from xgboost.callback import TrainingCallback
 
 from .core import cross_validate
 from .metrics import MetricsDict
+from .model_mapping import ModelConfigDict, ModelMappingDict
+from .model_postprocessing import ModelPostProcessor
 from .model_selection import ObjectiveScorer
 from .results_handling import CrossValidationResults
+from .run import Run as DummyRun
 from .split import CrossValMethod, string_to_crossvalmethod
 from .utilities import add_module_handlers, run_padding
-from .model_mapping import ModelConfigDict, ModelMappingDict
-from .run import Run as DummyRun
-from .model_postprocessing import ModelPostProcessor
 from .yaml_parser import read_mapping_from_yaml_file, read_mapping_from_yaml_string
-
 
 logger = logging.getLogger(__name__)
 add_module_handlers(logger)
@@ -365,7 +365,12 @@ class CrossValidation:
         yaml_string: str = None,
     ):
         """Set your models and related parameters. Pass a ModelMappingDict or pass yaml code or a path to a yaml file.
-
+        The mapping attribute of the class is a ModelMappingDict that contains a ModelConfigDict for each model.
+        The class attribute self.config["mapping"] is always updated in this method. 
+        Therefore, you can call this method multiple times to add models to the mapping.
+        You can also call set_models() with a ModelMappingDict and then call set_models() again with yaml code or a path to a yaml file or after you already called add_models().
+        
+        
         Args:
           mapping (ModelMappingDict[str, ModelConfigDict]): Dict of model names and model configurations. See ModelMappingDict for more information. (Default value = None)
           yaml_path (str | pathlib.Path): Path to a yaml file containing a model mapping. See flexcv.yaml_parser for more information. (Default value = None)
@@ -390,7 +395,7 @@ class CrossValidation:
             ```python
             >>> from flexcv import CrossValidation
             >>> cv = CrossValidation()
-            >>> cv.set_models(path="path/to/your/yaml/file")
+            >>> cv.set_models(yaml_path="path/to/your/yaml/file")
             ```
             This will automatically read the yaml file and create a ModelMappingDict.
             It even takes care of the imports and instantiates the classes of model, postprocessor and for the optune distributions.
@@ -404,26 +409,23 @@ class CrossValidation:
             raise ValueError(
                 "You must provide either mapping, yaml_path or yaml_string, not multiple"
             )
-
+        
         if mapping is not None:
             if not isinstance(mapping, ModelMappingDict):
                 raise TypeError("mapping must be a ModelMappingDict")
-
-            self.config["mapping"] = mapping
+            self.config["mapping"].update(mapping)
 
         elif yaml_path is not None:
             if not isinstance(yaml_path, str) and not isinstance(
                 yaml_path, pathlib.Path
             ):
                 raise TypeError("yaml_path must be a string or pathlib.Path")
-
-            self.config["mapping"] = read_mapping_from_yaml_file(yaml_path)
+            self.config["mapping"].update(read_mapping_from_yaml_file(yaml_path))
 
         elif yaml_string is not None:
             if not isinstance(yaml_string, str):
                 raise TypeError("yaml_string must be a string")
-
-            self.config["mapping"] = read_mapping_from_yaml_string(yaml_string)
+            self.config["mapping"].update(read_mapping_from_yaml_string(yaml_string))
 
         return self
 
@@ -547,6 +549,9 @@ class CrossValidation:
         model_name: str = "",
         post_processor: ModelPostProcessor = None,
         params: dict = None,
+        callbacks: Optional[Sequence[TrainingCallback]] = None,
+        model_kwargs: dict = None,
+        fit_kwargs: dict = None,
         **kwargs,
     ):
         """Add a model to the model mapping dict.
@@ -557,7 +562,10 @@ class CrossValidation:
           requires_inner_cv (bool): Whether or not the model requires inner cross validation. (Default value = False)
           model_name (str): The name of the model. Used for logging.
           post_processor (ModelPostProcessor): A post processor to be applied to the model. (Default value = None)
-          **kwargs: Arbitrary keyword arguments. Will be passed to the ModelConfigDict.
+          callbacks (Optional[Sequence[TrainingCallback]]): Callbacks to be passed to the fit method of the model in outer CV. (Default value = None)
+          kwargs: A dict of additional keyword arguments that will be passed to the model constructor.
+          fit_kwargs: A dict of keyword arguments that will be passed to the model fit method.
+          **kwargs: Arbitrary keyword arguments that will be passed to the ModelConfigDict.
 
         Returns:
             (CrossValidation): self
@@ -605,11 +613,37 @@ class CrossValidation:
         if params is not None and not isinstance(params, dict):
             raise TypeError("params must be a dict")
 
+        # check if post_processor is a class that inherits ModelPostProcessor object that is not instantiated
+        if post_processor and not issubclass(post_processor, ModelPostProcessor):
+            raise TypeError("post_processor must be a ModelPostProcessor")
+
+        # params and kwargs may not contain the same keys
+        if kwargs is not None and not isinstance(kwargs, dict):
+            raise TypeError("kwargs must be a dict")
+
+        if (
+            kwargs is not None
+            and params is not None
+            and (set(params.keys()) & set(kwargs.keys()))
+        ):
+            raise ValueError(
+                "params and additional kwargs may not contain the same keys"
+            )
+
+        if callbacks is not None and not isinstance(callbacks, Sequence):
+            raise TypeError("callbacks must be a Sequence of TrainingCallbacks")
+
         if requires_inner_cv and params is None:
             warnings.warn(
                 f"You did not provide hyperparameters for the model {model_name} but set requires_inner_cv to True.",
                 UserWarning,
             )
+
+        if model_kwargs is not None and not isinstance(model_kwargs, dict):
+            raise TypeError("model_kwargs must be a dict")
+
+        if fit_kwargs is not None and not isinstance(fit_kwargs, dict):
+            raise TypeError("fit_kwargs must be a dict")
 
         if not requires_inner_cv and params is not None and params != {}:
             requires_inner_cv = True
@@ -620,27 +654,27 @@ class CrossValidation:
         if not model_name:
             model_name = model_class.__name__
 
-        # check if post_processor is a class that inherits ModelPostProcessor object that is not instantiated
-        if post_processor and not issubclass(post_processor, ModelPostProcessor):
-            raise TypeError("post_processor must be a ModelPostProcessor")
+        if model_kwargs is None:
+            model_kwargs = {}
 
-        # params and kwargs may not contain the same keys
-        if kwargs is not None and not isinstance(kwargs, dict):
-            raise TypeError("kwargs must be a dict")
-
-        if kwargs is not None and (set(params.keys()) & set(kwargs.keys())):
-            raise ValueError(
-                "params and additional kwargs may not contain the same keys"
-            )
+        if fit_kwargs is None:
+            fit_kwargs = {}
 
         if kwargs is None:
             kwargs = {}
+
+        callbacks_dict = {}
+        if callbacks is not None:
+            callbacks_dict = {"callbacks": callbacks}
 
         config_dict = {
             "model": model_class,
             "post_processor": post_processor,
             "requires_inner_cv": requires_inner_cv,
             "params": params,
+            "callbacks": callbacks_dict,
+            "fit_kwargs": fit_kwargs,
+            "model_kwargs": model_kwargs,
             **kwargs,
         }
 
@@ -688,6 +722,9 @@ class CrossValidation:
         self.config["n_trials"] = self.config.setdefault("n_trials", 100)
 
         for model_key, inner_dict in self.config["mapping"].items():
+            if "fit_kwargs" not in inner_dict:
+                self.config["mapping"][model_key]["fit_kwargs"] = {}
+
             if "n_trials" not in inner_dict:
                 self.config["mapping"][model_key]["n_trials"] = self.config["n_trials"]
 
@@ -711,7 +748,11 @@ class CrossValidation:
                 "formula" in model_fit_signature_parameters
             )
 
-            self.config["mapping"][model_key]["model_kwargs"] = {}
+            if (
+                "model_kwargs" not in self.config["mapping"][model_key]
+            ):  # TODO test case
+                self.config["mapping"][model_key]["model_kwargs"] = {}
+
             if "n_jobs" in model_signature_parameters:
                 self.config["mapping"][model_key]["model_kwargs"][
                     "n_jobs"
@@ -857,6 +898,7 @@ class CrossValidation:
 
 if __name__ == "__main__":
     import numpy as np
+
     from .models import LinearModel
     from .synthesizer import generate_regression
 
