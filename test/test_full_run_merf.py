@@ -1,6 +1,6 @@
 import numpy as np
 import optuna
-from data import DATA_TUPLE_3_25
+from flexcv._data import DATA_TUPLE_3_25
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.svm import SVR
 from xgboost import XGBRegressor
