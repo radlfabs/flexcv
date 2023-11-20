@@ -1,6 +1,6 @@
-# flexcv 23.0.0
+# flexcv v23.0-beta
 
-## Initial Release
+## Initial Beta Release
 
 Welcome to the first release of flexcv! This version marks the beginning of a powerful and versatile library designed to simplify nested cross validation tasks in Python.
 

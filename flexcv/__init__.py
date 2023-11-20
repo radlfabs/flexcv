@@ -3,7 +3,7 @@ from .interface import CrossValidation
 from .model_mapping import ModelMappingDict, ModelConfigDict
 from .repeated import RepeatedCV
 
-__version__ = "23.0.0"
+__version__ = "v23.0-beta"
 
 __all__ = [
     "CrossValidation",
