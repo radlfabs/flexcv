@@ -365,7 +365,12 @@ class CrossValidation:
         yaml_string: str = None,
     ):
         """Set your models and related parameters. Pass a ModelMappingDict or pass yaml code or a path to a yaml file.
-
+        The mapping attribute of the class is a ModelMappingDict that contains a ModelConfigDict for each model.
+        The class attribute self.config["mapping"] is always updated in this method. 
+        Therefore, you can call this method multiple times to add models to the mapping.
+        You can also call set_models() with a ModelMappingDict and then call set_models() again with yaml code or a path to a yaml file or after you already called add_models().
+        
+        
         Args:
           mapping (ModelMappingDict[str, ModelConfigDict]): Dict of model names and model configurations. See ModelMappingDict for more information. (Default value = None)
           yaml_path (str | pathlib.Path): Path to a yaml file containing a model mapping. See flexcv.yaml_parser for more information. (Default value = None)
@@ -404,26 +409,26 @@ class CrossValidation:
             raise ValueError(
                 "You must provide either mapping, yaml_path or yaml_string, not multiple"
             )
-
+        
         if mapping is not None:
             if not isinstance(mapping, ModelMappingDict):
                 raise TypeError("mapping must be a ModelMappingDict")
 
-            self.config["mapping"] = mapping
+            self.config["mapping"].update(mapping)
 
         elif yaml_path is not None:
             if not isinstance(yaml_path, str) and not isinstance(
                 yaml_path, pathlib.Path
             ):
                 raise TypeError("yaml_path must be a string or pathlib.Path")
-
-            self.config["mapping"] = read_mapping_from_yaml_file(yaml_path)
+            
+            self.config["mapping"].update(read_mapping_from_yaml_file(yaml_path))
 
         elif yaml_string is not None:
             if not isinstance(yaml_string, str):
                 raise TypeError("yaml_string must be a string")
 
-            self.config["mapping"] = read_mapping_from_yaml_string(yaml_string)
+            self.config["mapping"].update(read_mapping_from_yaml_string(yaml_string))
 
         return self
 

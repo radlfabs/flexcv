@@ -44,6 +44,7 @@ dev = [
   "mkdocstrings",
   "mktestdocs",
   "mkdocs-material",
+  "mkdocstrings-python",
   "check-manifest",
   "pip-tools",
   "twine",
