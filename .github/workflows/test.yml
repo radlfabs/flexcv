@@ -39,7 +39,7 @@ jobs:
       
     - name: Run PyTest 
       run: |
-        pytest .. --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=flexcv test/ | tee pytest-coverage.txt
+        pytest .. --junitxml=pytest.xml --cov-report json:cov.json --cov-report=term-missing:skip-covered --cov=flexcv test/ | tee pytest-coverage.txt
 
     - name: Pytest coverage comment
       uses: MishaKav/pytest-coverage-comment@main
@@ -47,4 +47,10 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         pytest-coverage-path: ./pytest-coverage.txt
         junitxml-path: ./pytest.xml
+
+    - name: Update Coverage Badge
+      # GitHub actions: default branch variable
+      # https://stackoverflow.com/questions/64781462/github-actions-default-branch-variable
+      if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+      uses: we-cli/coverage-badge-action@main
           
