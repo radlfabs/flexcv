@@ -37,9 +37,6 @@ jobs:
     environment:
       name: pypi
       url: https://pypi.org/p/flexcv  # Replace <package-name> with your PyPI project name
-      with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
 
@@ -102,8 +99,8 @@ jobs:
     runs-on: ubuntu-latest
 
     environment:
-      name: test-pypi
-      url: https://test.pypi.org/p/<package-name>
+      name: testpypi
+      url: https://test.pypi.org/p/flexcv
 
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
