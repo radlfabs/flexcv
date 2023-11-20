@@ -1,6 +1,6 @@
 <table>
   <tr>
-    <td><img src="https://github.com/radlfabs/flexcv/blob/f5601995ede63e1632c81794531247c882bf34b9/imgs/logo_colored.png" width="200"></td>
+    <td><img src="https://github.com/radlfabs/flexcv/blob/main/imgs/logo_colored.png?raw=true" width="200"></td>
     <td><h1>Flexible Cross Validation and Machine Learning for Regression on Tabular Data
 </h1></td>
   </tr>
