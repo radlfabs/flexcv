@@ -1,6 +1,6 @@
 <table>
   <tr>
-    <td><img src="docs/images/logo_colored.png" width="200"></td>
+    <td><img src="https://github.com/radlfabs/flexcv/blob/main/imgs/logo_colored.png?raw=true" width="200"></td>
     <td><h1>Flexible Cross Validation and Machine Learning for Regression on Tabular Data
 </h1></td>
   </tr>
@@ -8,8 +8,6 @@
 
 [![tests](https://github.com/radlfabs/flexcv/actions/workflows/test.yml/badge.svg)](https://github.com/radlfabs/flexcv/actions/workflows/test.yml)
 
-<!-- Pytest Coverage Comment:Begin -->
-<!-- Pytest Coverage Comment:End -->
 
 Authors: Fabian Rosenthal, Patrick Blättermann and Siegbert Versümer
 
