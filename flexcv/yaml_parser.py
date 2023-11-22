@@ -135,7 +135,7 @@ def read_mapping_from_yaml_file(yaml_file_path: str) -> ModelMappingDict:
         The imports are done by the importlib module.
 
     Args:
-        yaml_code (str): The yaml code.
+        yaml_file_path (str): The yaml file path.
 
     Returns:
         (ModelMappingDict): A dictionary of ModelConfigDict objects.

@@ -96,4 +96,5 @@ nav:
     - Plotting: reference/plotting.md
     - Utilities: reference/utilities.md
     - Data Synthesis: reference/synthesis.md
+    - YAML Parser: reference/yaml.md
   - About: about.md
