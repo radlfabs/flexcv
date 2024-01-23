@@ -1,3 +1,10 @@
+# flexcv v24.0-beta
+
+## Bug Fixes
+- Fix: [#41](https://github.com/radlfabs/flexcv/issues/41) is fixed by pinning `scipy` to version <1.12. The problem was in neptune-sklearn's dependency scikit-plot, which is not compatible with scipy >=1.12 and no longer actively maintained. This is a temporary fix until neptune-sklearn or scikit-plot is updated.
+
+
+
 # flexcv v23.0.1-beta
 
 ## Fixing Stuff in Beta
