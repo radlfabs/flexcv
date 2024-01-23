@@ -39,6 +39,7 @@ dependencies = [
   "neptune-xgboost >= 1.1.1",
   "neptune-sklearn >= 2.1.0",
   "pyyaml",
+  "scipy < 1.12",
 ]
 requires-python = ">=3.10,<3.12"
 
