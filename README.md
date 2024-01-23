@@ -67,7 +67,7 @@ from flexcv.synthesizer import generate_regression
 from flexcv.models import LinearModel
   
 # generate some random sample data that is clustered
-X, y, group, _ = generate_regression(10, 100, n_slopes=1, noise_level=9.1e-2, random_seed=42)
+X, y, group, _ = generate_regression(10, 100, 5, n_slopes=1, noise_level=9.1e-2, random_seed=42)
 ```
 
 The `CrossValidation` class is the core of this package. It holds all the information about the data, the models, the cross validation splits and the results. It is also responsible for performing the cross validation and logging the results. Setting up the `CrossValidation` object is easy. We can use method chaining to set up our configuration and perform the cross validation. You might be familiar with this pattern from `pandas` and other packages. The set-methods all return the `CrossValidation` object itself, so we can chain them together. The `perform` method then performs the cross validation and returns the `CrossValidation` object again. The `get_results` method returns a `CrossValidationResults` object which holds all the results of the cross validation. It has a `summary` property which returns a `pandas.DataFrame` with all the results. We can then use the `to_excel` method of the `DataFrame` to save the results to an excel file.
