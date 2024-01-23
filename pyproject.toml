@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "flexcv"
-version = "v23.0.1-beta"
+version = "v24.0-beta"
 description = "Easy and flexible nested cross validation for tabular data in python."
 readme = "README.md"
 
@@ -108,7 +108,7 @@ addopts = ["-rf", "--import-mode=importlib"]
 filterwarnings = ["ignore:jsonschema.RefResolver is deprecated:DeprecationWarning"]
 
 [tool.bumpver]
-current_version = "v23.0.1-beta"
+current_version = "v24.0-beta"
 version_pattern = 'vYY.MINOR[.PATCH][-TAG]'
 commit_message = "bump version {old_version} -> {new_version}"
 tag_message = "{new_version}"
