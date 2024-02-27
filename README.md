@@ -59,8 +59,9 @@ As soon as you want to use a linear mixed effects model, you have to use the `st
 
 
 Let's set up a minimal working example using a LinearRegression estimator and some randomly generated regression data.
+The `CrossValidation` class is the core of this package. It holds all the information about the data, the models, the cross validation splits and the results. It is also responsible for performing the cross validation and logging the results. Setting up the `CrossValidation` object is easy. We can use method chaining to set up our configuration and perform the cross validation. You might be familiar with this pattern from `pandas` and other packages. The set-methods all return the `CrossValidation` object itself, so we can chain them together. The `perform` method then performs the cross validation and returns the `CrossValidation` object again. The `get_results` method returns a `CrossValidationResults` object which holds all the results of the cross validation. It has a `summary` property which returns a `pandas.DataFrame` with all the results. We can then use the `to_excel` method of the `DataFrame` to save the results to an excel file.
 
-```py
+```python
 # import the interface class, a data generator and our model
 from flexcv import CrossValidation
 from flexcv.synthesizer import generate_regression
@@ -68,11 +69,7 @@ from flexcv.models import LinearModel
   
 # generate some random sample data that is clustered
 X, y, group, _ = generate_regression(10, 100, n_slopes=1, noise_level=9.1e-2, random_seed=42)
-```
 
-The `CrossValidation` class is the core of this package. It holds all the information about the data, the models, the cross validation splits and the results. It is also responsible for performing the cross validation and logging the results. Setting up the `CrossValidation` object is easy. We can use method chaining to set up our configuration and perform the cross validation. You might be familiar with this pattern from `pandas` and other packages. The set-methods all return the `CrossValidation` object itself, so we can chain them together. The `perform` method then performs the cross validation and returns the `CrossValidation` object again. The `get_results` method returns a `CrossValidationResults` object which holds all the results of the cross validation. It has a `summary` property which returns a `pandas.DataFrame` with all the results. We can then use the `to_excel` method of the `DataFrame` to save the results to an excel file.
-
-```python
 # instantiate our cross validation class
 cv = CrossValidation()
 
@@ -81,8 +78,7 @@ results = (
     cv
     .set_data(X, y, group, dataset_name="ExampleData")
     # configure our split strategies. Lets go for a GroupKFold since our data is clustered
-    .set_splits(
-        method_outer_split=flexcv.CrossValMethod.GROUP
+    .set_splits(split_out="GroupKFold")
     # add the model class
     .add_model(LinearModel)
     .perform()
