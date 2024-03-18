@@ -32,6 +32,9 @@ def test_cross_validation_results_init():
 
 # TODO add tests for results.summary generation
 
+def test_results_repr():
+    CrossValidationResults({1: "1", 2: "2"})
+
 
 def test_get_best_model_by_metric_min():
     # Test get_best_model_by_metric method with direction="min"

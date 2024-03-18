@@ -7,6 +7,7 @@ import operator
 
 import numpy as np
 import pandas as pd
+from flexcv.utilities import pformat_dict
 
 
 def add_summary_stats(df: pd.DataFrame) -> pd.DataFrame:
